@@ -1,0 +1,1281 @@
+#!/usr/bin/tclsh
+package require Tclx
+
+# automatic
+# daemon [{display <number> | esd <server> | syslog} ...]
+# hold
+# kill
+# listen station
+# off
+# reconnect
+# set station
+# which
+
+set logLevel 2
+set defaultPlayers {vlc}
+
+keylset extensionsArray(asx) players {vlc mplayer}
+keylset extensionsArray(pls) players {xine realplay}
+keylset extensionsArray(ram) players {realplay}
+keylset extensionsArray(rm) players {realplay}
+keylset extensionsArray(rv) players {realplay}
+
+set displayCommands {
+   {Xvfb -ac -fn 7x14}
+}
+
+keylset playersArray(mplayer) provides {esd}
+keylset playersArray(realplay) requires {display} kill realplay.bin
+keylset playersArray(vlc) provides {esd rtp rtsp}
+keylset playersArray(xine) provides {esd} requires {display}
+
+proc writeStream {stream line} {
+   puts $stream $line
+   flush $stream
+}
+
+proc writeOutput {line} {
+   writeStream stdout $line
+}
+
+proc writeError {line} {
+   writeStream stderr $line
+}
+
+proc logWrite {message level} {
+   global applicationName
+   writeError "$applicationName: $message"
+}
+
+proc logEvent {message level} {
+   global logLevel
+
+   if {$level <= $logLevel} {
+      foreach line [split $message \n] {
+         logWrite $line $level
+      }
+   }
+}
+
+proc logError {message} {
+   logEvent $message 0
+}
+
+proc logWarning {message} {
+   logEvent $message 1
+}
+
+proc logNotice {message} {
+   logEvent $message 2
+}
+
+proc logInformation {message} {
+   logEvent $message 3
+}
+
+proc logDebug {message} {
+   logEvent $message 4
+}
+
+proc syntaxError {message} {
+   logError $message
+   exit 2
+}
+
+proc semanticError {message} {
+   logWarning $message
+   exit 1
+}
+
+proc systemError {message} {
+   logError $message
+   exit 3
+}
+
+proc updateData {dataVariable timeVariable extension define} {
+   global userPrefix systemPrefix
+   upvar 1 $dataVariable data
+   upvar 1 $timeVariable time
+
+   foreach prefix [list $userPrefix $systemPrefix] {
+      if {[string length $prefix] > 0} {
+         set file "$prefix.$extension"
+
+         if {[file exists $file]} {
+            if {[catch [list file stat $file status] response] == 0} {
+               if {![string equal $time $status(mtime)]} {
+                  if {[catch [list open $file {RDONLY}] stream] == 0} {
+                     set line 0
+
+                     while {[gets $stream record] >= 0} {
+                        incr line
+
+                        if {[set index [string first # $record]] >= 0} {
+                           set record [string range $record 0 [expr {$index - 1}]]
+                        }
+
+                        regsub -all "\[ \t\]+" $record " " record
+                        regsub {^ } $record {} record
+                        regsub { $} $record {} record
+
+                        if {[string length $record] == 0} {
+                           continue
+                        }
+
+                        if {![$define data [split $record " "]]} {
+                           logWarning "error on $file\[$line\]: $record"
+                        }
+                     }
+
+                     set time [fstat $stream mtime]
+                     close $stream; unset stream
+                     return 1
+                  } else {
+                     logWarning $stream
+                  }
+               }
+            } else {
+               logWarning $response
+            }
+
+            break
+         }
+      }
+   }
+
+   return 0
+}
+
+proc signalProcess {process signal} {
+   if {[catch [list kill $signal [list $process]] response] == 0} {
+      return 1
+   } else {
+      logWarning $response
+   }
+
+   return 0
+}
+
+proc testProcess {process} {
+   return [signalProcess $process 0]
+}
+
+proc stopProcess {process {executable ""}} {
+   if {[string length $process] == 0} {
+      return 0
+   }
+
+   set signal term
+   if {[string length $executable] == 0} {
+      signalProcess $process $signal
+   } elseif {[catch [list exec pkill -$signal -x $executable] response] != 0} {
+      logWarning $response
+   }
+   return 1
+}
+
+proc testCommand {path} {
+   if {[file isfile $path]} {
+      if {[file executable $path]} {
+         return 1
+      }
+   }
+
+   return 0
+}
+
+proc findCommand {name} {
+   set path ""
+
+   if {![string equal [file pathtype $name] absolute] && ([llength [file split $name]] == 1)} {
+      global env
+
+      foreach directory [split $env(PATH) :] {
+         if {[string length $directory] == 0} {
+            set directory "."
+         }
+
+         if {[testCommand [set location [file join $directory $name]]]} {
+            set path $location
+            break
+         }
+      }
+   } elseif {[testCommand $name]} {
+      set path $name
+   }
+
+   if {[string length $path] > 0} {
+      set path [file normalize $path]
+   }
+
+   return $path
+}
+
+proc startCommand {command} {
+   set nullDevice /dev/null
+   set command [concat [list exec < $nullDevice] $command]
+   lappend command > $nullDevice 2> $nullDevice
+   lappend command &
+
+   if {[catch $command processIdentifier] == 0} {
+      return $processIdentifier
+   } else {
+      logWarning $processIdentifier
+   }
+
+   return ""
+}
+
+proc startDisplay {} {
+   global env displayCommands displayNumber displayProcess
+
+   if {![info exists [set displayVariable env(DISPLAY)]]} {
+      if {[string length $displayNumber] == 0} {
+         logInformation "display number not provided"
+         return 0
+      }
+      set display ":$displayNumber"
+
+      foreach command $displayCommands {
+         if {[string length [set path [findCommand [set driver [lindex $command 0]]]]] > 0} {
+            logInformation "selected display driver: $driver"
+            set command [lreplace $command 0 0 $path $display]
+            logDebug "display command: [join $command " "]"
+
+            if {[string length [set displayProcess [startCommand $command]]] > 0} {
+               logDebug "display process: $displayProcess"
+               set $displayVariable $display
+               break
+            }
+         }
+      }
+
+      if {[string length $displayProcess] == 0} {
+         logInformation "no display driver found"
+         return 0
+      }
+   }
+
+   return 1
+}
+
+proc displayStopped {} {
+   global displayProcess
+
+   set displayProcess ""
+}
+
+proc stopDisplay {} {
+   global displayProcess
+
+   if {[stopProcess $displayProcess]} {
+      displayStopped
+      logDebug "display stopped"
+   }
+}
+
+proc setSpeaker {server variable} {
+   lassign $server host port
+
+   if {[string length $host] == 0} {
+      set host "localhost"
+   }
+
+   if {[string length $port] > 0} {
+      set port ":$port"
+   }
+
+   set ::env($variable) "$host$port"
+}
+
+proc setEsoundSpeaker {server} {
+   setSpeaker $server ESPEAKER
+}
+
+proc setPulseSpeaker {server} {
+   setSpeaker $server PULSE_SERVER
+}
+
+proc playerOperands->mplayer {mrl} {
+   global playerRequirements
+
+   set operands [list -msglevel all=2 -vo null -vc null]
+
+   if {[keylget playerRequirements esd server]} {
+      setEsoundSpeaker $server
+      lappend operands -ao sdl
+   }
+
+   lappend operands -- $mrl
+   return $operands
+}
+
+proc playerOperands->realplay {mrl} {
+   set operands [list -q]
+   lappend operands -- $mrl
+   return $operands
+}
+
+proc playerOperands->vlc {mrl} {
+   global playerRequirements
+
+   set operands [list --quiet --audio --no-video --play-and-exit]
+   set outputs [list]
+
+   if {[keylget playerRequirements esd server]} {
+      setEsoundSpeaker $server
+      lappend operands --aout sdl
+   }
+
+   if {[keylget playerRequirements rtp server]} {
+      lassign $server host port
+
+      if {[string length $host] == 0} {
+         set host "localhost"
+      }
+
+      if {[string length $port] == 0} {
+         set port 8554
+      }
+
+      lappend outputs "transcode{acodec=mp3,samplerate=44100}:rtp{dst=$host,port=$port,mux=ts}"
+   }
+
+   if {[keylget playerRequirements rtsp server]} {
+      lassign $server host port
+
+      if {[string length $host] == 0} {
+         set host ""
+      }
+
+      if {[string length $port] == 0} {
+         set port 8554
+      }
+
+      lappend outputs "transcode{acodec=mp4a,aenc=ffmpeg,samplerate=44100,ab=128,channels=2}:rtp{mp4a-latm,sdp=rtsp://$host:$port/sdp}"
+   }
+
+   if {[llength $outputs] > 0} {
+      if {[llength $outputs] == 1} {
+         set output [lindex $outputs 0]
+      } else {
+         set destinations [list]
+
+         foreach output $outputs {
+            lappend destinations "dst='$output'"
+         }
+
+         set output "duplicate\{[join $destinations ","]\}"
+      }
+
+      lappend operands --sout "#$output"
+   }
+
+   lappend operands --intf dummy
+   lappend operands -- $mrl
+
+   return $operands
+}
+
+proc playerOperands->xine {mrl} {
+   global playerRequirements
+
+   set operands [list --verbose=0 --video-driver none]
+
+   if {[keylget playerRequirements esd server]} {
+      setEsoundSpeaker $server
+      lappend operands --audio-driver esd
+   }
+
+   lappend operands -- $mrl
+   return $operands
+}
+
+proc getPlayers {mrl} {
+   global extensionsArray defaultPlayers
+
+   if {[string length [set extension [file extension $mrl]]] > 0} {
+      set extension [string range $extension 1 end]
+   }
+
+   if {!([info exists extensionsArray($extension)] && [keylget extensionsArray($extension) players players])} {
+      set players [list]
+   }
+
+   return [concat $players $defaultPlayers]
+}
+
+proc getPlayerCommand {mrl options} {
+   global playersArray playerRequirements
+
+   if {[string equal [file pathtype $mrl] absolute]} {
+      if {[file isfile $mrl] && [file executable $mrl]} {
+         set command [list $mrl]
+         lvarcat command $options
+         return $command
+      }
+   }
+
+   set requiredCapabilities [keylkeys playerRequirements]
+   set displayFailed 0
+
+   foreach player [getPlayers $mrl] {
+      if {[llength $requiredCapabilities] > 0} {
+         if {![info exists playersArray($player)]} {
+            continue
+         }
+
+         if {![keylget playersArray($player) provides providedCapabilities]} {
+            continue
+         }
+
+         if {[llength [lindex [intersect3 $requiredCapabilities $providedCapabilities] 0]] > 0} {
+            continue
+         }
+      }
+
+      if {[string length [set path [findCommand $player]]] == 0} {
+         logInformation "player not installed: $player"
+         continue
+      }
+
+      if {[llength [info procs [set makeOperands playerOperands->$player]]] != 1} {
+         logInformation "player not supported: $player"
+         continue
+      }
+
+      if {!([info exists playersArray($player)] && [keylget playersArray($player) requires requires])} {
+         set requires [list]
+      }
+
+      if {[lsearch -exact $requires display] >= 0} {
+         if {$displayFailed} {
+            continue
+         }
+
+         if {![startDisplay]} {
+            set displayFailed 1
+            continue
+         }
+      }
+
+      logInformation "selected player: $player"
+      set command [list $path]
+      lvarcat command [$makeOperands $mrl]
+      return $command
+   }
+
+   logWarning "no eligible player found"
+   return [list]
+}
+
+proc startPlayer {station} {
+   global playersArray
+   global playerProcess playerKill
+
+   set mrl [keylget station mrl]
+   set options [keylget station options]
+   set command [getPlayerCommand $mrl $options]
+
+   if {[llength $command] > 0} {
+      logDebug "player command: [join $command " "]"
+      set player [file tail [lindex $command 0]]
+
+      if {[string length [set playerProcess [startCommand $command]]] > 0} {
+         logDebug "player process: $playerProcess"
+
+         if {[info exists playersArray($player)] && [keylget playersArray($player) kill kill]} {
+            set playerKill $kill
+         }
+
+         return 1
+      }
+   }
+
+   return 0
+}
+
+proc playerStopped {} {
+   global playerProcess playerKill
+
+   set playerProcess ""
+   set playerKill ""
+}
+
+proc stopPlayer {} {
+   global playerProcess playerKill
+
+   if {[stopProcess $playerProcess $playerKill]} {
+      playerStopped
+      logDebug "player stopped"
+   }
+}
+
+proc getStationDefinition {definitionVariable reference} {
+   global stationsArray
+   upvar 1 $definitionVariable definition
+
+   if {[info exists stationsArray($reference)]} {
+      set definition $stationsArray($reference)
+      return 1
+   }
+
+   set file $reference
+   if {[set colon [string first : $reference]] >= 0} {
+      set slash [string first / $reference]
+
+      if {($slash < 0) || ($slash > $colon)} {
+         set scheme [string range $reference 0 [expr {$colon - 1}]]
+
+         if {![string equal $scheme file]} {
+            keylset definition mrl $reference
+            return 1
+         }
+
+         set file [string range $reference [expr {$colon + 1}] end]
+         if {[regexp {^//([^:/]*)(:[^/]*)?(/.*)$} $file x host port path]} {
+            set file $path
+
+            if {[string length $host] > 0} {
+               set file "/net/$host$path"
+            }
+
+            if {[string length $port] > 0} {
+               return 0
+            }
+         }
+      }
+   }
+
+   if {[file isfile [set file [file normalize $file]]]} {
+      keylset definition mrl "file://$file"
+      return 1
+   }
+
+   return 0
+}
+
+proc defineStation {stationsArray fields} {
+   upvar 1 $stationsArray stations
+
+   if {[llength $fields] == 0} {
+      logWarning "missing station name"
+   } else {
+      set name [lvarpop fields]
+
+      if {[llength fields] == 0} {
+         logWarning "missing media resource locator"
+      } else {
+         keylset stations($name) mrl [lvarpop fields]
+         keylset stations($name) options $fields
+         return 1
+      }
+   }
+
+   return 0
+}
+
+proc initializeStations {stationsArray} {
+   upvar 1 $stationsArray stations
+   array set stations [list]
+}
+
+proc updateStations {} {
+   global stationsExtension stationsTime stationsArray
+
+   initializeStations newStations
+   if {[updateData newStations stationsTime $stationsExtension defineStation]} {
+      array set stationsArray [array get newStations]
+      logInformation "stations loaded"
+   }
+}
+
+proc defineKeyword {keyword unit value} {
+   global rulesKeywords
+
+   set setting [list $unit $value]
+   while {[string length $keyword] > 0} {
+      set variable rulesKeywords($keyword)
+      set keyword [string range $keyword 0 end-1]
+
+      if {[llength $setting] > 0} {
+	 if {[info exists $variable]} {
+	    set setting {}
+	 }
+      } elseif {[string length [set $variable]] == 0} {
+         break
+      }
+
+      set $variable $setting
+   }
+}
+
+proc defineKeywords {unit keywords} {
+   set value 0
+   foreach keyword $keywords {
+      defineKeyword $keyword $unit $value
+      incr value
+   }
+}
+
+proc isInteger {value} {
+   return [expr {[string is digit -strict $value] && (([string length $value] == 1) || ![string equal [string index $value 0] 0])}]
+}
+
+proc checkInteger {value name minimum maximum} {
+   if {![isInteger $value]} {
+      logWarning "invalid $name: $value"
+   } elseif {$value < $minimum} {
+      logWarning "$name less than $minimum: $value"
+   } elseif {$value > $maximum} {
+      logWarning "$name greater than $maximum: $value"
+   } else {
+      return 1
+   }
+
+   return 0
+}
+
+proc timeValue {hour minute} {
+   return [expr {($hour * 60) + $minute}]
+}
+
+proc keywordValidator {valueVariable unit} {
+   global rulesKeywords
+   upvar 1 $valueVariable value
+   set variable rulesKeywords($value)
+
+   if {[info exists $variable]} {
+      if {[string equal $unit [lindex [set $variable] 0]]} {
+         set value [lindex [set $variable] 1]
+	 return 1
+      }
+   }
+
+   logWarning "invalid $unit: $value"
+   return 0
+}
+
+proc dayValidator {valueVariable} {
+   upvar 1 $valueVariable value
+   return [keywordValidator value day]
+}
+
+proc monthValidator {valueVariable} {
+   upvar 1 $valueVariable value
+   return [keywordValidator value month]
+}
+
+proc dateValidator {valueVariable} {
+   upvar 1 $valueVariable value
+
+   if {[checkInteger $value date 1 31]} {
+      incr value -1
+      return 1
+   }
+
+   return 0
+}
+
+proc timeValidator {valueVariable} {
+   upvar 1 $valueVariable value
+
+   if {![regexp {^([0-9][0-9]):([0-9][0-9])$} $value x hour minute]} {
+      logWarning "invalid time: $value"
+   } else {
+      foreach variable {hour minute} {
+         if {[string length [set $variable [string trimleft [set $variable] 0]]] == 0} {
+	    set $variable 0
+	 }
+      }
+
+      if {[checkInteger $hour hour 0 23]} {
+	 if {[checkInteger $minute minute 0 59]} {
+	    set value [timeValue $hour $minute]
+	    return 1
+	 }
+      }
+   }
+
+   return 0
+}
+
+proc defineRule {rulesList fields} {
+   global rulesKeywords
+   upvar 1 $rulesList rules
+
+   if {[llength $fields] == 0} {
+      logWarning "missing station name"
+   } else {
+      keylset rule station [lvarpop fields]
+
+      foreach field $fields {
+         if {[set index [string first - $field]] < 0} {
+	    set first $field
+	    set last ""
+	 } else {
+	    set first [string range $field 0 [expr {$index - 1}]]
+	    set last [string range $field [expr {$index + 1}] end]
+	 }
+
+	 set unit ""
+	 set validated 0
+
+	 if {[info exists [set variable rulesKeywords($first)]]} {
+	    if {[llength [set value [set $variable]]] > 0} {
+	       lassign $value unit first
+	       set validated 1
+	    }
+	 } elseif {[string is digit $first]} {
+	    set unit date
+	 } elseif {[string first : $first] >= 0} {
+	    set unit time
+	 }
+
+	 if {[string length $unit] == 0} {
+	    logWarning "invalid qualifier: $field"
+	    return 0
+	 }
+
+	 set validator "${unit}Validator"
+	 if {!$validated} {
+	    if {![$validator first]} {
+	       return 0
+	    }
+	 }
+
+	 if {[string length $last] == 0} {
+	    set last $first
+	 } else {
+	    if {![$validator last]} {
+	       return 0
+	    }
+
+	    if {$last < $first} {
+	       logWarning "negative $unit range: $field"
+	       return 0
+	    }
+	 }
+
+	 if {[info exists $unit]} {
+	    foreach range [set $unit] {
+	       if {($first <= [lindex $range 1]) && ($last >= [lindex $range 0])} {
+	          logWarning "overlapping $unit range: $field"
+		  return 0
+	       }
+	    }
+	 }
+
+	 lappend $unit [list $first $last]
+      }
+
+      foreach unit {time day date month} {
+         if {[info exists $unit]} {
+	    keylset rule $unit [set $unit]
+	 }
+      }
+
+      lappend rules $rule
+      return 1
+   }
+
+   return 0
+}
+
+proc initializeRules {rulesList} {
+   upvar 1 $rulesList rules
+   set rules [list]
+}
+
+proc updateRules {} {
+   global rulesExtension rulesTime rulesList
+
+   initializeRules newRules
+   if {[updateData newRules rulesTime $rulesExtension defineRule]} {
+      set rulesList $newRules
+      logInformation "rules loaded"
+   }
+}
+
+proc testRule {rule time date month day} {
+   foreach unit {time date month day} {
+      if {[keylget rule $unit ranges]} {
+	 set value [set $unit]
+	 set found 0
+
+	 foreach range $ranges {
+	    lassign $range first last
+
+	    if {($value >= $first) && ($value <= $last)} {
+	       set found 1
+	       break
+	    }
+	 }
+
+	 if {!$found} {
+	    return 0
+	 }
+      }
+   }
+
+   return 1
+}
+
+proc selectStation {} {
+   global holdFile rulesList
+
+   if {[file exists $holdFile]} {
+      if {[catch [list open $holdFile {RDONLY}] holdStream] == 0} {
+         set station [gets $holdStream]
+         close $holdStream
+         return $station
+      } else {
+         logWarning $holdStream
+      }
+
+      unset holdStream
+   }
+
+   foreach variable {minute hour date month day} value [split [clock format [clock seconds] -format "%M.%H.%d.%m.%w"] .] {
+      set $variable [regsub {^0*(\d+?)$} $value {\1}]
+   }
+
+   set time [timeValue $hour $minute]
+   incr date -1
+   incr month -1
+
+   updateRules
+   foreach rule $rulesList {
+      if {[testRule $rule $time $date $month $day]} {
+	 return [keylget rule station]
+      }
+   }
+
+   return ""
+}
+
+proc changeStation {} {
+   global currentStation noStation
+
+   if {[string equal [set newStation [selectStation]] $noStation]} {
+      set newStation ""
+   }
+
+   if {![string equal $newStation $currentStation]} {
+      set log "station change: "
+      append log [expr {([string length $currentStation] > 0)? $currentStation: $noStation}]
+      append log " -> "
+      append log [expr {([string length $newStation] > 0)? $newStation: $noStation}]
+      logNotice $log
+
+      stopPlayer
+      set currentStation ""
+
+      if {[string length $newStation] > 0} {
+         updateStations
+
+         if {[getStationDefinition stationDefinition $newStation]} {
+            if {[startPlayer $stationDefinition]} {
+               set currentStation $newStation
+            }
+         } else {
+            logWarning "station not defined: $newStation"
+         }
+      }
+
+      if {[string length $currentStation] == 0} {
+         logNotice "$noStation"
+      }
+   }
+}
+
+proc stationChanger {} {
+   changeStation
+
+   set interval 60
+   set now [clock seconds]
+   after [expr {($interval - ($now % $interval)) * 1000}] {
+      stationChanger
+   }
+}
+
+proc idler {} {
+   after 1000000 [list idler]
+}
+
+proc signalDaemon {signal} {
+   global processFile
+
+   if {[file exists $processFile]} {
+      if {[catch [list open $processFile {RDONLY}] processStream] == 0} {
+         flock -read $processStream
+         set processIdentifier [gets $processStream]
+         funlock $processStream
+         close $processStream; unset processStream
+
+         if {[string is digit -strict $processIdentifier]} {
+            if {[signalProcess $processIdentifier $signal]} {
+               return 1
+            }
+         } else {
+            logWarning "corrupt PID file"
+         }
+      } else {
+         logWarning $processStream
+      }
+   } else {
+      logWarning "daemon not running"
+   }
+
+   logNotice "daemon not notified"
+   return 0
+}
+
+proc changedStation {} {
+   signalDaemon usr1
+}
+
+proc setStation {station} {
+   global holdFile
+
+   if {[catch [list open $holdFile {WRONLY TRUNC CREAT}] stream] != 0} {
+      systemError $stream
+   }
+
+   puts $stream $station
+   close $stream; unset stream
+   changedStation
+}
+
+proc monitorSignals {signals code} {
+   signal trap $signals [list after 0 $code]
+}
+
+proc reapProcesses {} {
+   global currentStation noStation
+   global returnCode playerProcess displayProcess
+
+   while {[catch [list wait -nohang] response] == 0} {
+      if {[llength $response] == 0} {
+         break
+      }
+
+      lassign $response process type value
+      logDebug "child terminated: $process: $type $value"
+
+      if {[string length $playerProcess] > 0} {
+         if {$process == $playerProcess} {
+            playerStopped
+            logDebug "player stopped"
+
+            if {[info exists currentStation]} {
+               set currentStation ""
+               logNotice "$noStation"
+            } else {
+               set returnCode 0
+            }
+
+            continue
+         }
+      }
+
+      if {[string length $displayProcess] > 0} {
+         if {$process == $displayProcess} {
+            displayStopped
+            logDebug "display stopped"
+            continue
+         }
+      }
+   }
+}
+
+proc doRadio {code} {
+   playerStopped
+   displayStopped
+
+   monitorSignals {int quit term} {
+      set ::returnCode 0
+   }
+
+   monitorSignals {chld} {
+      reapProcesses
+   }
+
+   uplevel 1 $code
+   vwait ::returnCode
+
+   stopPlayer
+   stopDisplay
+}
+
+proc verifyStation {reference {definitionVariable ""}} {
+   if {[string length $definitionVariable] > 0} {
+      upvar 1 $definitionVariable definition
+   }
+
+   updateStations
+
+   if {![getStationDefinition definition $reference]} {
+      semanticError "station not defined: $reference"
+   }
+}
+
+proc nextOperand {operandsList {operandVariable ""}} {
+   upvar 1 $operandsList operands
+
+   if {[llength $operands] == 0} {
+      return 0
+   }
+
+   if {[string length $operandVariable] > 0} {
+      upvar 1 $operandVariable operand
+      set operand [lvarpop operands]
+   }
+
+   return 1
+}
+
+proc operandsDone {operandsList} {
+   upvar 1 $operandsList operands
+
+   if {[nextOperand operands]} {
+      syntaxError "too many operands"
+   }
+}
+
+proc processRadioOptions {operandsList} {
+   global playerRequirements displayNumber
+   upvar 1 $operandsList operands
+
+   set useSyslog 0
+   set playerRequirements [list]
+   set displayNumber ""
+
+   while {[nextOperand operands option]} {
+      switch -exact -- $option {
+         display {
+            if {![nextOperand operands number]} {
+               syntaxError "missing display number"
+            }
+            set displayNumber $number
+         }
+
+         rtp -
+         rtsp -
+         esd {
+            if {![nextOperand operands server]} {
+               syntaxError "missing server"
+            }
+
+            if {![regexp {^([^:/]*)(?::([1-9][0-9]*)?)?$} $server x host port]} {
+               syntaxError "invalid server"
+            }
+
+            keylset playerRequirements $option [list $host $port]
+         }
+
+         syslog {
+            set useSyslog 1
+         }
+
+         default {
+            syntaxError "unknown option: $option"
+         }
+      }
+   }
+
+   if {$useSyslog} {
+      global loggerPath
+
+      if {[string length [set loggerPath [findCommand [set loggerCommand logger]]]] > 0} {
+         proc logWrite {message level} {
+            global loggerPath applicationName
+            exec $loggerPath -d -t $applicationName -i -p "daemon.[lindex {err warning notice info debug} $level]" -- $message
+         }
+      } else {
+         logWarning "syslog not available: $loggerCommand not installed"
+      }
+   }
+}
+
+proc actionHandler->automatic {operands} {
+   global holdFile
+
+   operandsDone operands
+
+   if {[catch [list file delete -- $holdFile] response] != 0} {
+      systemError $response
+   }
+   changedStation
+}
+
+proc actionHandler->daemon {operands} {
+   global returnCode processFile
+   global currentStation
+
+   processRadioOptions operands
+
+   if {[catch [list open $processFile {RDWR CREAT}] processStream] == 0} {
+      flock -write $processStream
+
+      if {![string equal [set currentProcess [pid]] [set previousProcess [gets $processStream]]]} {
+         if {[string length $previousProcess] > 0} {
+            if {[testProcess $previousProcess]} {
+               semanticError "daemon already running"
+            }
+         }
+
+         seek $processStream 0
+         ftruncate -fileid $processStream 0
+         puts $processStream $currentProcess
+      }
+
+      funlock $processStream
+      close $processStream
+   } else {
+      systemError $processStream
+   }
+   unset processStream
+
+   logInformation "daemon started"
+   set currentStation ""
+
+   monitorSignals {usr1} {
+      changeStation
+   }
+
+   monitorSignals {usr2} {
+      stopPlayer
+      set ::currentStation ""
+
+      logNotice "reconnecting"
+      changeStation
+   }
+
+   doRadio {
+      stationChanger
+   }
+
+   file delete -- $processFile
+   logInformation "daemon stopped: rc=$returnCode"
+}
+
+proc actionHandler->hold {operands} {
+   operandsDone operands
+
+   setStation [selectStation]
+}
+
+proc actionHandler->kill {operands} {
+   operandsDone operands
+   signalDaemon term
+}
+
+proc actionHandler->listen {operands} {
+   if {![nextOperand operands station]} {
+      set station ""
+   } elseif {[string equal $station -]} {
+      set station ""
+   }
+
+   if {[string length $station] == 0} {
+      if {[string length [set station [selectStation]]] == 0} {
+         semanticError "no current station"
+      }
+   }
+
+   verifyStation $station definition
+   processRadioOptions operands
+
+   doRadio {
+      idler
+      startPlayer $definition
+   }
+}
+
+proc actionHandler->off {operands} {
+   operandsDone operands
+   setStation ""
+}
+
+proc actionHandler->reconnect {operands} {
+   operandsDone operands
+   signalDaemon usr2
+}
+
+proc actionHandler->set {operands} {
+   if {![nextOperand operands station]} {
+      syntaxError "missing station name"
+   }
+
+   operandsDone operands
+   verifyStation $station
+   setStation $station
+}
+
+proc actionHandler->which {operands} {
+   global noStation
+
+   operandsDone operands
+
+   updateRules
+   if {[string length [set station [selectStation]]] == 0} {
+      set station $noStation
+   }
+   writeOutput $station
+}
+
+proc processOperands {operands} {
+   if {![nextOperand operands]} {
+      syntaxError "missing action"
+   }
+
+   if {[string is alpha [set actionName [lvarpop operands]]]} {
+      if {[llength [set actionHandlers [info procs "actionHandler->[string tolower $actionName]*"]]] == 1} {
+         eval [list [lindex $actionHandlers 0] $operands]
+         return
+      }
+
+      if {[llength $actionHandlers] > 0} {
+         foreach actionHandler $actionHandlers {
+            lappend actionNames [string range $actionHandler [expr {[string first > $actionHandler] + 1}] end]
+         }
+
+         syntaxError "ambiguous action: $actionName ([join $actionNames ", "])"
+      }
+   }
+
+   syntaxError "unknown action: $actionName"
+}
+
+set applicationName "radio"
+set systemPrefix "/etc/"
+set processExtension "pid"
+set holdExtension "hold"
+
+if {[id effective userid] == 0} {
+   set userPrefix ""
+   set processFile "/var/run/$applicationName.$processExtension"
+   set holdFile "$systemPrefix.$holdExtension"
+} else {
+   set userPrefix "~/.$applicationName"
+   set processFile "$userPrefix.$processExtension.[info host]"
+   set holdFile "$userPrefix.$holdExtension"
+}
+
+set stationsExtension "stations"
+set stationsTime ""
+initializeStations stationsArray
+
+set rulesExtension "rules"
+set rulesTime ""
+initializeRules rulesList
+
+defineKeywords day {sunday monday tuesday wednesday thursday friday saturday}
+defineKeywords month {january february march april may june july august september october november december}
+
+set noStation "off"
+
+set returnCode 0
+processOperands $argv
+exit $returnCode

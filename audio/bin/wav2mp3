@@ -1,0 +1,13 @@
+#!/bin/bash -p
+set -e
+
+name="${1}"
+
+inputFile="${name}.wav"
+outputFile="${name}.mp3"
+temporaryFile="temp.wav"
+
+sox "${inputFile}" "${temporaryFile}" norm -3 pad 1.5 1.5
+vlc-record -n "${temporaryFile}" "${outputFile}"
+rm "${temporaryFile}"
+exit 0

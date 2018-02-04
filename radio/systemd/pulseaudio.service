@@ -1,0 +1,31 @@
+[Unit]
+
+Description=Pulse Audio Server
+Documentation=man:pulseaudio(1)
+Documentation=http://www.pulseaudio.org/
+
+DefaultDependencies=yes
+Requires=network.target
+After=syslog.target sound.target network.target remote-fs.target autofs.service
+Before=systemd-user-sessions.service
+
+
+[Service]
+
+Type=simple
+ExecStart=/opt/sys/conf/pulseaudio/run
+
+TimeoutStartSec=10
+TimeoutStopSec=10
+
+Restart=always
+RestartSec=30
+
+Nice=-10
+OOMScoreAdjust=-900
+
+
+[Install]
+WantedBy=multi-user.target
+
+

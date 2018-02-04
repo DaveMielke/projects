@@ -1,0 +1,28 @@
+[Unit]
+
+Description=LAN Broadcast Monitor
+
+DefaultDependencies=yes
+PartOf=pulseaudio.service
+After=pulseaudio.service syslog.target network.target remote-fs.target autofs.service
+
+
+[Service]
+
+Type=simple
+ExecStart=/home/radio/listen
+
+User=radio
+WorkingDirectory=/home/radio
+
+TimeoutStartSec=10
+TimeoutStopSec=10
+
+Restart=always
+RestartSec=30
+
+
+[Install]
+WantedBy=multi-user.target
+
+

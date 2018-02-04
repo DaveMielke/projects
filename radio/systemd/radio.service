@@ -1,0 +1,27 @@
+[Unit]
+
+Description=Radio Daemon
+
+DefaultDependencies=yes
+After=syslog.target network.target remote-fs.target autofs.service
+
+
+[Service]
+
+Type=simple
+ExecStart=/opt/dave/bin/radio daemon syslog rtp 239.4.1.13:8554
+
+User=radio
+WorkingDirectory=/home/radio
+
+TimeoutStartSec=10
+TimeoutStopSec=10
+
+Restart=always
+RestartSec=30
+
+
+[Install]
+WantedBy=multi-user.target
+
+

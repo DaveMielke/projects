@@ -1,0 +1,41 @@
+#!/bin/sh
+set -e
+
+url="http://cbc.ca/radio/includes/streams.html"
+echo "# stations from ${url}"
+
+wget -q -O - "${url}" |
+tr $"\t" " " |
+tr -d $"\r" |
+sed -n -r '
+  /&nbsp;/b
+  /^ *(<h3>|<p>.*http:)/{
+    s/ *<[^>]*> *//g
+
+    /^http:/b END_NAME
+    y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/
+    s/&#[0-9]*;//g
+    s/[-/].*//
+    s/[.]//g
+    s/^cape *breton$/sydney/
+    s/^labrador$/goosebay/
+    s/  */|/g
+    : END_NAME
+
+    p
+  }
+' |
+while read name
+do
+  read url
+  echo "${name} ${url}" |
+  sed -r -e '
+  s/^(.*cbc_r)(.)(.*)$/cbc\2-\1\2\3/
+  /^cbc2-/s/\|\S*//
+  /cbc2-international /d
+  s/\|//g
+  '
+done
+
+echo ""
+exit 0

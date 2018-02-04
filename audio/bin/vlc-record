@@ -1,0 +1,151 @@
+#!/bin/bash -p
+set -e
+
+programName="${0##*/}"
+
+function programMessage() {
+   local message="${1}"
+
+   echo >&2 "${programName}: ${message}"
+}
+
+function syntaxError() {
+   local problem="${1}"
+
+   programMessage "${problem}"
+   exit 2
+}
+
+startTime=""
+endTime=""
+outputFormat=""
+outputLength=""
+sampleRate=""
+noMonitor=false
+
+while getopts ":e:f:l:nr:s:" option
+do
+   case "${option}"
+   in
+      e) endTime="${OPTARG}";;
+      f) outputFormat="${OPTARG}";;
+      l) outputLength="${OPTARG}";;
+      n) noMonitor=true;;
+      r) sampleRate="${OPTARG}";;
+      s) startTime="${OPTARG}";;
+      :) syntaxError "missing operand: -${OPTARG}";;
+     \?) syntaxError "unknown option: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+[ "${#}" -gt 0 ] || syntaxError "missing input location"
+inputLocation="${1}"
+shift 1
+
+if [ "${#}" -eq 0 ]
+then
+   outputFile=""
+else
+   outputFile="${1}"
+   shift 1
+
+   [ "${#}" -eq 0 ] || syntaxError "too many parameters"
+fi
+
+outputName="${outputFile##*/}"
+outputExtension="${outputName##*.}"
+[ "${outputExtension}" != "${outputName}" ] || outputExtension=""
+
+[ -n "${outputFormat}" ] || outputFormat="${outputExtension}"
+[ -n "${outputFormat}" ] || syntaxError "missing output format"
+[ -n "${outputFile}" ] || outputFile="out.${outputFormat}"
+
+case "${outputFormat}"
+in
+   aac)
+      audioCodec="ts"
+      audioMuxer="mp4"
+      ;;
+
+   ogg)
+      audioCodec="vorb"
+      audioMuxer="ogg"
+      ;;
+
+   mp3)
+      audioCodec="mp3"
+      audioMuxer="dummy"
+      ;;
+
+   mp4)
+      audioCodec="mp4a"
+      audioMuxer="mp4"
+      ;;
+
+   wav)
+      audioCodec="s16l"
+      audioMuxer="wav"
+      ;;
+
+   wma)
+      audioCodec="wma"
+      audioMuxer="asf"
+      ;;
+
+   *) syntaxError "unknown output format: ${outputFormat}";;
+esac
+
+set -- "acodec=${audioCodec}"
+[ -z "${sampleRate}" ] || set -- "${@}" "samplerate=${sampleRate}"
+
+transcodeOptions=""
+for transcodeOption
+do
+   [ -z "${transcodeOptions}" ] || transcodeOptions="${transcodeOptions},"
+   transcodeOptions="${transcodeOptions}${transcodeOption}"
+done
+
+set -- "transcode{${transcodeOptions}}:standard{access=file,dst=${outputFile},mux=${audioMuxer}}"
+controlInterface="dummy"
+
+"${noMonitor}" || {
+   set -- "${@}" display
+   controlInterface=""
+}
+
+if [ "${#}" -eq 1 ]
+then
+   outputModule="${1}"
+else
+   outputModule=""
+
+   for outputDestination
+   do 
+      [ -z "${outputModule}" ] || outputModule="${outputModule},"
+      outputModule="${outputModule}dst='${outputDestination}'"
+   done
+
+   outputModule="duplicate{${outputModule}}"
+fi
+
+set -- vlc --quiet --audio --no-video --sout "#${outputModule}"
+[ -z "${controlInterface}" ] || set -- "${@}" --intf "${controlInterface}"
+set -- "${@}" --play-and-exit --no-loop --no-repeat --no-random --
+
+case "${inputLocation}"
+in
+   cdda://*@*)
+      set -- "${@}" "${inputLocation%%@*}" ":cdda-track=${inputLocation#*@}"
+      ;;
+
+   *) set -- "${@}" "${inputLocation}";;
+esac
+
+[ -z "${startTime}" ] || set -- "${@}" ":start-time=${startTime}"
+[ -z "${endTime}" ] || set -- "${@}" ":stop-time=${endTime}"
+[ -z "${outputLength}" ] || set -- "${@}" ":run-time=${outputLength}"
+
+"${@}"
+exit "${?}"

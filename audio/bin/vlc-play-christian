@@ -1,0 +1,4 @@
+#!/bin/bash -p
+set -e
+exec vlc-play /opt/dave//Music/Christian/mp3
+exit "${?}"

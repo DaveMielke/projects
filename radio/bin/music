@@ -1,0 +1,497 @@
+#!/bin/bash -p
+set -e
+
+readonly defaultPauseSeconds=0.5
+
+readonly audioFileExtensions=(mp3 ogg)
+readonly timeStringFormat="%Y-%m-%d@%H:%M:%S"
+
+readonly preannouncementPauseSeconds=1
+readonly postannouncementPauseSeconds=1
+readonly lockWaitSeconds=3
+
+readonly bookInitialDelay=9
+readonly bookAnnouncementDelay=3
+readonly bookWaitMinimum=8
+readonly bookWaitMaximum=25
+readonly bookWaitNumerator=14
+readonly bookWaitDenominator=10
+
+setProgramVariables() {
+  declare -g -r programName="${0##*/}"
+} && readonly -f setProgramVariables
+
+programMessage() {
+  local message="${1}"
+
+  echo >&2 "${programName}: ${message}"
+} && readonly -f programMessage
+
+syntaxError() {
+  local message="${1}"
+
+  programMessage "${message}"
+  exit 2
+} && readonly -f syntaxError
+
+semanticError() {
+  local message="${1}"
+
+  programMessage "${message}"
+  exit 3
+} && readonly -f semanticError
+
+sayText() {
+  local text="${1}"
+
+  espeak -- "${text}"
+} && readonly -f sayText
+
+playFile() {
+  local file="${1}"
+
+  if [ -f "${file}" ]
+  then
+    writeLog "playing ${file}"
+    local command=( vlc --quiet --album-art 0 --audio --no-video --play-and-exit )
+
+    if [ -t 0 ]
+    then
+      "${command[@]}" --intf rc "${file}" || :
+    else
+      "${command[@]}" --intf dummy "${file}" &
+      playerProcessIdentifier="${!}"
+      wait "${playerProcessIdentifier}" || :
+      playerProcessIdentifier=""
+    fi
+  else
+    writeLog "skipping ${file}"
+  fi
+} && readonly -f playFile
+
+testInteger() {
+  local number="${1}"
+
+  [[ "${number}" =~ ^(0|[1-9][0-9]*)$ ]]
+} && readonly -f testInteger
+
+testReal() {
+  local number="${1}"
+
+  [[ "${number}" =~ ^(0|[1-9][0-9]*)(\.[0-9]+)?$ ]]
+} && readonly -f testReal
+
+setVariable() {
+  printf -v "${1}" "%s" "${2}"
+} || readonly -f setVariable
+
+setRandomNumber() {
+  setVariable "${1}" $(( (RANDOM * ${2}) / 32768 ))
+} && readonly -f setRandomNumber
+
+formatTime() {
+  printf -v "${1}" "%(${3})T" "${2}"
+} && readonly -f formatTime
+
+setTimeVariables() {
+  formatTime SECONDS -1 "%s"
+  declare -g -r secondsPerMinute=60
+  declare -g -r minutesPerHour=60
+  declare -g -r secondsPerHour=$((secondsPerMinute * minutesPerHour))
+} && readonly -f setTimeVariables
+
+makeAudioFilePattern() {
+  local pattern="${audioFileExtensions[*]}"
+  pattern="*.{${pattern// /,}}"
+
+  declare -g -r audioFilePattern="${pattern}"
+} && readonly -f makeAudioFilePattern
+
+makeFindMusicCommand() {
+  local command=()
+  local extension
+
+  for extension in "${audioFileExtensions[@]}"
+  do
+    [ "${#command[*]}" -eq 0 ] || command+=(-o)
+    command+=(-name "*.${extension}")
+  done
+
+  [ "${#command[*]}" -le 2 ] || command=("(" "${command[@]}" ")")
+  command=(find -H "${musicRoot}" -type f -readable "${command[@]}" -print)
+
+  declare -g -r findMusicCommand=( "${command[@]}" )
+} && readonly -f makeFindMusicCommand
+
+findMusic() {
+  musicFiles=()
+
+  [ -z "${musicRoot}" ] || {
+    writeLog "finding music: ${musicRoot}"
+    local line
+
+    while read line
+    do
+      musicFiles+=("${line}")
+    done < <("${findMusicCommand[@]}" || :)
+
+    writeLog "music files: ${#musicFiles[*]}"
+  }
+} && readonly -f findMusic
+
+playMusic() {
+  local count=${#musicFiles[*]}
+
+  (( count > 0 )) || {
+    "${playMusicOnce}" && {
+      writeLog "music finished"
+      exit 0
+    }
+
+    findMusic
+    count=${#musicFiles[*]}
+    (( count > 0 )) || return 1
+  }
+
+  local index
+  setRandomNumber index "${count}"
+  playFile "${musicFiles[index]}"
+
+  musicFiles[index]="${musicFiles[count -= 1]}"
+  unset "musicFiles[count]"
+} && readonly -f playMusic
+
+setBookDelaySeconds() {
+  local delay="${1}"
+
+  local time=$((SECONDS + delay))
+  [ -n "${bookDelayTime}" ] && (( bookDelayTime >= time )) || bookDelayTime="${time}"
+} && readonly -f setBookDelaySeconds
+
+setBookDelayMinutes() {
+  local minutes="${1}"
+
+  setBookDelaySeconds $((minutes * secondsPerMinute))
+} && readonly -f setBookDelayMinutes
+
+testBookDelayTime() {
+  (( SECONDS >= bookDelayTime ))
+} && readonly -f testBookDelayTime
+
+restoreArray() {
+  local array="${1}"
+
+  local count
+  read count && testInteger "${count}" || return 1
+
+  if (( count ))
+  then
+    readarray -n "${count}" -t "${array}"
+  else
+    eval "${array}=()"
+  fi
+} && readonly -f restoreArray
+
+restoreBookState() {
+  local file="${bookStateFile}"
+
+  if [ -e "${file}" ]
+  then
+    [ -f "${file}" ] || semanticError "not a file: ${file}"
+    [ -r "${file}" ] || semanticError "file not readable: ${file}"
+    [ -w "${file}" ] || semanticError "file not writable: ${file}"
+
+    {
+      local line directories=() files=()
+
+      read line &&
+      [ "${line}" = "${bookStateFileHeader}" ] &&
+
+      read line &&
+      [ "${line}" = "${bookRoot}" ] &&
+
+      restoreArray directories &&
+      restoreArray files &&
+
+      ! read line
+    } <"${file}" || semanticError "not a book state file: ${file}"
+
+    bookDirectories=( "${directories[@]}" )
+    bookFiles=( "${files[@]}" )
+  else
+    local directory="$(dirname "${file}")"
+    [ -e "${directory}" ] || semanticError "directory not found: ${directory}"
+    [ -d "${directory}" ] || semanticError "not a directory: ${directory}"
+    [ -w "${directory}" ] || semanticError "directory not writable: ${directory}"
+
+    bookDirectories=()
+    bookFiles=()
+  fi
+} && readonly -f restoreBookState
+
+saveArray() {
+  local line
+
+  for line in ${#} "${@}"
+  do
+    echo "${line}"
+  done
+} && readonly -f saveArray
+
+saveBookState() {
+  local file="${bookStateFile}"
+  local oldFile="${file}.old"
+  local newFile="${file}.new"
+
+  {
+    echo "${bookStateFileHeader}"
+    echo "${bookRoot}"
+    saveArray "${bookDirectories[@]}"
+    saveArray "${bookFiles[@]}"
+  } >"${newFile}"
+
+  [ -f "${oldFile}" ] && rm "${oldFile}"
+  [ -f "${file}" ] && mv "${file}" "${oldFile}"
+  mv "${newFile}" "${file}"
+  [ -f "${oldFile}" ] && rm "${oldFile}"
+} && readonly -f saveBookState
+
+nextBook() {
+  local count="${#bookDirectories[*]}"
+  local index
+
+  (( count > 0 )) || {
+    writeLog "finding books: ${bookRoot}"
+    bookDirectories=( "${bookRoot}/"* )
+
+    count="${#bookDirectories[*]}"
+    index=0
+
+    while (( index < count ))
+    do
+      if [ -d "${bookDirectories[index]}" ]
+      then
+        index=$((index + 1))
+      else
+        bookDirectories[index]="${bookDirectories[count -= 1]}"
+        unset "bookDirectories[count]"
+      fi
+    done
+
+    writeLog "book directories: ${count}"
+    (( count > 0 )) || return 1
+  }
+
+  setRandomNumber index "${count}"
+  local directory="${bookDirectories[index]}"
+  writeLog "selected book $((index + 1)) of ${count}: ${directory}"
+
+  bookDirectories[index]="${bookDirectories[count -= 1]}"
+  unset "bookDirectories[count]"
+
+  eval set -- "'${directory}/'${audioFilePattern}"
+  bookFiles=( "${@}" )
+} && readonly -f nextBook
+
+readBook() {
+  [ -z "${bookRoot}" ] || {
+    while true
+    do
+      [ "${#bookFiles[*]}" -eq 0 ] || {
+        local start="${SECONDS}"
+        playFile "${bookFiles[0]}"
+
+        local delay=$(( (((SECONDS - start) * bookWaitNumerator) / bookWaitDenominator) + (secondsPerMinute * bookWaitMinimum) ))
+        local maximum=$((secondsPerMinute * bookWaitMaximum))
+        (( delay <= maximum )) || delay="${maximum}"
+        setBookDelaySeconds "${delay}"
+
+        unset "bookFiles[0]"
+        bookFiles=( "${bookFiles[@]}" )
+        saveBookState
+
+        return 0
+      }
+
+      nextBook || break
+      saveBookState
+    done
+  }
+
+  return 1
+} && readonly -f readBook
+
+announceTime() {
+  local time=$((SECONDS + 32)) hour minute
+  formatTime hour "${time}" "%-H"
+  formatTime minute "${time}" "%-M"
+
+  (( minute < 10 )) && {
+    (( minute == 0 )) && minute="'clock"
+    minute="o${minute}"
+  }
+
+  sayText "It's ${hour} ${minute}."
+} && readonly -f announceTime
+
+doHourlyAnnouncement() {
+  local pause="${1}"
+
+  local announced=false
+  local time=$((SECONDS + 30))
+
+  local hour
+  formatTime hour "${time}" "%Y%m%d%H"
+
+  local minute
+  formatTime minute "${time}" "%-M"
+
+  [ "${hour}" = "${currentHour}" ] || {
+    [ -z "${currentHour}" ] && (( minute != 0 )) || {
+      sleep "${pause}"
+      announceTime
+      setBookDelayMinutes "${bookAnnouncementDelay}"
+      announced=true
+    }
+
+    currentHour="${hour}"
+  }
+
+  "${announced}" && return 0 || return 1
+} && readonly -f doHourlyAnnouncement
+
+mainLoop() {
+  local hourlyAnnouncementPause=0
+  local noBookDelay=false
+
+  while true
+  do
+    "${doHourlyAnnouncements}" &&
+    doHourlyAnnouncement "${hourlyAnnouncementPause}" &&
+    sleep "${postannouncementPauseSeconds}"
+
+    hourlyAnnouncementPause="${preannouncementPauseSeconds}"
+    local noBooks=false
+
+    "${noBookDelay}" || testBookDelayTime && {
+      noBookDelay=false
+
+      ! readBook || {
+        sleep "${pauseSeconds}"
+        continue
+      }
+
+      noBooks=true
+    }
+
+    if playMusic
+    then
+      sleep "${pauseSeconds}"
+    elif "${noBooks}"
+    then
+      sleep $((secondsPerMinute - (SECONDS % secondsPerMinute)))
+      hourlyAnnouncementPause=0
+    else
+      noBookDelay=true
+    fi
+  done
+} && readonly -f mainLoop
+
+handleInterrupt() {
+  writeLog "interrupted"
+  [ -z "${playerProcessIdentifier}" ] || kill -TERM "${playerProcessIdentifier}" || :
+  exit 0
+} && readonly -f handleInterrupt
+
+monitorInterrupts() {
+  trap handleInterrupt int term
+} && readonly -f monitorInterrupts
+
+shopt -s nullglob
+shopt -s extglob
+
+setProgramVariables
+setTimeVariables
+
+logFile=""
+playMusicOnce=false
+pauseSeconds=""
+musicRoot=""
+bookRoot=""
+bookStateFile=""
+doHourlyAnnouncements=false
+
+while getopts ":b:l:m:op:B:H" option
+do
+  case "${option}"
+  in
+    b) bookRoot="${OPTARG}";;
+    l) logFile="${OPTARG}";;
+    m) musicRoot="${OPTARG}";;
+    o) playMusicOnce=true;;
+    p) pauseSeconds="${OPTARG}";;
+    B) bookStateFile="${OPTARG}";;
+    H) doHourlyAnnouncements=true;;
+
+    :) syntaxError "missing operand: -${OPTARG}";;
+   \?) syntaxError "unrecognized option: -${OPTARG}";;
+    *) syntaxError "unimplemented option: -${option}";;
+  esac
+done
+
+shift $((OPTIND - 1))
+[ "${#}" -eq 0 ] || syntaxError "too many parameters: ${*}"
+
+[ -n "${pauseSeconds}" ] || pauseSeconds="${defaultPauseSeconds:-0}"
+testReal "${pauseSeconds}" || syntaxError "invalid pause time: ${pauseSeconds}"
+
+[ -z "${musicRoot}" ] || {
+  [ "${musicRoot}" != "${musicRoot#*/}" ] || musicRoot="${HOME}/Music/${musicRoot}"
+  [ -d "${musicRoot}" ] || semanticError "not a directory: ${musicRoot}"
+}
+
+[ -z "${bookRoot}" ] || {
+  [ "${bookRoot}" != "${bookRoot#*/}" ] || bookRoot="${HOME}/Books/${bookRoot}"
+  [ -d "${bookRoot}" ] || semanticError "not a directory: ${bookRoot}"
+
+  [ -n "${bookStateFile}" ] || {
+    bookStateFile="${HOME}/.${programName}.books.${bookRoot##*/}.reading-state"
+  }
+
+  readonly bookStateFileHeader="[BOOK-READING-STATE-HEADER]"
+  restoreBookState
+  setBookDelayMinutes "${bookInitialDelay}"
+}
+
+if [ -n "${logFile}" ]
+then
+  [ -d "${logFile}" ] && logFile="${logFile%/}/${programName}.log"
+  exec 3>>"${logFile}" || semanticError "can't access log file: ${logFile}"
+  flock -x -w "${lockWaitSeconds}" 3 || semanticError "already running: ${logFile}"
+  : >"${logFile}"
+
+  writeLog() {
+    local log="${1}"
+
+    local time
+    formatTime time "${SECONDS}" "${timeStringFormat}"
+    printf >>"${logFile}" '%s %s\n' "${time}" "${log}"
+  } && readonly -f writeLog
+else
+  writeLog() {
+    local log="${1}"
+
+    programMessage "${log}"
+  } && readonly -f writeLog
+fi
+
+makeAudioFilePattern
+makeFindMusicCommand
+findMusic
+
+currentHour=""
+playerProcessIdentifier=""
+
+monitorInterrupts
+mainLoop
+exit 0

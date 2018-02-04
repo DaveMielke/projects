@@ -1,0 +1,99 @@
+#!/bin/bash -p
+set -e
+
+programName="${0##*/}"
+programMessage() {
+   local message="${1}"
+
+   echo >&2 "${programName}: ${message}"
+}
+
+syntaxError() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 2
+}
+
+start=0
+length=""
+end=""
+volume=""
+bass=""
+treble=""
+
+while getopts ":s:l:e:v:b:t:" option
+do
+   case "${option}"
+   in
+      s) start="${OPTARG}";;
+      l) length="${OPTARG}";;
+      e) end="${OPTARG}";;
+      v) volume="${OPTARG}";;
+      b) bass="${OPTARG}";;
+      t) treble="${OPTARG}";;
+      :) syntaxError "missing value: -${OPTARG}";;
+     \?) syntaxError "unknown option: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+[ "${#}" -gt 0 ] || syntaxError "missing input file"
+inputFile="${1}"
+shift 1
+
+if [ "${#}" -eq 0 ]
+then
+   outputFile=""
+else
+   outputFile="${1}"
+   shift 1
+
+   [ "${#}" -eq 0 ] || "too many parameters"
+fi
+
+set -- sox "${inputFile}"
+
+[ -z "${outputFile}" ] || {
+   outputDriver="${outputFile%%:*}"
+   outputDevice="${outputFile#*:}"
+
+   [ "${outputDriver}" = "${outputFile}" ] || {
+      [ -n "${outputDriver}" ] || syntaxError "missing audio driver"
+
+      case "${outputDriver}"
+      in
+         esd) export ESPEAKER="${outputDevice-beta}";;
+         *) syntaxError "unrecognized audio driver: ${outputDriver}";;
+      esac
+
+      export AUDIODRIVER=ao
+      export AUDIODEV="${outputDriver}"
+      outputFile=""
+   }
+}
+
+if [ -n "${outputFile}" ]
+then
+   set  -- "${@}" "${outputFile}"
+else
+   set  -- "${@}" -d
+fi
+
+set -- "${@}" trim "${start}"
+if [ -n "${length}" ]
+then
+   set -- "${@}" "${length}"
+else
+   threshold="-60d"
+   set -- "${@}" silence 1 2.0 "${threshold}" 1 0.5 "${threshold}"
+fi
+[ -z "${end}" ] || set -- "${@}" reverse trim 0 "${end}" reverse
+
+[ -z "${volume}" ] || set -- "${@}" vol "${volume}"
+[ -z "${bass}" ] || set -- "${@}" bass "${bass}"
+[ -z "${treble}" ] || set -- "${@}" treble "${treble}"
+
+"${@}"
+exit 0
