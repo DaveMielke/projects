@@ -1,0 +1,76 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
+editValue=false
+wordifyValue=false
+editPrompt=""
+noValue=true
+showAction=true
+
+while getopts ":ep:qv:w" option
+do
+   case "${option}"
+   in
+      e) editValue=true;;
+      q) showAction=false;;
+      p) editPrompt="${OPTARG}";;
+      v) noValue=false; newValue="${OPTARG}";;
+      w) wordifyValue=true;;
+
+     \?) syntaxError "unknown option: -${OPTARG}";;
+      :) syntaxError "missing operand: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+[ "${#}" -gt 0 ] || syntaxError "missing MP3 file path"
+mp3Path="${1}"
+shift 1
+
+[ "${#}" -gt 0 ] || syntaxError "missing MP3 metadata key"
+mp3Key="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+[ -e "${mp3Path}" ] || semanticError "file not found: ${mp3Path}"
+[ -f "${mp3Path}" ] || semanticError "not a file: ${mp3Path}"
+[ -r "${mp3Path}" ] || semanticError "file not readable: ${mp3Path}"
+[ -w "${mp3Path}" ] || semanticError "file not writable: ${mp3Path}"
+
+oldValue="$(id3v2 -l "${mp3Path}" | sed -n -r -e "s/^${mp3Key} +\(.*\): *//p")"
+"${noValue}" && newValue="${oldValue}"
+"${wordifyValue}" && wordifyString newValue
+
+[ -n "${editPrompt}" ] || editPrompt="${mp3Key}"
+"${editValue}" && editString newValue "${editPrompt}> "
+
+if [ "${newValue}" = "${oldValue}" ]
+then
+   mp3Action="unchanged"
+else
+   mp3Directory="$(dirname "${mp3Path}")"
+   mp3File="$(basename "${mp3Path}")"
+   mp3Reference="${mp3Directory}/.${mp3File}.ref"
+
+   touch -r "${mp3File}" -- "${mp3Reference}"
+   returnCode=0
+   id3v2 --"${mp3Key}" "${newValue}" -- "${mp3Path}" || returnCode="${?}"
+   touch -r "${mp3Reference}" -- "${mp3File}"
+   rm -- "${mp3Reference}"
+   [ "${returnCode}" -eq 0 ] || exit "${returnCode}"
+
+   if [ -z "${newValue}" ]
+   then
+      mp3Action="removed"
+   elif [ -z "${oldValue}" ]
+   then
+      mp3Action="added"
+   else
+      mp3Action="replaced"
+   fi
+fi
+
+"${showAction}" && echo "${mp3Key} frame ${mp3Action}"
+exit 0

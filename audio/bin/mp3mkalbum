@@ -1,0 +1,29 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
+[ "${#}" -gt 0 ] || syntaxError "missing album name"
+albumDirectory="${1}"
+shift
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+[ -e "${albumDirectory}" ] || semanticError "directory not found: ${albumDirectory}"
+[ -d "${albumDirectory}" ] || semanticError "not a directory: ${albumDirectory}"
+
+albumName="$(basename "${albumDirectory}")"
+wordifyString albumName
+editString albumName "edit album name"
+
+for filePath in $(find "${albumDirectory}" -type f -name '*.mp3' -print)
+do
+   fileName="$(basename "${filePath}" .mp3)"
+   wordifyString fileName
+   editString fileName 'edit file name'
+
+   id3v2 --delete-all "${filePath}"
+   id3v2 --album "${albumName}" "${filePath}"
+   id3v2 --artist "Kitty Wells" "${filePath}"
+   id3v2 --TIT1 "${fileName}" "${filePath}"
+done
+
+exit 0

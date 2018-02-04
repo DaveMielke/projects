@@ -1,0 +1,84 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+shopt -s nullglob
+
+function setMetadata() {
+   local key="${1}"
+   local value="${2}"
+
+   [ -z "${value}" ] || "${programDirectory}/mp3set" "${outputFiles[songIndex]}" "${key}" "${value}"
+}
+
+album=""
+performer=""
+group=""
+
+while getopts ":a:g:p:" option
+do
+   case "${option}"
+   in
+      a) album="${OPTARG}";;
+      g) group="${OPTARG}";;
+      p) performer="${OPTARG}";;
+
+     \?) syntaxError "unknown option: -${OPTARG}";;
+      :) syntaxError "missing operand: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+declare -a inputFiles outputFiles fileNames songNames
+declare -i songCount=0
+
+for inputFile in *.wav
+do
+   fileName="${inputFile%.*}"
+   outputFile="${fileName}.mp3"
+
+   [ -f "${outputFile}" ] || {
+      inputFiles[songCount]="${inputFile}"
+      outputFiles[songCount]="${outputFile}"
+      fileNames[songCount]="${fileName}"
+
+      oldName="${fileName}"
+      wordifyString oldName
+
+      newName="${oldName}"
+      editString newName "edit song name> " || {
+         break
+      }
+
+      [ -n "${newName}" ] || {
+         echo "skipping: ${oldName}"
+         continue
+      }
+
+      songNames[songCount]="${newName}"
+      let "songCount += 1"
+   }
+done
+
+if ((songCount))
+then
+   declare -i songIndex=0
+
+   while ((songIndex < songCount))
+   do
+      echo "converting: ${songNames[songIndex]}"
+      wav2mp3 "${fileNames[songIndex]}"
+
+      setMetadata TALB "${album}"
+      setMetadata TPE1 "${performer}"
+      setMetadata TIT1 "${group}"
+      setMetadata TIT2 "${songNames[songIndex]}"
+
+      let "songIndex += 1"
+   done
+
+   echo "done"
+else
+   echo "no new songs"
+fi
+
+exit 0

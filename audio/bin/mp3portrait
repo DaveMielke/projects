@@ -1,0 +1,23 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
+album="Dave Mielke's Musical Portraits Collection"
+
+[ "${#}" -gt 0 ] || syntaxError "file(s) not specified"
+
+for file
+do
+   song="$(basename "${file}" ".mp3")"
+   wordifyString song
+   editString song "edit song name> "
+
+   artist="$(basename "$(pwd)")"
+   wordifyString artist
+
+   id3v2 --delete-all "${file}"
+   id3v2 --album "${album}" "${file}"
+   id3v2 --artist "${artist}" "${file}"
+   id3v2 --song "${song}" "${file}"
+done
+
+exit 0

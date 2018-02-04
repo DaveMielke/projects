@@ -1,0 +1,19 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
+[ "${#}" -gt 0 ] || syntaxError "missing MP3 file path"
+mp3Path="${1}"
+shift 1
+
+[ "${#}" -gt 0 ] || syntaxError "missing MP3 metadata key"
+mp3Key="${1}"
+shift 1
+
+[ "${#}" -gt 0 ] || syntaxError "missing MP3 metadata value"
+mp3Value="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+"${programDirectory}/mp3update" -q -v "${mp3Value}" "${mp3Path}" "${mp3Key}"
+exit 0
