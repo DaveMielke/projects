@@ -3,6 +3,9 @@ christian /home/radio/bin/music-christian -l christian.log
 portraits /home/radio/bin/music-portraits -l portraits.log
 lombardo /home/radio/bin/music-lombardo -l lombardo.log
 
+ops http://listen.broadcastify.com:80?t=8789D00994BC0952900667B9C9A1BDCD0EEFCD17752D3FB8AC71D007FF93EB280CE0B4973A411CBDC485EB424C2BFE16113659C397D5A8666E1EA6E24204F913
+nasatv https://manifest.googlevideo.com/api/manifest/hls_playlist/id/wwMDvPCGeE0.4/itag/300/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/cmbypass/yes/goi/160/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D298/hls_chunk_host/r8---sn-gvbxgn-tvfl.googlevideo.com/ei/KxAFXJWOO5b1igSVvbrIBg/gcr/ca/playlist_type/DVR/hcs/yes/initcwndbps/11530/mm/32/mn/sn-gvbxgn-tvfl/ms/lv/mv/m/pl/19/shardbypass/yes/smhost/r1---sn-gvbxgn-tvfe.googlevideo.com/dover/11/keepalive/yes/mt/1543835541/disable_polymer/true/ip/99.249.46.214/ipbits/0/expire/1543857292/sparams/ip,ipbits,expire,id,itag,source,requiressl,ratebypass,live,cmbypass,goi,sgoap,sgovp,hls_chunk_host,ei,gcr,playlist_type,hcs,initcwndbps,mm,mn,ms,mv,pl,shardbypass,smhost/signature/14271EF57F06F5B8CB70F0B6494153790131157C.458295FDE8AA7D4BE8C37236A99A048DE0CEE06D/key/dg_yt0/playlist/index.m3u8
+
 # stations from http://cbc.ca/radio/includes/streams.html
 cbc1-kamloops http://cbc_r1_kam.akacast.akamaistream.net/7/440/451661/v1/rc.akacast.akamaistream.net/cbc_r1_kam
 cbc1-kelowna http://cbc_r1_kel.akacast.akamaistream.net/7/229/451661/v1/rc.akacast.akamaistream.net/cbc_r1_kel
@@ -44,10 +47,18 @@ cbc2-central http://cbc_r2_wpg.akacast.akamaistream.net/7/233/451661/v1/rc.akaca
 cbc2-mountain http://cbc_r2_edm.akacast.akamaistream.net/7/40/451661/v1/rc.akacast.akamaistream.net/cbc_r2_edm
 cbc2-pacific http://cbc_r2_vcr.akacast.akamaistream.net/7/773/451661/v1/rc.akacast.akamaistream.net/cbc_r2_vcr
 
-fr-west http://PlayerServices.StreamTheWorld.com/pls/FAMILYRADIO_WEST.pls
-fr-east http://PlayerServices.StreamTheWorld.com/pls/FAMILYRADIO_EAST.pls
-fr-europe http://PlayerServices.StreamTheWorld.com/pls/FAMILYRADIO_EURO.pls
-
-aljazeera http://aljazeera-eng-apple-live.adaptive.level3.net/apple/aljazeera/english/160audio.m3u8
+#aljazeera http://aljazeera-eng-apple-live.adaptive.level3.net/apple/aljazeera/english/160audio.m3u8
+aljazeera https://english.streaming.aljazeera.net/aljazeera/english2/index4147.m3u8
 bbc-world http://www.bbc.co.uk/worldservice/meta/live/mp3/eneuk.pls
+
+# stations from https://www.rte.ie/radio/page/138471-rte-radio-ways-to-listen/
+rte-radio1 http://av.rasset.ie/av/live/radio/radio1.m3u
+rte-2fm http://av.rasset.ie/av/live/radio/2fm.m3u
+rte-rnag http://av.rasset.ie/av/live/radio/rnag.m3u
+rte-lyric http://av.rasset.ie/av/live/radio/lyric.m3u
+rte-junior http://av.rasset.ie/av/live/radio/junior.m3u
+rte-pulse http://av.rasset.ie/av/live/radio/pulse.m3u
+rte-2xm http://av.rasset.ie/av/live/radio/2xm.m3u
+rte-gold http://av.rasset.ie/av/live/radio/gold.m3u
+rte-radio1extra http://av.rasset.ie/av/live/radio/radio1extra.m3u
 

@@ -1,31 +1,14 @@
 [Unit]
+Description=Sound Service
 
-Description=Pulse Audio Server
-Documentation=man:pulseaudio(1)
-Documentation=http://www.pulseaudio.org/
-
-DefaultDependencies=yes
-Requires=network.target
-After=syslog.target sound.target network.target remote-fs.target autofs.service
-Before=systemd-user-sessions.service
-
+#Requires=pulseaudio.socket
 
 [Service]
-
+# Note that notify will only work if --daemonize=no
 Type=simple
-ExecStart=/opt/sys/conf/pulseaudio/run
-
-TimeoutStartSec=10
-TimeoutStopSec=10
-
-Restart=always
-RestartSec=30
-
-Nice=-10
-OOMScoreAdjust=-900
-
+ExecStart=/usr/bin/pulseaudio --daemonize=no --system --disallow-exit --disable-shm --high-priority --realtime
+Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
-
-
+#Also=pulseaudio.socket
+WantedBy=sound.target

@@ -7,11 +7,13 @@ album="Dave Mielke's Musical Portraits Collection"
 
 for file
 do
-   song="$(basename "${file}" ".mp3")"
+   path="$(realpath "${file}")"
+
+   song="$(basename "${path}" ".mp3")"
    wordifyString song
    editString song "edit song name> "
 
-   artist="$(basename "$(pwd)")"
+   artist="$(basename "$(dirname "${path}")")"
    wordifyString artist
 
    id3v2 --delete-all "${file}"

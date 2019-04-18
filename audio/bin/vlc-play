@@ -4,12 +4,12 @@ set -e
 programName="${0##*/}"
 
 exec vlc \
-  --quiet --intf ncurses \
+  --quiet --intf rc \
   --logfile "${TMPDIR:-/tmp}/${programName}.log" --logmode text --log-verbose -1 \
   --one-instance-when-started-from-file --started-from-file --no-playlist-enqueue \
-  --play-and-exit --sout-keep --random \
+  --play-and-exit --sout-keep \
   --audio --no-video --album-art 0 \
   --audio-replay-gain-mode track --audio-replay-gain-peak-protection \
-  -- "${@}"
+  "${@}"
 
 exit "${?}"
