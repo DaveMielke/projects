@@ -1,0 +1,58 @@
+#!/bin/bash
+set -e
+
+programName="${0##*/}"
+cd "$(dirname "${0}")"
+
+programMessage() {
+   local message="${1}"
+
+   [ -n "${message}" ] && echo >&2 "${programName}: ${message}"
+}
+
+declare -A prefixMap=(
+   ["audio"]="/home/dave/"
+   ["base"]="/home/dave/"
+   ["radio"]="/home/radio/"
+   ["radio/config"]="/home/radio/."
+   ["radio/systemd"]="/etc/systemd/system/"
+   ["tcl/lib"]="/opt/dave/lib/tcl/"
+)
+
+while read file
+do
+   file="${file#./}"
+   head="${file%/*}"
+   tail="${file##*/}"
+
+   while true
+   do
+      prefix="${prefixMap["${head}"]}"
+      [ -n "${prefix}" ] && break
+
+      name="${head##*/}"
+      [ "${name}" = "${head}" ] && break
+
+      tail="${name}/${tail}"
+      head="${head%/*}"
+   done
+
+   if [ -n "${prefix}" ]
+   then
+      original="${prefix}${tail}"
+
+      if [ -e "${original}" ]
+      then
+         cmp -s "${original}" "${file}" || {
+            programMessage "updating ${file}"
+            cp "${original}" "${file}"
+         }
+      else
+         programMessage "file not found: ${original}"
+      fi
+   else
+      programMessage "unhandled file: ${file}"
+   fi
+done < <(find . -mindepth 2 -type f -print)
+
+exit 0
