@@ -4,26 +4,28 @@ import android.app.Application;
 import android.content.Context;
 
 public class RadioApplication extends Application {
-  private static Context applicationContext;
+  private static Context applicationContext = null;
+  private static FileGenerator musicGenerator = null;
+  private static FileGenerator bookGenerator = null;
 
   @Override
   public void onCreate () {
     super.onCreate();
     applicationContext = this;
+
+    musicGenerator = new MusicGenerator();
+    bookGenerator = new BookGenerator();
   }
 
   public static Context getContext () {
     return applicationContext;
   }
 
-  private final static AbstractGenerator musicGenerator = new MusicGenerator();
-  private final static AbstractGenerator bookGenerator = new BookGenerator();
-
-  public static AbstractGenerator getMusicGenerator () {
+  public static FileGenerator getMusicGenerator () {
     return musicGenerator;
   }
 
-  public static AbstractGenerator getBookGenerator () {
+  public static FileGenerator getBookGenerator () {
     return bookGenerator;
   }
 }
