@@ -13,5 +13,5 @@ public abstract class RadioPlayer extends RadioComponent {
     Log.i(LOG_TAG, String.format("playing %s: %s", type, data));
   }
 
-  public abstract boolean play ();
+  public abstract boolean play (RadioProgram program);
 }

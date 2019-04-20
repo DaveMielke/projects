@@ -2,6 +2,8 @@ package cc.mielke.dave.android.radio;
 
 import java.io.File;
 
+import android.media.AudioAttributes;
+
 public class MusicPlayer extends CollectionPlayer {
   public MusicPlayer () {
     super(new MusicLibrary());
@@ -20,5 +22,10 @@ public class MusicPlayer extends CollectionPlayer {
         }
       }
     }
+  }
+
+  @Override
+  protected final int getAudioContentType () {
+    return AudioAttributes.CONTENT_TYPE_MUSIC;
   }
 }

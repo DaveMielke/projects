@@ -91,7 +91,7 @@ public abstract class CollectionPlayer extends FilePlayer {
   }
 
   @Override
-  public final boolean play () {
-    return play(nextFile());
+  public final boolean play (RadioProgram program) {
+    return play(program, nextFile());
   }
 }

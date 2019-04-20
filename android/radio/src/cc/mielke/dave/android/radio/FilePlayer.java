@@ -18,6 +18,15 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
+  private static RadioProgram radioProgram = null;
+
+  private static void onPlayerDone () {
+    mediaPlayer.reset();
+
+    RadioProgram program = radioProgram;
+    radioProgram = null;
+    program.play();
+  }
 
   private final static MediaPlayer.OnErrorListener onErrorListener =
     new MediaPlayer.OnErrorListener() {
@@ -49,7 +58,7 @@ public abstract class FilePlayer extends RadioPlayer {
         }
 
         Log.e(LOG_TAG, log.toString());
-        mediaPlayer.reset();
+        onPlayerDone();
         return true;
       }
     };
@@ -66,7 +75,7 @@ public abstract class FilePlayer extends RadioPlayer {
     new MediaPlayer.OnCompletionListener() {
       @Override
       public void onCompletion (MediaPlayer player) {
-        mediaPlayer.reset();
+        onPlayerDone();
       }
     };
 
@@ -81,7 +90,9 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  protected final boolean play (File file) {
+  protected abstract int getAudioContentType ();
+
+  protected final boolean play (RadioProgram program, File file) {
     if (file == null) return false;
 
     if (!file.isFile()) {
@@ -94,9 +105,8 @@ public abstract class FilePlayer extends RadioPlayer {
 
     {
       AudioAttributes.Builder builder = new AudioAttributes.Builder();
-      builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
-      builder.setUsage(AudioAttributes.USAGE_NOTIFICATION);
-      builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
+      builder.setUsage(AudioAttributes.USAGE_MEDIA);
+      builder.setContentType(getAudioContentType());
       mediaPlayer.setAudioAttributes(builder.build());
     }
 
@@ -107,6 +117,7 @@ public abstract class FilePlayer extends RadioPlayer {
       return false;
     }
 
+    radioProgram = program;
     mediaPlayer.prepareAsync();
     return true;
   }

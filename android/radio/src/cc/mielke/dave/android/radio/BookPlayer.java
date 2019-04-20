@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.Set;
 import java.util.HashSet;
 
+import android.media.AudioAttributes;
+
 public class BookPlayer extends CollectionPlayer {
   public BookPlayer () {
     super(new BookLibrary());
@@ -52,5 +54,10 @@ public class BookPlayer extends CollectionPlayer {
 
       return bookFiles.remove(0);
     }
+  }
+
+  @Override
+  protected final int getAudioContentType () {
+    return AudioAttributes.CONTENT_TYPE_SPEECH;
   }
 }

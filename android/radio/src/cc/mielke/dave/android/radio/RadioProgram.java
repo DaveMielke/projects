@@ -9,12 +9,12 @@ public abstract class RadioProgram extends RadioComponent {
     allPlayers = players;
   }
 
-  private final boolean next () {
+  public final boolean play () {
     synchronized (allPlayers) {
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
-        if (player.play()) {
+        if (player.play(this)) {
           currentPlayer = player;
           return true;
         }
@@ -25,7 +25,7 @@ public abstract class RadioProgram extends RadioComponent {
   }
 
   public final void start () {
-    next();
+    play();
   }
 
   public final void stop () {
