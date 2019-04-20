@@ -2,7 +2,7 @@ package cc.mielke.dave.android.radio;
 
 import java.io.File;
 
-public class MusicPlayer extends FilePlayer {
+public class MusicPlayer extends CollectionPlayer {
   public MusicPlayer () {
     super(new MusicLibrary());
     setCollection("Portraits");

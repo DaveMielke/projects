@@ -9,12 +9,12 @@ import android.util.Log;
 import android.media.MediaPlayer;
 import android.media.AudioAttributes;
 
-public abstract class FilePlayer extends RadioPlayer {
+public abstract class CollectionPlayer extends RadioPlayer {
   private final String LOG_TAG = getClass().getName();
 
   protected final CollectionLibrary collectionLibrary;
 
-  protected FilePlayer (CollectionLibrary library) {
+  protected CollectionPlayer (CollectionLibrary library) {
     super();
     collectionLibrary = library;
   }
@@ -58,7 +58,7 @@ public abstract class FilePlayer extends RadioPlayer {
     collectionMembers.add(member);
   }
 
-  public final FilePlayer setCollection (String name) {
+  public final CollectionPlayer setCollection (String name) {
     synchronized (collectionMembers) {
       collectionMembers.clear();
       collectionName = name;

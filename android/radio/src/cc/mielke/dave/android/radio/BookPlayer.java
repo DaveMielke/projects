@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.HashSet;
 
-public class BookPlayer extends FilePlayer {
+public class BookPlayer extends CollectionPlayer {
   public BookPlayer () {
     super(new BookLibrary());
     setCollection("Bible");
