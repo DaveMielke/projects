@@ -16,7 +16,7 @@ public class MusicPlayer extends FilePlayer {
       for (File file : files) {
         if (file.isDirectory()) {
           findMembers(file);
-        } else if (hasAudioExtension(file.getName())) {
+        } else if (hasAudioExtension(file)) {
           addMember(file);
         }
       }

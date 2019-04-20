@@ -40,7 +40,7 @@ public class BookPlayer extends FilePlayer {
 
           for (File file : book.listFiles()) {
             if (!file.isFile()) continue;
-            if (!hasAudioExtension(file.getName())) continue;
+            if (!hasAudioExtension(file)) continue;
             bookFiles.add(file);
           }
 

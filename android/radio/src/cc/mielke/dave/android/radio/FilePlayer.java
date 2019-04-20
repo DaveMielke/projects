@@ -6,6 +6,9 @@ import java.io.File;
 
 import android.util.Log;
 
+import android.media.MediaPlayer;
+import android.media.AudioAttributes;
+
 public abstract class FilePlayer extends RadioPlayer {
   private final String LOG_TAG = getClass().getName();
 
@@ -32,6 +35,10 @@ public abstract class FilePlayer extends RadioPlayer {
     return false;
   }
 
+  protected static boolean hasAudioExtension (File file) {
+    return hasAudioExtension(file.getName());
+  }
+
   protected static void sortByPath (ArrayList<File> files) {
     files.sort(
       new Comparator<File>() {
@@ -51,11 +58,13 @@ public abstract class FilePlayer extends RadioPlayer {
     collectionMembers.add(member);
   }
 
-  public final void setCollection (String name) {
+  public final FilePlayer setCollection (String name) {
     synchronized (collectionMembers) {
       collectionMembers.clear();
       collectionName = name;
     }
+
+    return this;
   }
 
   public final String getCollectionName () {
@@ -84,12 +93,14 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  @Override
-  public final boolean play () {
-    File file = nextFile();
+  private final boolean play (File file) {
     if (file == null) return false;
-
     logPlaying(file.getAbsolutePath());
     return true;
+  }
+
+  @Override
+  public final boolean play () {
+    return play(nextFile());
   }
 }
