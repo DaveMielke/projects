@@ -1,21 +1,22 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
 
 import android.util.Log;
 
-public abstract class AbstractLibrary {
+public abstract class AbstractLibrary extends RadioComponent {
   private final static String LOG_TAG = AbstractLibrary.class.getName();
 
   protected AbstractLibrary () {
     super();
   }
 
-  private final Map<String, File> bookDirectories = new HashMap<>();
+  private final Map<String, File> nameToDirectory = new HashMap<>();
 
-  protected final void add (String name, String directory) {
+  protected final void addCollection (String name, String directory) {
     File file = new File(directory);
 
     if (!file.exists()) {
@@ -23,15 +24,22 @@ public abstract class AbstractLibrary {
     } else if (!file.isDirectory()) {
       Log.w(LOG_TAG, ("not a directory: " + file.getAbsolutePath()));
     } else {
-      synchronized (bookDirectories) {
-        bookDirectories.put(name, file);
+      synchronized (nameToDirectory) {
+        nameToDirectory.put(name, file);
       }
     }
   }
 
-  public final File get (String name) {
-    synchronized (bookDirectories) {
-      return bookDirectories.get(name);
+  public final File getDirectory (String name) {
+    synchronized (nameToDirectory) {
+      return nameToDirectory.get(name);
+    }
+  }
+
+  public final String[] getNames () {
+    synchronized (nameToDirectory) {
+      Set<String> names = nameToDirectory.keySet();
+      return names.toArray(new String[names.size()]);
     }
   }
 }

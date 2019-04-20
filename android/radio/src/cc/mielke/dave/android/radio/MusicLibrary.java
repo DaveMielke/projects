@@ -4,9 +4,9 @@ public class MusicLibrary extends AbstractLibrary {
   public MusicLibrary () {
     super();
 
-    add("Anthems", "/sdcard/Music/Anthems");
-    add("Christian", "/sdcard/Music/Christian");
-    add("GuyLombardo", "/sdcard/Music/Bands/GuyLombardo");
-    add("Portraits", "/sdcard/Music/Portraits");
+    addCollection("Anthems", "/sdcard/Music/Anthems");
+    addCollection("Christian", "/sdcard/Music/Christian");
+    addCollection("GuyLombardo", "/sdcard/Music/Bands/GuyLombardo");
+    addCollection("Portraits", "/sdcard/Music/Portraits");
   }
 }

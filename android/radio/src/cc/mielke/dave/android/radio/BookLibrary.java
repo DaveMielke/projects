@@ -4,6 +4,6 @@ public class BookLibrary extends AbstractLibrary {
   public BookLibrary () {
     super();
 
-    add("Bible", "/sdcard/Audio/Bible");
+    addCollection("Bible", "/sdcard/Audio/Bible");
   }
 }

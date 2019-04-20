@@ -15,4 +15,15 @@ public class RadioApplication extends Application {
   public static Context getContext () {
     return applicationContext;
   }
+
+  private final static AbstractGenerator musicGenerator = new MusicGenerator();
+  private final static AbstractGenerator bookGenerator = new BookGenerator();
+
+  public static AbstractGenerator getMusicGenerator () {
+    return musicGenerator;
+  }
+
+  public static AbstractGenerator getBookGenerator () {
+    return bookGenerator;
+  }
 }
