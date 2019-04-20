@@ -1,6 +1,5 @@
 package cc.mielke.dave.android.radio;
 
-import java.util.List;
 import java.io.File;
 
 public class MusicGenerator extends AbstractGenerator {
@@ -9,23 +8,12 @@ public class MusicGenerator extends AbstractGenerator {
   }
 
   @Override
-  protected final void addMembers (List members, File directory) {
-    String[] extensions = new String[] {
-      ".mp3"
-    };
-
+  protected final void addMembers (File directory) {
     for (File file : directory.listFiles()) {
       if (file.isDirectory()) {
-        addMembers(members, file);
-      } else {
-        String name = file.getName();
-
-        for (String extension : extensions) {
-          if (name.endsWith(extension)) {
-            members.add(file);
-            break;
-          }
-        }
+        addMembers(file);
+      } else if (hasAudioExtension(file.getName())) {
+        addMember(file);
       }
     }
   }
