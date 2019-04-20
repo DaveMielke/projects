@@ -1,6 +1,7 @@
 package cc.mielke.dave.android.radio;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.io.File;
 
 import android.util.Log;
@@ -29,6 +30,17 @@ public abstract class FilePlayer extends RadioPlayer {
     }
 
     return false;
+  }
+
+  protected static void sortByPath (ArrayList<File> files) {
+    files.sort(
+      new Comparator<File>() {
+        @Override
+        public int compare (File file1, File file2) {
+          return file1.getAbsolutePath().compareTo(file2.getAbsolutePath());
+        }
+      }
+    );
   }
 
   private final ArrayList<File> collectionMembers = new ArrayList<>();

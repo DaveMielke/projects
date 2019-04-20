@@ -1,7 +1,6 @@
 package cc.mielke.dave.android.radio;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.io.File;
 
 import java.util.Set;
@@ -46,15 +45,7 @@ public class BookPlayer extends FilePlayer {
           }
 
           if (!bookFiles.isEmpty()) {
-            bookFiles.sort(
-              new Comparator<File>() {
-                @Override
-                public int compare (File file1, File file2) {
-                  return file1.getAbsolutePath().compareTo(file2.getAbsolutePath());
-                }
-              }
-            );
-
+            sortByPath(bookFiles);
             break;
           }
         }
