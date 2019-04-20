@@ -1,6 +1,6 @@
 package cc.mielke.dave.android.radio;
 
-public class MusicLibrary extends Library {
+public class MusicLibrary extends AbstractLibrary {
   public MusicLibrary () {
     super();
 
