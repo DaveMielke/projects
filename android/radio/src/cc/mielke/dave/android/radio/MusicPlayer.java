@@ -5,7 +5,6 @@ import java.io.File;
 public class MusicPlayer extends CollectionPlayer {
   public MusicPlayer () {
     super(new MusicLibrary());
-    setCollection("Portraits");
   }
 
   @Override

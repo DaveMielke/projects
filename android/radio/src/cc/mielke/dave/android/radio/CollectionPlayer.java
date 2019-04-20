@@ -6,10 +6,7 @@ import java.io.File;
 
 import android.util.Log;
 
-import android.media.MediaPlayer;
-import android.media.AudioAttributes;
-
-public abstract class CollectionPlayer extends RadioPlayer {
+public abstract class CollectionPlayer extends FilePlayer {
   private final String LOG_TAG = getClass().getName();
 
   protected final CollectionLibrary collectionLibrary;
@@ -91,12 +88,6 @@ public abstract class CollectionPlayer extends RadioPlayer {
 
       return removeRandomElement(collectionMembers);
     }
-  }
-
-  private final boolean play (File file) {
-    if (file == null) return false;
-    logPlaying(file.getAbsolutePath());
-    return true;
   }
 
   @Override

@@ -9,8 +9,8 @@ public abstract class RadioPlayer extends RadioComponent {
     super();
   }
 
-  protected final void logPlaying (String identifier) {
-    Log.i(LOG_TAG, ("playing " + identifier));
+  protected final void logPlaying (String type, String data) {
+    Log.i(LOG_TAG, String.format("playing %s: %s", type, data));
   }
 
   public abstract boolean play ();

@@ -10,7 +10,7 @@ public abstract class TextPlayer extends RadioPlayer {
   }
 
   protected final boolean play (String text) {
-    logPlaying(text);
+    logPlaying("text", text);
     return false;
   }
 }

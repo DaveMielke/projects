@@ -9,7 +9,6 @@ import java.util.HashSet;
 public class BookPlayer extends CollectionPlayer {
   public BookPlayer () {
     super(new BookLibrary());
-    setCollection("Bible");
   }
 
   @Override
