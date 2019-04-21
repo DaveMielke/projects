@@ -95,6 +95,14 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
+  public final void ensureDelay (long milliseconds) {
+    setEarliestTime(getCurrentTime() + milliseconds);
+  }
+
+  public final void ensureDelay (long count, TimeUnit unit) {
+    ensureDelay(unit.toMillis(count));
+  }
+
   public final void onPlayStart () {
     synchronized (this) {
       startTime = getCurrentTime();

@@ -5,8 +5,8 @@ public class MusicLibrary extends CollectionLibrary {
     super();
 
     addCollection("Anthems", "/sdcard/Music/Anthems");
+    addCollection("Bands", "/sdcard/Music/Bands");
     addCollection("Christian", "/sdcard/Music/Christian");
-    addCollection("GuyLombardo", "/sdcard/Music/Bands/GuyLombardo");
     addCollection("Portraits", "/sdcard/Music/Portraits");
   }
 }

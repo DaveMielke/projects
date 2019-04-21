@@ -17,6 +17,7 @@ public class BookPlayer extends CollectionPlayer {
     setMinimumDelay(8, TimeUnit.MINUTES);
     setMaximumDelay(25, TimeUnit.MINUTES);
     setRelativeDelay(1.4d);
+    ensureDelay(9, TimeUnit.MINUTES);
   }
 
   @Override
