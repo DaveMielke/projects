@@ -1,7 +1,7 @@
 package cc.mielke.dave.android.radio;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 import android.util.Log;
 
@@ -12,12 +12,14 @@ public abstract class RadioProgram extends RadioComponent {
     super();
   }
 
-  private final List<RadioPlayer> allPlayers = new ArrayList<>();
+  private final List<RadioPlayer> allPlayers = new LinkedList<>();
   private RadioPlayer currentPlayer = null;
 
   protected final void addPlayers (RadioPlayer... players) {
-    for (RadioPlayer player : players) {
-      allPlayers.add(player);
+    synchronized (allPlayers) {
+      for (RadioPlayer player : players) {
+        allPlayers.add(player);
+      }
     }
   }
 

@@ -23,25 +23,32 @@ public class HourlyPlayer extends TextPlayer {
     long now = getCurrentTime();
     long hour = ((now + HALF_MINUTE) / ONE_HOUR) * ONE_HOUR;
 
-    boolean first = previousHour == null;
-    previousHour = hour;
-
-    long next = hour + ONE_HOUR - HALF_MINUTE;
-    setEarliestTime(next);
-
-    if (first) {
-      if (Math.abs(now - hour) > HALF_MINUTE) return false;
-    } else if (hour == previousHour) {
-      return false;
+    {
+      long next = hour + ONE_HOUR - HALF_MINUTE;
+      setEarliestTime(next);
     }
 
-    StringBuilder text = new StringBuilder();
-    text.append("It's ");
-    boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
-    String format = use24HourFormat? "H": "h a";
-    text.append(new SimpleDateFormat(format).format(hour));
-    if (use24HourFormat) text.append(" o'clock");
-    text.append('.');
-    return play(text.toString());
+    {
+      boolean announce =
+        (previousHour == null)?
+        (Math.abs(now - hour) <= HALF_MINUTE):
+        (hour != previousHour);
+
+      previousHour = hour;
+      if (!announce) return false;
+    }
+
+    {
+      StringBuilder text = new StringBuilder();
+      boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
+      String format = use24HourFormat? "H": "h a";
+
+      text.append("It's ");
+      text.append(new SimpleDateFormat(format).format(hour));
+      if (use24HourFormat) text.append(" o'clock");
+      text.append('.');
+
+      return play(text.toString());
+    }
   }
 }

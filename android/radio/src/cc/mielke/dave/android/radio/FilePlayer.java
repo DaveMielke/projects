@@ -32,7 +32,7 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  private final static MediaPlayer.OnErrorListener onErrorListener =
+  private final static MediaPlayer.OnErrorListener mediaPlayerErrorListener =
     new MediaPlayer.OnErrorListener() {
       private final String getErrorMessage (int error) {
         switch (error) {
@@ -67,7 +67,7 @@ public abstract class FilePlayer extends RadioPlayer {
       }
     };
 
-  private final static MediaPlayer.OnPreparedListener onPreparedListener =
+  private final static MediaPlayer.OnPreparedListener mediaPlayerPreparedListener =
     new MediaPlayer.OnPreparedListener() {
       @Override
       public void onPrepared (MediaPlayer player) {
@@ -75,7 +75,7 @@ public abstract class FilePlayer extends RadioPlayer {
       }
     };
 
-  private final static MediaPlayer.OnCompletionListener onCompletionListener =
+  private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
     new MediaPlayer.OnCompletionListener() {
       @Override
       public void onCompletion (MediaPlayer player) {
@@ -83,13 +83,14 @@ public abstract class FilePlayer extends RadioPlayer {
       }
     };
 
-  private static void ensurePlayer () {
+  private static void ensureMediaPlayer () {
     synchronized (PLAYER_LOCK) {
       if (mediaPlayer == null) {
         mediaPlayer = new MediaPlayer();
-        mediaPlayer.setOnErrorListener(onErrorListener);
-        mediaPlayer.setOnPreparedListener(onPreparedListener);
-        mediaPlayer.setOnCompletionListener(onCompletionListener);
+
+        mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
+        mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
+        mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
       }
     }
   }
@@ -104,7 +105,7 @@ public abstract class FilePlayer extends RadioPlayer {
       return false;
     }
 
-    ensurePlayer();
+    ensureMediaPlayer();
     logPlaying("file", file.getAbsolutePath());
 
     synchronized (PLAYER_LOCK) {
@@ -116,6 +117,7 @@ public abstract class FilePlayer extends RadioPlayer {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
         builder.setContentType(getAudioContentType());
+        builder.setFlags(AudioAttributes.FLAG_HW_AV_SYNC);
         mediaPlayer.setAudioAttributes(builder.build());
       }
 
