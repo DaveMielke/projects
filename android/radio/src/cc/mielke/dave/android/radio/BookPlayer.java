@@ -1,5 +1,7 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.concurrent.TimeUnit;
+
 import java.util.ArrayList;
 import java.io.File;
 
@@ -11,6 +13,10 @@ import android.media.AudioAttributes;
 public class BookPlayer extends CollectionPlayer {
   public BookPlayer () {
     super(new BookLibrary());
+
+    setMinimumDelay(8, TimeUnit.MINUTES);
+    setMaximumDelay(25, TimeUnit.MINUTES);
+    setRelativeDelay(1.4d);
   }
 
   @Override

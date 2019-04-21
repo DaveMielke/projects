@@ -18,14 +18,18 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
-  private static RadioProgram radioProgram = null;
+  private static RadioPlayer currentPlayer = null;
 
   private static void onPlayerDone () {
-    mediaPlayer.reset();
+    synchronized (PLAYER_LOCK) {
+      mediaPlayer.reset();
 
-    RadioProgram program = radioProgram;
-    radioProgram = null;
-    program.play();
+      {
+        RadioPlayer player = currentPlayer;
+        currentPlayer = null;
+        player.onPlayEnd();
+      }
+    }
   }
 
   private final static MediaPlayer.OnErrorListener onErrorListener =
@@ -92,7 +96,7 @@ public abstract class FilePlayer extends RadioPlayer {
 
   protected abstract int getAudioContentType ();
 
-  protected final boolean play (RadioProgram program, File file) {
+  protected final boolean play (File file) {
     if (file == null) return false;
 
     if (!file.isFile()) {
@@ -100,25 +104,31 @@ public abstract class FilePlayer extends RadioPlayer {
       return false;
     }
 
-    logPlaying("file", file.getAbsolutePath());
     ensurePlayer();
+    logPlaying("file", file.getAbsolutePath());
 
-    {
-      AudioAttributes.Builder builder = new AudioAttributes.Builder();
-      builder.setUsage(AudioAttributes.USAGE_MEDIA);
-      builder.setContentType(getAudioContentType());
-      mediaPlayer.setAudioAttributes(builder.build());
+    synchronized (PLAYER_LOCK) {
+      if (currentPlayer != null) {
+        throw new IllegalStateException("already playing");
+      }
+
+      {
+        AudioAttributes.Builder builder = new AudioAttributes.Builder();
+        builder.setUsage(AudioAttributes.USAGE_MEDIA);
+        builder.setContentType(getAudioContentType());
+        mediaPlayer.setAudioAttributes(builder.build());
+      }
+
+      try {
+        mediaPlayer.setDataSource(getContext(), Uri.fromFile(file));
+      } catch (IOException exception) {
+        Log.e(LOG_TAG, ("media player source error: " + exception.getMessage()));
+        return false;
+      }
+
+      currentPlayer = this;
+      mediaPlayer.prepareAsync();
+      return true;
     }
-
-    try {
-      mediaPlayer.setDataSource(getContext(), Uri.fromFile(file));
-    } catch (IOException exception) {
-      Log.e(LOG_TAG, ("media player source error: " + exception.getMessage()));
-      return false;
-    }
-
-    radioProgram = program;
-    mediaPlayer.prepareAsync();
-    return true;
   }
 }

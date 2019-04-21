@@ -7,14 +7,23 @@ public abstract class RadioProgram extends RadioComponent {
   protected RadioProgram (RadioPlayer... players) {
     super();
     allPlayers = players;
+
+    for (RadioPlayer player : allPlayers) {
+      player.setProgram(this);
+    }
   }
 
   public final boolean play () {
+    long now = getCurrentTime();
+
     synchronized (allPlayers) {
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
-        if (player.play(this)) {
+        if (now < player.getEarliestTime()) continue;
+
+        if (player.play()) {
+          player.onPlayStart();
           currentPlayer = player;
           return true;
         }

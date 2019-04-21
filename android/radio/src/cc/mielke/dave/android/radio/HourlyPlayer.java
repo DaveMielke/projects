@@ -6,7 +6,7 @@ public class HourlyPlayer extends TextPlayer {
   }
 
   @Override
-  public final boolean play (RadioProgram program) {
+  public final boolean play () {
     return false;
   }
 }
