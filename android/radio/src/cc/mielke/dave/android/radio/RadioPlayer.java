@@ -12,9 +12,9 @@ public abstract class RadioPlayer extends RadioComponent {
   }
 
   private RadioProgram radioProgram = null;
-  private long minimumDelay = 0;
-  private long maximumDelay = Long.MAX_VALUE;
+  private long baseDelay = 0;
   private double relativeDelay = 0d;
+  private long maximumDelay = Long.MAX_VALUE;
 
   public final RadioProgram getProgram () {
     synchronized (this) {
@@ -29,21 +29,34 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
-  public final long getMinimumDelay () {
+  public final long getBaseDelay () {
     synchronized (this) {
-      return minimumDelay;
+      return baseDelay;
     }
   }
 
-  public final RadioPlayer setMinimumDelay (long milliseconds) {
+  public final RadioPlayer setBaseDelay (long milliseconds) {
     synchronized (this) {
-      minimumDelay = milliseconds;
+      baseDelay = milliseconds;
       return this;
     }
   }
 
-  public final RadioPlayer setMinimumDelay (long count, TimeUnit unit) {
-    return setMinimumDelay(unit.toMillis(count));
+  public final RadioPlayer setBaseDelay (long count, TimeUnit unit) {
+    return setBaseDelay(unit.toMillis(count));
+  }
+
+  public final double getRelativeDelay () {
+    synchronized (this) {
+      return relativeDelay;
+    }
+  }
+
+  public final RadioPlayer setRelativeDelay (double multiplier) {
+    synchronized (this) {
+      relativeDelay = multiplier;
+      return this;
+    }
   }
 
   public final long getMaximumDelay () {
@@ -63,19 +76,6 @@ public abstract class RadioPlayer extends RadioComponent {
     return setMaximumDelay(unit.toMillis(count));
   }
 
-  public final double getRelativeDelay () {
-    synchronized (this) {
-      return relativeDelay;
-    }
-  }
-
-  public final RadioPlayer setRelativeDelay (double multiplier) {
-    synchronized (this) {
-      relativeDelay = multiplier;
-      return this;
-    }
-  }
-
   protected final void logPlaying (String type, String data) {
     Log.i(LOG_TAG, String.format("playing %s: %s", type, data));
   }
@@ -89,18 +89,19 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
-  public final void setEarliestTime (long time) {
+  public final RadioPlayer setEarliestTime (long time) {
     synchronized (this) {
       earliestTime = Math.max(earliestTime, time);
+      return this;
     }
   }
 
-  public final void ensureDelay (long milliseconds) {
-    setEarliestTime(getCurrentTime() + milliseconds);
+  public final RadioPlayer ensureDelay (long milliseconds) {
+    return setEarliestTime(getCurrentTime() + milliseconds);
   }
 
-  public final void ensureDelay (long count, TimeUnit unit) {
-    ensureDelay(unit.toMillis(count));
+  public final RadioPlayer ensureDelay (long count, TimeUnit unit) {
+    return ensureDelay(unit.toMillis(count));
   }
 
   public final void onPlayStart () {
@@ -115,8 +116,8 @@ public abstract class RadioPlayer extends RadioComponent {
       long duration = now - startTime;
       startTime = null;
 
-      long delay = Math.round((double)duration * getRelativeDelay());
-      delay = Math.max(delay, getMinimumDelay());
+      long delay = getBaseDelay();
+      delay += Math.round((double)duration * getRelativeDelay());
       delay = Math.min(delay, getMaximumDelay());
 
       setEarliestTime(now + delay);

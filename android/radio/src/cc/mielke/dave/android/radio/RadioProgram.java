@@ -41,12 +41,15 @@ public abstract class RadioProgram extends RadioComponent {
           return;
         }
 
+        player.ensureDelay(player.getBaseDelay());
         next = Math.min(next, player.getEarliestTime());
       }
 
-      Log.i(LOG_TAG, "nothing to play");
-      long delay = next - now;
-      getHandler().postDelayed(playCallback, delay);
+      {
+        Log.i(LOG_TAG, "nothing to play");
+        long delay = next - now;
+        getHandler().postDelayed(playCallback, delay);
+      }
     }
   }
 
