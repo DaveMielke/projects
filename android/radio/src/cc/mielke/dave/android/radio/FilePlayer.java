@@ -12,8 +12,8 @@ import android.net.Uri;
 public abstract class FilePlayer extends RadioPlayer {
   private final static String LOG_TAG = FilePlayer.class.getName();
 
-  protected FilePlayer () {
-    super();
+  protected FilePlayer (RadioProgram program) {
+    super(program);
   }
 
   private final static Object PLAYER_LOCK = new Object();

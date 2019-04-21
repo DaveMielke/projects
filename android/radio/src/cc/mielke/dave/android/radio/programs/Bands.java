@@ -3,9 +3,11 @@ import cc.mielke.dave.android.radio.*;
 
 public class Bands extends RadioProgram {
   public Bands () {
-    super(
-      new HourlyPlayer(),
-      new MusicPlayer().setCollection("Bands")
+    super();
+
+    addPlayers(
+      new HourlyPlayer(this),
+      new MusicPlayer(this).setCollection("Bands")
     );
   }
 }

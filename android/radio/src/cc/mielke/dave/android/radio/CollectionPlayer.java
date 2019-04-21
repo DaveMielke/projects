@@ -11,8 +11,8 @@ public abstract class CollectionPlayer extends FilePlayer {
 
   protected final CollectionLibrary collectionLibrary;
 
-  protected CollectionPlayer (CollectionLibrary library) {
-    super();
+  protected CollectionPlayer (RadioProgram program, CollectionLibrary library) {
+    super(program);
     collectionLibrary = library;
   }
 

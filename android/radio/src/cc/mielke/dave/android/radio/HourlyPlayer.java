@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import android.text.format.DateFormat;
 
 public class HourlyPlayer extends TextPlayer {
-  public HourlyPlayer () {
-    super();
+  public HourlyPlayer (RadioProgram program) {
+    super(program);
   }
 
   private final static long ONE_HOUR = TimeUnit.HOURS.toMillis(1);

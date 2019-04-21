@@ -7,27 +7,20 @@ import android.util.Log;
 public abstract class RadioPlayer extends RadioComponent {
   private final static String LOG_TAG = RadioPlayer.class.getName();
 
-  protected RadioPlayer () {
+  private final RadioProgram radioProgram;
+
+  protected RadioPlayer (RadioProgram program) {
     super();
+    radioProgram = program;
   }
 
-  private RadioProgram radioProgram = null;
+  public final RadioProgram getProgram () {
+    return radioProgram;
+  }
+
   private long baseDelay = 0;
   private double relativeDelay = 0d;
   private long maximumDelay = Long.MAX_VALUE;
-
-  public final RadioProgram getProgram () {
-    synchronized (this) {
-      return radioProgram;
-    }
-  }
-
-  public final RadioPlayer setProgram (RadioProgram program) {
-    synchronized (this) {
-      radioProgram = program;
-      return this;
-    }
-  }
 
   public final long getBaseDelay () {
     synchronized (this) {

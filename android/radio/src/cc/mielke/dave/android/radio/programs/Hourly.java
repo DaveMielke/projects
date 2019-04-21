@@ -3,8 +3,10 @@ import cc.mielke.dave.android.radio.*;
 
 public class Hourly extends RadioProgram {
   public Hourly () {
-    super(
-      new HourlyPlayer()
+    super();
+
+    addPlayers(
+      new HourlyPlayer(this)
     );
   }
 }

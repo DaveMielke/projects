@@ -3,9 +3,11 @@ import cc.mielke.dave.android.radio.*;
 
 public class Portraits extends RadioProgram {
   public Portraits () {
-    super(
-      new HourlyPlayer(),
-      new MusicPlayer().setCollection("Portraits")
+    super();
+
+    addPlayers(
+      new HourlyPlayer(this),
+      new MusicPlayer(this).setCollection("Portraits")
     );
   }
 }

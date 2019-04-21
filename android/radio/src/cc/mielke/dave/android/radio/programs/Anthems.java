@@ -3,9 +3,11 @@ import cc.mielke.dave.android.radio.*;
 
 public class Anthems extends RadioProgram {
   public Anthems () {
-    super(
-      new HourlyPlayer(),
-      new MusicPlayer().setCollection("Anthems")
+    super();
+
+    addPlayers(
+      new HourlyPlayer(this),
+      new MusicPlayer(this).setCollection("Anthems")
     );
   }
 }

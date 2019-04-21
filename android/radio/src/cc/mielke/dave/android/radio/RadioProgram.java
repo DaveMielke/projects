@@ -1,19 +1,23 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.List;
+import java.util.ArrayList;
+
 import android.util.Log;
 
 public abstract class RadioProgram extends RadioComponent {
   private final static String LOG_TAG = RadioProgram.class.getName();
 
-  private final RadioPlayer[] allPlayers;
+  protected RadioProgram () {
+    super();
+  }
+
+  private final List<RadioPlayer> allPlayers = new ArrayList<>();
   private RadioPlayer currentPlayer = null;
 
-  protected RadioProgram (RadioPlayer... players) {
-    super();
-    allPlayers = players;
-
-    for (RadioPlayer player : allPlayers) {
-      player.setProgram(this);
+  protected final void addPlayers (RadioPlayer... players) {
+    for (RadioPlayer player : players) {
+      allPlayers.add(player);
     }
   }
 
