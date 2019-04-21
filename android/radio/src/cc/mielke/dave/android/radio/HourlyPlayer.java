@@ -18,10 +18,13 @@ public class HourlyPlayer extends TextPlayer {
   @Override
   public final boolean play () {
     long now = getCurrentTime();
-    long hour = (now / ONE_HOUR) * ONE_HOUR;
+    long hour = ((now + HALF_MINUTE) / ONE_HOUR) * ONE_HOUR;
 
     boolean first = previousHour == null;
     previousHour = hour;
+
+    long next = hour + ONE_HOUR - HALF_MINUTE;
+    setEarliestTime(next);
 
     if (first) {
       if (Math.abs(now - hour) > HALF_MINUTE) return false;

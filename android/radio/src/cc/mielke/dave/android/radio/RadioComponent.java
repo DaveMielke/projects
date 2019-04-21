@@ -3,6 +3,7 @@ package cc.mielke.dave.android.radio;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.os.Handler;
 
 public class RadioComponent {
   protected RadioComponent () {
@@ -15,6 +16,15 @@ public class RadioComponent {
 
   protected static long getCurrentTime () {
     return System.currentTimeMillis();
+  }
+
+  private static Handler handler = null;
+
+  protected final Handler getHandler () {
+    synchronized (this) {
+      if (handler == null) handler = new Handler();
+      return handler;
+    }
   }
 
   protected final <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {

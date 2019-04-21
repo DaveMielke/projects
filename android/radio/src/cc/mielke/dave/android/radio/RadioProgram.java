@@ -13,23 +13,35 @@ public abstract class RadioProgram extends RadioComponent {
     }
   }
 
-  public final boolean play () {
+  private final Runnable playCallback =
+    new Runnable() {
+      @Override
+      public void run () {
+        play();
+      }
+    };
+
+  public final void play () {
     long now = getCurrentTime();
+    long next = Long.MAX_VALUE;
 
     synchronized (allPlayers) {
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
-        if (now < player.getEarliestTime()) continue;
+        long earliest = player.getEarliestTime();
+        if (earliest < next) next = earliest;
+        if (now < earliest) continue;
 
         if (player.play()) {
           player.onPlayStart();
           currentPlayer = player;
-          return true;
+          return;
         }
       }
 
-      return false;
+      long delay = next - now;
+      getHandler().postDelayed(playCallback, delay);
     }
   }
 

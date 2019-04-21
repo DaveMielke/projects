@@ -14,10 +14,10 @@ public class BookPlayer extends CollectionPlayer {
   public BookPlayer () {
     super(new BookLibrary());
 
-    setMinimumDelay(8, TimeUnit.MINUTES);
-    setMaximumDelay(25, TimeUnit.MINUTES);
-    setRelativeDelay(1.4d);
-    ensureDelay(9, TimeUnit.MINUTES);
+    setMinimumDelay(RadioParameters.BOOK_MINIMUM_DELAY);
+    setMaximumDelay(RadioParameters.BOOK_MAXIMUM_DELAY);
+    setRelativeDelay(RadioParameters.BOOK_RELATIVE_DELAY);
+    ensureDelay(RadioParameters.BOOK_INITIAL_DELAY);
   }
 
   @Override
