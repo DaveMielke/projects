@@ -2,6 +2,9 @@ package cc.mielke.dave.android.radio;
 
 import java.util.concurrent.TimeUnit;
 
+import java.text.SimpleDateFormat;
+import android.text.format.DateFormat;
+
 public class HourlyPlayer extends TextPlayer {
   public HourlyPlayer () {
     super();
@@ -32,6 +35,13 @@ public class HourlyPlayer extends TextPlayer {
       return false;
     }
 
-    return play(String.format("It's %d o'clock.", hour));
+    StringBuilder text = new StringBuilder();
+    text.append("It's ");
+    boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
+    String format = use24HourFormat? "H": "h a";
+    text.append(new SimpleDateFormat(format).format(hour));
+    if (use24HourFormat) text.append(" o'clock");
+    text.append('.');
+    return play(text.toString());
   }
 }

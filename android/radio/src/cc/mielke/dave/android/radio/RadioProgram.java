@@ -1,6 +1,10 @@
 package cc.mielke.dave.android.radio;
 
+import android.util.Log;
+
 public abstract class RadioProgram extends RadioComponent {
+  private final static String LOG_TAG = RadioProgram.class.getName();
+
   private final RadioPlayer[] allPlayers;
   private RadioPlayer currentPlayer = null;
 
@@ -29,17 +33,18 @@ public abstract class RadioProgram extends RadioComponent {
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
-        long earliest = player.getEarliestTime();
-        if (earliest < next) next = earliest;
-        if (now < earliest) continue;
+        if (now < player.getEarliestTime()) continue;
 
         if (player.play()) {
           player.onPlayStart();
           currentPlayer = player;
           return;
         }
+
+        next = Math.min(next, player.getEarliestTime());
       }
 
+      Log.i(LOG_TAG, "nothing to play");
       long delay = next - now;
       getHandler().postDelayed(playCallback, delay);
     }
@@ -50,5 +55,6 @@ public abstract class RadioProgram extends RadioComponent {
   }
 
   public final void stop () {
+    getHandler().removeCallbacks(playCallback);
   }
 }
