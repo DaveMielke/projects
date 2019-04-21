@@ -3,6 +3,7 @@ package cc.mielke.dave.android.radio;
 public abstract class SimpleProgram extends RadioProgram {
   protected SimpleProgram (String music, boolean hourly, String book) {
     super();
+    setName(getClass().getSimpleName());
 
     if (hourly) addPlayers(new HourlyPlayer(this));
     if (book != null) addPlayers(new BookPlayer(this).setCollection(book));

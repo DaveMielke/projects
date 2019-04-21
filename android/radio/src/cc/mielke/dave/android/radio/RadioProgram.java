@@ -12,15 +12,50 @@ public abstract class RadioProgram extends RadioComponent {
     super();
   }
 
+  private String programName = null;
+
+  public final String getName () {
+    synchronized (this) {
+      return programName;
+    }
+  }
+
+  public final RadioProgram setName (String name) {
+    synchronized (this) {
+      programName = name;
+      return this;
+    }
+  }
+
+  protected final void logAction (String action) {
+    StringBuilder log = new StringBuilder(action);
+
+    {
+      String name = getName();
+
+      if (name != null) {
+        if (!name.isEmpty()) {
+          log.append(": ");
+          log.append(name);
+        }
+      }
+    }
+
+    Log.d(LOG_TAG, log.toString());
+  }
+
   private final List<RadioPlayer> allPlayers = new LinkedList<>();
   private RadioPlayer currentPlayer = null;
+  private boolean isStarted = false;
 
-  protected final void addPlayers (RadioPlayer... players) {
+  protected final RadioProgram addPlayers (RadioPlayer... players) {
     synchronized (allPlayers) {
       for (RadioPlayer player : players) {
         allPlayers.add(player);
       }
     }
+
+    return this;
   }
 
   private final Runnable playCallback =
@@ -32,10 +67,12 @@ public abstract class RadioProgram extends RadioComponent {
     };
 
   public final void play () {
-    long now = getCurrentTime();
-    long next = Long.MAX_VALUE;
-
     synchronized (allPlayers) {
+      if (!isStarted) return;
+
+      long now = getCurrentTime();
+      long next = Long.MAX_VALUE;
+
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
@@ -53,17 +90,32 @@ public abstract class RadioProgram extends RadioComponent {
 
       {
         Log.i(LOG_TAG, "nothing to play");
-        long delay = next - now;
+        long delay = Math.max((next - now), 0);
         getHandler().postDelayed(playCallback, delay);
       }
     }
   }
 
   public final void start () {
-    play();
+    synchronized (allPlayers) {
+      if (!isStarted) {
+        logAction("starting");
+        isStarted = true;
+
+        play();
+      }
+    }
   }
 
   public final void stop () {
-    getHandler().removeCallbacks(playCallback);
+    synchronized (allPlayers) {
+      if (isStarted) {
+        logAction("stopping");
+        isStarted = false;
+
+        getHandler().removeCallbacks(playCallback);
+        if (currentPlayer != null) currentPlayer.stop();
+      }
+    }
   }
 }

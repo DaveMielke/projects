@@ -119,5 +119,8 @@ public abstract class RadioPlayer extends RadioComponent {
     getProgram().play();
   }
 
+  public void stop () {
+  }
+
   public abstract boolean play ();
 }
