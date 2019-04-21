@@ -3,6 +3,6 @@ import cc.mielke.dave.android.radio.*;
 
 public class Bands extends SimpleProgram {
   public Bands () {
-    super("Bands", true);
+    super(MusicLibrary.BANDS, true);
   }
 }

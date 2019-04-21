@@ -1,9 +1,11 @@
 package cc.mielke.dave.android.radio;
 
 public class BookLibrary extends CollectionLibrary {
+  public final static String BIBLE = "The Bible";
+
   public BookLibrary () {
     super();
 
-    addCollection("Bible", "/sdcard/Audio/Bible");
+    addCollection(BIBLE, "/sdcard/Audio/Bible");
   }
 }

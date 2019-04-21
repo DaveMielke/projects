@@ -3,6 +3,6 @@ import cc.mielke.dave.android.radio.*;
 
 public class Anthems extends SimpleProgram {
   public Anthems () {
-    super("Anthems", true);
+    super(MusicLibrary.ANTHEMS, true);
   }
 }
