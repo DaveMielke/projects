@@ -1,12 +1,8 @@
 package cc.mielke.dave.android.radio.programs;
 import cc.mielke.dave.android.radio.*;
 
-public class Hourly extends RadioProgram {
+public class Hourly extends SimpleProgram {
   public Hourly () {
-    super();
-
-    addPlayers(
-      new HourlyPlayer(this)
-    );
+    super(null, true);
   }
 }
