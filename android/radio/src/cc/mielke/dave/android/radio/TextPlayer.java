@@ -22,10 +22,12 @@ public abstract class TextPlayer extends RadioPlayer {
 
   private static void ttsDone () {
     synchronized (TTS_LOCK) {
-      {
+      if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
         currentPlayer = null;
         player.onPlayEnd();
+      } else {
+        Log.w(LOG_TAG, "no current player");
       }
     }
   }
@@ -168,7 +170,6 @@ public abstract class TextPlayer extends RadioPlayer {
 
   @Override
   public void stop () {
-  // to-do
     try {
       synchronized (TTS_LOCK) {
         if (ttsObject != null) {

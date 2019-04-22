@@ -24,10 +24,12 @@ public abstract class FilePlayer extends RadioPlayer {
     synchronized (PLAYER_LOCK) {
       mediaPlayer.reset();
 
-      {
+      if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
         currentPlayer = null;
         player.onPlayEnd();
+      } else {
+        Log.w(LOG_TAG, "no current player");
       }
     }
   }

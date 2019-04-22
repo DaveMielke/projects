@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string-array name="programs">
+    <item>Anthems</item>
+    <item>Bands</item>
+    <item>Christian</item>
+    <item>Hourly</item>
+    <item>Portraits</item>
+  </string-array>
+</resources>

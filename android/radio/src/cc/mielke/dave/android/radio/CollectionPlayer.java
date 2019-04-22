@@ -92,6 +92,8 @@ public abstract class CollectionPlayer extends FilePlayer {
 
   @Override
   public final boolean play () {
-    return play(nextFile());
+    File file = nextFile();
+    if (file == null) return false;
+    return play(file);
   }
 }
