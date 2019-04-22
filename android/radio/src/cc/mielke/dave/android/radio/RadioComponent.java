@@ -18,13 +18,22 @@ public class RadioComponent {
     return System.currentTimeMillis();
   }
 
+  private final static Object HANDLER_LOCK = new Object();
   private static Handler handler = null;
 
-  protected final Handler getHandler () {
-    synchronized (this) {
+  protected static Handler getHandler () {
+    synchronized (HANDLER_LOCK) {
       if (handler == null) handler = new Handler();
       return handler;
     }
+  }
+
+  protected static void post (Runnable runnable) {
+    getHandler().post(runnable);
+  }
+
+  protected static void post (long delay, Runnable runnable) {
+    getHandler().postDelayed(runnable, delay);
   }
 
   protected final <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {

@@ -91,7 +91,7 @@ public abstract class RadioProgram extends RadioComponent {
       {
         Log.i(LOG_TAG, "nothing to play");
         long delay = Math.max((next - now), 0);
-        getHandler().postDelayed(playCallback, delay);
+        post(delay, playCallback);
       }
     }
   }
