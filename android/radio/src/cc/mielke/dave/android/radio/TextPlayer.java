@@ -15,6 +15,7 @@ public abstract class TextPlayer extends RadioPlayer {
 
   private final static Object TTS_LOCK = new Object();
   private static TextToSpeech ttsObject = null;
+  private static boolean ttsReady = false;
   private static int ttsMaximumInputLength = 0;
   private static int ttsUtteranceIdentifier = 0;
   private static RadioPlayer currentPlayer = null;
@@ -73,11 +74,11 @@ public abstract class TextPlayer extends RadioPlayer {
       }
     };
 
-  private static int getMaximumInputLength (TextToSpeech tts) {
+  private static int getMaximumInputLength () {
     int length = 4000;
 
     try {
-      length = tts.getMaxSpeechInputLength();
+      length = ttsObject.getMaxSpeechInputLength();
     } catch (IllegalArgumentException exception) {
       Log.w(LOG_TAG, "get maximum TTS input length", exception);
     }
@@ -85,65 +86,8 @@ public abstract class TextPlayer extends RadioPlayer {
     return length - 1; // Android returns the wrong value
   }
 
-  private static boolean ttsStart () {
-    synchronized (TTS_LOCK) {
-      if (ttsObject != null) return true;
-
-      class Listener implements TextToSpeech.OnInitListener {
-        public int initializationStatus = TextToSpeech.ERROR;
-
-        @Override
-        public void onInit (int status) {
-          synchronized (this) {
-            Log.d(LOG_TAG, ("TTS initialization status: " + status));
-            initializationStatus = status;
-            notify();
-          }
-        }
-      }
-
-      Log.d(LOG_TAG, "starting TTS");
-      Listener listener = new Listener();
-      TextToSpeech tts;
-
-      synchronized (listener) {
-        tts = new TextToSpeech(getContext(), listener);
-
-        try {
-          Log.d(LOG_TAG, "waiting for TTS initialization");
-          listener.wait();
-        } catch (InterruptedException exception) {
-          Log.w(LOG_TAG, "TTS initialization wait interrupted");
-        }
-      }
-
-      switch (listener.initializationStatus) {
-        case TextToSpeech.SUCCESS: {
-          Log.d(LOG_TAG, "TTS initialized successfully");
-          tts.setOnUtteranceProgressListener(ttsUtteranceProgressListener);
-
-          ttsMaximumInputLength = getMaximumInputLength(tts);
-          ttsObject = tts;
-          return true;
-        }
-
-        default:
-          Log.d(LOG_TAG, ("unexpected TTS initialization status: " + listener.initializationStatus));
-          /* fall through */
-        case TextToSpeech.ERROR:
-          Log.w(LOG_TAG, "TTS failed to initialize");
-          return false;
-      }
-    }
-  }
-
-  protected final boolean play (String text) {
-    if (!ttsStart()) return false;
-    logPlaying("text", text);
-
-    synchronized (TTS_LOCK) {
-      currentPlayer = this;
-
+  private static boolean ttsSpeak (String text) {
+    if (ttsReady) {
       String utterance = Integer.toString(++ttsUtteranceIdentifier);
       Bundle parameters = new Bundle();
 
@@ -151,7 +95,71 @@ public abstract class TextPlayer extends RadioPlayer {
         text, TextToSpeech.QUEUE_FLUSH, parameters, utterance
       );
 
-      if (status == TextToSpeech.SUCCESS) return true;
+      if (status == TextToSpeech.SUCCESS) {
+        return true;
+      } else {
+        Log.e(LOG_TAG, ("TTS speak failed: " + status));
+      }
+    } else {
+      Log.w(LOG_TAG, "TTS not ready");
+    }
+
+    return false;
+  }
+
+  private final static TextToSpeech.OnInitListener ttsInitializationListener =
+    new TextToSpeech.OnInitListener() {
+      @Override
+      public void onInit (int status) {
+        synchronized (TTS_LOCK) {
+          Log.d(LOG_TAG, ("TTS initialization status: " + status));
+
+          switch (status) {
+            case TextToSpeech.SUCCESS: {
+              Log.d(LOG_TAG, "TTS initialized successfully");
+
+              ttsObject.setOnUtteranceProgressListener(ttsUtteranceProgressListener);
+              ttsMaximumInputLength = getMaximumInputLength();
+
+              ttsReady = true;
+              break;
+            }
+
+            default:
+              Log.d(LOG_TAG, ("unexpected TTS initialization status: " + status));
+              /* fall through */
+            case TextToSpeech.ERROR:
+              Log.w(LOG_TAG, "TTS failed to initialize");
+              ttsObject = null;
+
+              post(
+                RadioParameters.TTS_RETRY_DELAY,
+                new Runnable() {
+                  @Override
+                  public void run () {
+                    ttsStart();
+                  }
+                }
+              );
+
+              break;
+          }
+        }
+      }
+    };
+
+  private static void ttsStart () {
+    synchronized (TTS_LOCK) {
+      Log.d(LOG_TAG, "starting TTS");
+      ttsObject = new TextToSpeech(getContext(), ttsInitializationListener);
+    }
+  }
+
+  protected final boolean play (String text) {
+    synchronized (TTS_LOCK) {
+      logPlaying("text", text);
+      currentPlayer = this;
+      if (ttsSpeak(text)) return true;
       currentPlayer = null;
     }
 
@@ -160,16 +168,20 @@ public abstract class TextPlayer extends RadioPlayer {
 
   @Override
   public void stop () {
+  // to-do
     try {
       synchronized (TTS_LOCK) {
         if (ttsObject != null) {
           ttsObject.stop();
-          ttsObject.shutdown();
           ttsDone();
         }
       }
     } finally {
       super.stop();
     }
+  }
+
+  static {
+    ttsStart();
   }
 }
