@@ -34,11 +34,11 @@ public class MainActivity extends BaseActivity {
   }
 
   public final void selectProgram (View view) {
-    String[] programNames = getProgramNames();
+    String[] names = getProgramNames();
 
-    final String[] items = new String[1 + programNames.length];
+    final String[] items = new String[1 + names.length];
     items[0] = getString(R.string.choice_noProgram);
-    System.arraycopy(programNames, 0, items, 1, programNames.length);
+    System.arraycopy(names, 0, items, 1, names.length);
 
     selectItem(
       items,
@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
 
               try {
                 type = Class.forName(
-                  getClass().getPackage().getName() + ".programs." + name
+                  getClass().getPackage().getName() + ".programs." + name.replace(" ", "")
                 );
               } catch (ClassNotFoundException exception) {
                 showMessage(R.string.message_undefinedProgram, name);

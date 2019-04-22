@@ -1,11 +1,13 @@
 package cc.mielke.dave.android.radio;
 
 public abstract class SimpleProgram extends RadioProgram {
+  private final static String splitPattern = "(?<=\\p{lower})()(?=\\p{upper})";
+
   protected SimpleProgram (String music, boolean hourly, String book) {
     super();
-    setName(getClass().getSimpleName());
+    setName(getClass().getSimpleName().replaceAll(splitPattern, " "));
 
-    if (hourly) addPlayers(new HourlyPlayer(this));
+    if (hourly) addPlayers(new HourlyAnnouncementPlayer(this));
     if (book != null) addPlayers(new BookPlayer(this).setCollection(book));
     if (music != null) addPlayers(new MusicPlayer(this).setCollection(music));
   }

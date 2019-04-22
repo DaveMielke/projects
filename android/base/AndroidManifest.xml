@@ -6,4 +6,6 @@
   android:versionName="1.0"
   >
 
+  <!-- Android 4.1 (JellyBean) -->
+  <uses-sdk android:minSdkVersion="16" />
 </manifest>
