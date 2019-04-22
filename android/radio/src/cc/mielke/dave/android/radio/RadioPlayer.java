@@ -116,7 +116,14 @@ public abstract class RadioPlayer extends RadioComponent {
       setEarliestTime(now + delay);
     }
 
-    getProgram().play();
+    post(
+      new Runnable() {
+        @Override
+        public void run () {
+          getProgram().play();
+        }
+      }
+    );
   }
 
   public void stop () {

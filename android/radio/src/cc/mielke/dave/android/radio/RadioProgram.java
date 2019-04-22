@@ -76,15 +76,16 @@ public abstract class RadioProgram extends RadioComponent {
       currentPlayer = null;
 
       for (RadioPlayer player : allPlayers) {
-        if (now < player.getEarliestTime()) continue;
+        if (now >= player.getEarliestTime()) {
+          if (player.play()) {
+            player.onPlayStart();
+            currentPlayer = player;
+            return;
+          }
 
-        if (player.play()) {
-          player.onPlayStart();
-          currentPlayer = player;
-          return;
+          player.ensureDelay(player.getBaseDelay());
         }
 
-        player.ensureDelay(player.getBaseDelay());
         next = Math.min(next, player.getEarliestTime());
       }
 
