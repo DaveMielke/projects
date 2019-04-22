@@ -18,10 +18,40 @@ public class HourlyPlayer extends TextPlayer {
 
   private static Long previousHour = null;
 
+  private static String toTimeString (long time) {
+    boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
+    String format = use24HourFormat? "H": "h";
+    SimpleDateFormat formatter = new SimpleDateFormat(format);
+
+    StringBuilder text = new StringBuilder();
+    text.append("It's ");
+    text.append(formatter.format(time));
+
+    {
+      long minutes = TimeUnit.MILLISECONDS.toMinutes(time % ONE_HOUR);
+
+      if (minutes > 0) {
+        if (minutes < 10) text.append("o ");
+        text.append(minutes);
+      } else if (use24HourFormat) {
+        text.append(" o'clock");
+      }
+    }
+
+    if (!use24HourFormat) {
+      formatter.applyPattern(" a");
+      text.append(formatter.format(time));
+    }
+
+    text.append('.');
+    return text.toString();
+  }
+
   @Override
   public final boolean play () {
     long now = getCurrentTime();
-    long hour = ((now + HALF_MINUTE) / ONE_HOUR) * ONE_HOUR;
+    long time = now + HALF_MINUTE;
+    long hour = (time / ONE_HOUR) * ONE_HOUR;
 
     {
       long next = hour + ONE_HOUR - HALF_MINUTE;
@@ -38,17 +68,6 @@ public class HourlyPlayer extends TextPlayer {
       if (!announce) return false;
     }
 
-    {
-      StringBuilder text = new StringBuilder();
-      boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
-      String format = use24HourFormat? "H": "h a";
-
-      text.append("It's ");
-      text.append(new SimpleDateFormat(format).format(hour));
-      if (use24HourFormat) text.append(" o'clock");
-      text.append('.');
-
-      return play(text.toString());
-    }
+    return play(toTimeString(time));
   }
 }
