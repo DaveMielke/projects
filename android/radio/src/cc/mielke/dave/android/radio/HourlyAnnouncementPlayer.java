@@ -25,7 +25,9 @@ public class HourlyAnnouncementPlayer extends TextPlayer {
 
     StringBuilder text = new StringBuilder();
     text.append("It's ");
+
     text.append(formatter.format(time));
+    text.append(' ');
 
     {
       long minutes = TimeUnit.MILLISECONDS.toMinutes(time % ONE_HOUR);
@@ -34,12 +36,13 @@ public class HourlyAnnouncementPlayer extends TextPlayer {
         if (minutes < 10) text.append("o ");
         text.append(minutes);
       } else if (use24HourFormat) {
-        text.append(" o'clock");
+        text.append("o'clock");
       }
     }
 
     if (!use24HourFormat) {
-      formatter.applyPattern(" a");
+      formatter.applyPattern("a");
+      text.append(' ');
       text.append(formatter.format(time));
     }
 
