@@ -35,6 +35,10 @@ public abstract class BaseComponent {
     return getContext().getString(string);
   }
 
+  protected static File getExternalStorageDirectory () {
+    return BaseApplication.getExternalStorageDirectory();
+  }
+
   private final static Object HANDLER_LOCK = new Object();
   private static Handler handler = null;
 
@@ -57,7 +61,7 @@ public abstract class BaseComponent {
     return System.currentTimeMillis();
   }
 
-  protected void sort (String[] strings) {
+  protected static void sort (String[] strings) {
     Arrays.sort(
       strings,
       new Comparator<String>() {

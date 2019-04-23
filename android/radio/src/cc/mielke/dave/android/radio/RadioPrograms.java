@@ -12,7 +12,7 @@ public class RadioPrograms extends RadioComponent {
   private RadioProgram currentProgram = null;
 
   private final void addPrograms () {
-    File directory = RadioApplication.getExternalDirectory();
+    File directory = getExternalStorageDirectory();
 
     if (directory != null) {
       directory = new File(directory, RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);

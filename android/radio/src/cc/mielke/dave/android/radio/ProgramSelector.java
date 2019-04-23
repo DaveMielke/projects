@@ -6,10 +6,9 @@ import android.content.DialogInterface;
 public class ProgramSelector extends RadioComponent {
   private final MainActivity mainActivity;
   private final Button selectorButton;
-  private final RadioPrograms radioPrograms;
 
   private final void showName () {
-    RadioProgram program = radioPrograms.getProgram();
+    RadioProgram program = getRadioPrograms().getProgram();
 
     if (program != null) {
       selectorButton.setText(program.getName());
@@ -23,13 +22,12 @@ public class ProgramSelector extends RadioComponent {
 
     mainActivity = activity;
     selectorButton = mainActivity.findViewById(R.id.button_selectProgram);
-    radioPrograms = RadioApplication.getRadioPrograms();
 
     showName();
   }
 
   public final void selectProgram () {
-    String[] names = radioPrograms.getNames();
+    String[] names = getRadioPrograms().getNames();
     sort(names);
 
     final String[] items = new String[1 + names.length];
@@ -47,7 +45,7 @@ public class ProgramSelector extends RadioComponent {
             program = null;
           } else {
             String name = items[position];
-            program = radioPrograms.getProgram(name);
+            program = getRadioPrograms().getProgram(name);
 
             if (program == null) {
               mainActivity.showMessage(R.string.message_undefinedProgram, name);
@@ -55,7 +53,7 @@ public class ProgramSelector extends RadioComponent {
             }
           }
 
-          radioPrograms.setProgram(program);
+          getRadioPrograms().setProgram(program);
           showName();
         }
       }

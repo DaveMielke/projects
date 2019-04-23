@@ -5,10 +5,10 @@ import java.util.LinkedList;
 
 import android.util.Log;
 
-public abstract class RadioProgram extends RadioComponent {
+public class RadioProgram extends RadioComponent {
   private final static String LOG_TAG = RadioProgram.class.getName();
 
-  protected RadioProgram () {
+  public RadioProgram () {
     super();
   }
 

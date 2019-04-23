@@ -32,7 +32,7 @@ public abstract class BaseApplication extends Application {
     return getName(context);
   }
 
-  public static File getExternalDirectory () {
+  public static File getExternalStorageDirectory () {
     File directory = Environment.getExternalStorageDirectory();
     if (directory == null) return null;
 

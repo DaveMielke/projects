@@ -12,7 +12,7 @@ public abstract class CollectionLibrary extends RadioComponent {
   private final static String LOG_TAG = CollectionLibrary.class.getName();
 
   private final void addCollections (String type) {
-    File directory = RadioApplication.getExternalDirectory();
+    File directory = getExternalStorageDirectory();
 
     if (directory != null) {
       Properties properties = loadProperties(new File(directory, type));
