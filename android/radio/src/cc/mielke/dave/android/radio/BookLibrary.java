@@ -6,6 +6,6 @@ public class BookLibrary extends CollectionLibrary {
   public BookLibrary () {
     super();
 
-    addCollection(BIBLE, "/sdcard/Audio/Bible");
+    addCollection(BIBLE, "/sdcard/Books/Bible");
   }
 }

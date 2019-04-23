@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity {
           }
 
           showProgramName();
-          RadioApplication.setProgram(selectedProgram);
+          RadioPrograms.set(selectedProgram);
         }
       }
     );
