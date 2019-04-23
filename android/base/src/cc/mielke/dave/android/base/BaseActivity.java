@@ -6,7 +6,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 public abstract class BaseActivity extends Activity {
-  protected final AlertDialog.Builder newAlertDialogBuilder (int name) {
+  public final AlertDialog.Builder newAlertDialogBuilder (int name) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
     {
@@ -31,11 +31,11 @@ public abstract class BaseActivity extends Activity {
     return builder;
   }
 
-  protected final AlertDialog.Builder newAlertDialogBuilder () {
+  public final AlertDialog.Builder newAlertDialogBuilder () {
     return newAlertDialogBuilder(0);
   }
 
-  protected final void showMessage (String message, String... details) {
+  public final void showMessage (String message, String... details) {
     if (details.length > 0) {
       StringBuilder text = new StringBuilder(message);
 
@@ -56,11 +56,11 @@ public abstract class BaseActivity extends Activity {
       .show();
   }
 
-  protected final void showMessage (int message, String... details) {
+  public final void showMessage (int message, String... details) {
     showMessage(getString(message), details);
   }
 
-  protected final void selectItem (int action, String[] items, DialogInterface.OnClickListener listener) {
+  public final void selectItem (int action, String[] items, DialogInterface.OnClickListener listener) {
     newAlertDialogBuilder(action)
       .setNegativeButton(android.R.string.no, null)
       .setItems(items, listener)

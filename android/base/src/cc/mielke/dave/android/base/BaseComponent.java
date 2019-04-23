@@ -1,5 +1,8 @@
 package cc.mielke.dave.android.base;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import java.util.Properties;
 
 import java.io.File;
@@ -28,6 +31,10 @@ public abstract class BaseComponent {
     return BaseApplication.getContext();
   }
 
+  protected static String getString (int string) {
+    return getContext().getString(string);
+  }
+
   private final static Object HANDLER_LOCK = new Object();
   private static Handler handler = null;
 
@@ -48,6 +55,18 @@ public abstract class BaseComponent {
 
   protected static long getCurrentTime () {
     return System.currentTimeMillis();
+  }
+
+  protected void sort (String[] strings) {
+    Arrays.sort(
+      strings,
+      new Comparator<String>() {
+        @Override
+        public int compare (String string1, String string2) {
+          return string1.compareTo(string2);
+        }
+      }
+    );
   }
 
   protected static Properties loadProperties (Reader reader) {
