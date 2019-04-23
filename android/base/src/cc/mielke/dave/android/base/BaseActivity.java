@@ -6,9 +6,33 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 public abstract class BaseActivity extends Activity {
-  protected final AlertDialog.Builder newAlertDialogBuilder () {
+  protected final AlertDialog.Builder newAlertDialogBuilder (int name) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+    {
+      StringBuilder title = new StringBuilder();
+
+      String[] components = new String[] {
+        BaseApplication.getName(this),
+        (name == 0)? null: getString(name)
+      };
+
+      for (String component : components) {
+        if (component == null) continue;
+        if (component.isEmpty()) continue;
+
+        if (title.length() > 0) title.append(" - ");
+        title.append(component);
+      }
+
+      if (title.length() > 0) builder.setTitle(title.toString());
+    }
+
     return builder;
+  }
+
+  protected final AlertDialog.Builder newAlertDialogBuilder () {
+    return newAlertDialogBuilder(0);
   }
 
   protected final void showMessage (String message, String... details) {
@@ -36,8 +60,8 @@ public abstract class BaseActivity extends Activity {
     showMessage(getString(message), details);
   }
 
-  protected final void selectItem (String[] items, DialogInterface.OnClickListener listener) {
-    newAlertDialogBuilder()
+  protected final void selectItem (int action, String[] items, DialogInterface.OnClickListener listener) {
+    newAlertDialogBuilder(action)
       .setNegativeButton(android.R.string.no, null)
       .setItems(items, listener)
       .show();

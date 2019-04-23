@@ -1,21 +1,8 @@
 package cc.mielke.dave.android.radio;
 
-import android.app.Application;
-import android.content.Context;
+import cc.mielke.dave.android.base.BaseApplication;
 
-public class RadioApplication extends Application {
-  private static Context applicationContext = null;
-
-  @Override
-  public void onCreate () {
-    super.onCreate();
-    applicationContext = this;
-  }
-
-  public static Context getContext () {
-    return applicationContext;
-  }
-
+public class RadioApplication extends BaseApplication {
   private final static Object PROGRAM_LOCK = new Object();
   private static RadioProgram radioProgram = null;
 

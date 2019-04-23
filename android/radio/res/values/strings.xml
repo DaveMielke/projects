@@ -3,6 +3,7 @@
 <resources>
   <string name="app_name">DM Radio</string>
 
+  <string name="action_selectProgram">Select Program</string>
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
   <string name="message_undefinedProgram">program not defined</string>

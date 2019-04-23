@@ -1,0 +1,31 @@
+package cc.mielke.dave.android.base;
+
+import android.app.Application;
+import android.content.pm.ApplicationInfo;
+import android.content.Context;
+
+public abstract class BaseApplication extends Application {
+  private static Context applicationContext = null;
+
+  @Override
+  public void onCreate () {
+    super.onCreate();
+    applicationContext = this;
+  }
+
+  public static Context getContext () {
+    return applicationContext;
+  }
+
+  public static String getName (Context context) {
+    ApplicationInfo info = context.getApplicationInfo();
+    int label = info.labelRes;
+    return (label == 0)? info.nonLocalizedLabel.toString(): context.getString(label);
+  }
+
+  public static String getName () {
+    Context context = getContext();
+    if (context == null) return null;
+    return getName(context);
+  }
+}

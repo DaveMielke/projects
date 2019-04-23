@@ -41,7 +41,7 @@ public class MainActivity extends BaseActivity {
     System.arraycopy(names, 0, items, 1, names.length);
 
     selectItem(
-      items,
+      R.string.action_selectProgram, items,
       new DialogInterface.OnClickListener() {
         @Override
         public void onClick (DialogInterface dialog, int position) {
