@@ -3,11 +3,10 @@ package cc.mielke.dave.android.radio;
 import android.widget.Button;
 import android.content.DialogInterface;
 
-public class ProgramSelector extends RadioComponent {
-  private final MainActivity mainActivity;
+public class ProgramSelector extends ActivityComponent {
   private final Button selectorButton;
 
-  private final void showName () {
+  private final void updateButtonText () {
     RadioProgram program = getRadioPrograms().getProgram();
 
     if (program != null) {
@@ -18,12 +17,9 @@ public class ProgramSelector extends RadioComponent {
   }
 
   public ProgramSelector (MainActivity activity) {
-    super();
-
-    mainActivity = activity;
+    super(activity);
     selectorButton = mainActivity.findViewById(R.id.button_selectProgram);
-
-    showName();
+    updateButtonText();
   }
 
   public final void selectProgram () {
@@ -54,7 +50,7 @@ public class ProgramSelector extends RadioComponent {
           }
 
           getRadioPrograms().setProgram(program);
-          showName();
+          updateButtonText();
         }
       }
     );
