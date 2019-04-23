@@ -3,6 +3,8 @@ package cc.mielke.dave.android.radio;
 import java.io.File;
 import java.io.IOException;
 
+import cc.mielke.dave.android.base.ApiTests;
+
 import android.util.Log;
 
 import android.media.MediaPlayer;
@@ -115,7 +117,7 @@ public abstract class FilePlayer extends RadioPlayer {
         throw new IllegalStateException("already playing");
       }
 
-      {
+      if (ApiTests.haveLollipop) {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
         builder.setContentType(getAudioContentType());

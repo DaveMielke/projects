@@ -1,10 +1,13 @@
 package cc.mielke.dave.android.radio;
 
+import cc.mielke.dave.android.base.ApiTests;
+
 import android.util.Log;
 
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.os.Bundle;
+import java.util.HashMap;
 
 public abstract class TextPlayer extends RadioPlayer {
   private final static String LOG_TAG = TextPlayer.class.getName();
@@ -16,8 +19,22 @@ public abstract class TextPlayer extends RadioPlayer {
   private final static Object TTS_LOCK = new Object();
   private static TextToSpeech ttsObject = null;
   private static boolean ttsReady = false;
+
+  private final static boolean ttsNewParadigm = ApiTests.haveLollipop;
+  private static Bundle ttsNewParameters = null;
+  private static HashMap<String, String> ttsOldParameters = null;
+
+  static {
+    if (ttsNewParadigm) {
+      ttsNewParameters = new Bundle();
+    } else {
+      ttsOldParameters = new HashMap<String, String>();
+    }
+  }
+
   private static int ttsMaximumInputLength = 0;
   private static int ttsUtteranceIdentifier = 0;
+
   private static RadioPlayer currentPlayer = null;
 
   private static void ttsDone () {
@@ -79,23 +96,41 @@ public abstract class TextPlayer extends RadioPlayer {
   private static int getMaximumInputLength () {
     int length = 4000;
 
-    try {
-      length = ttsObject.getMaxSpeechInputLength();
-    } catch (IllegalArgumentException exception) {
-      Log.w(LOG_TAG, "get maximum TTS input length", exception);
+    if (ApiTests.haveJellyBeanMR2) {
+      try {
+        length = ttsObject.getMaxSpeechInputLength();
+      } catch (IllegalArgumentException exception) {
+        Log.w(LOG_TAG, "get maximum TTS input length", exception);
+      }
     }
 
     return length - 1; // Android returns the wrong value
   }
 
+  private static void ttsSet (String key, String value) {
+    if (ttsNewParadigm) {
+      synchronized (ttsNewParameters) {
+        ttsNewParameters.putString(key, value);
+      }
+    } else {
+      synchronized (ttsOldParameters) {
+        ttsOldParameters.put(key, value);
+      }
+    }
+  }
+
   private static boolean ttsSpeak (String text) {
     if (ttsReady) {
+      int queueMode = TextToSpeech.QUEUE_FLUSH;
       String utterance = Integer.toString(++ttsUtteranceIdentifier);
-      Bundle parameters = new Bundle();
+      int status;
 
-      int status = ttsObject.speak(
-        text, TextToSpeech.QUEUE_FLUSH, parameters, utterance
-      );
+      if (ttsNewParadigm) {
+        status = ttsObject.speak(text, queueMode, ttsNewParameters, utterance);
+      } else {
+        ttsSet(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utterance);
+        status = ttsObject.speak(text, queueMode, ttsOldParameters);
+      }
 
       if (status == TextToSpeech.SUCCESS) {
         return true;
