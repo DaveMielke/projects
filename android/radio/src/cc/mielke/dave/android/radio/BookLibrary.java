@@ -4,8 +4,6 @@ public class BookLibrary extends CollectionLibrary {
   public final static String BIBLE = "The Bible";
 
   public BookLibrary () {
-    super();
-
-    addCollection(BIBLE, "/sdcard/Books/Bible");
+    super(RadioParameters.BOOK_LIBRARY_TYPE);
   }
 }

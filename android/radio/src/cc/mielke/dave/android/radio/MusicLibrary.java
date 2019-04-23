@@ -7,11 +7,6 @@ public class MusicLibrary extends CollectionLibrary {
   public final static String PORTRAITS = "Musical Portraits";
 
   public MusicLibrary () {
-    super();
-
-    addCollection(ANTHEMS, "/sdcard/Music/Anthems");
-    addCollection(LOMBARDO, "/sdcard/Music/Bands/GuyLombardo");
-    addCollection(CHRISTIAN, "/sdcard/Music/Christian");
-    addCollection(PORTRAITS, "/sdcard/Music/Portraits");
+    super(RadioParameters.MUSIC_LIBRARY_TYPE);
   }
 }

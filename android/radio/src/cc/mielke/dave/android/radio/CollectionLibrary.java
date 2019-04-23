@@ -3,6 +3,7 @@ package cc.mielke.dave.android.radio;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Properties;
 import java.io.File;
 
 import android.util.Log;
@@ -10,8 +11,26 @@ import android.util.Log;
 public abstract class CollectionLibrary extends RadioComponent {
   private final static String LOG_TAG = CollectionLibrary.class.getName();
 
-  protected CollectionLibrary () {
+  private final void addCollections (String type) {
+    File directory = RadioApplication.getExternalDirectory();
+
+    if (directory != null) {
+      Properties properties = loadProperties(new File(directory, type));
+
+      if (properties != null) {
+        for (String name : properties.stringPropertyNames()) {
+          String path = properties.getProperty(name, null);
+          if (path == null) continue;
+          if (path.isEmpty()) continue;
+          addCollection(name, path);
+        }
+      }
+    }
+  }
+
+  protected CollectionLibrary (String type) {
     super();
+    addCollections(type);
   }
 
   private final Map<String, File> nameToRoot = new HashMap<>();

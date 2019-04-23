@@ -1,5 +1,8 @@
 package cc.mielke.dave.android.base;
 
+import java.io.File;
+
+import android.os.Environment;
 import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.content.Context;
@@ -27,5 +30,13 @@ public abstract class BaseApplication extends Application {
     Context context = getContext();
     if (context == null) return null;
     return getName(context);
+  }
+
+  public static File getExternalDirectory () {
+    File directory = Environment.getExternalStorageDirectory();
+    if (directory == null) return null;
+
+    directory = new File(directory, getName());
+    return directory;
   }
 }

@@ -3,6 +3,21 @@ package cc.mielke.dave.android.radio;
 import cc.mielke.dave.android.base.BaseApplication;
 
 public class RadioApplication extends BaseApplication {
-  public final static MusicLibrary musicLibrary = new MusicLibrary();
-  public final static BookLibrary bookLibrary = new BookLibrary();
+  private static MusicLibrary musicLibrary = null;
+  private static BookLibrary bookLibrary = null;
+
+  @Override
+  public void onCreate () {
+    super.onCreate();
+    musicLibrary = new MusicLibrary();
+    bookLibrary = new BookLibrary();
+  }
+
+  public static MusicLibrary getMusicLibrary () {
+    return musicLibrary;
+  }
+
+  public static BookLibrary getBookLibrary () {
+    return bookLibrary;
+  }
 }
