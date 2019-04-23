@@ -2,12 +2,12 @@ package cc.mielke.dave.android.radio;
 
 import java.util.regex.Pattern;
 
-public abstract class SimpleProgram extends RadioProgram {
+public class SimpleProgram extends RadioProgram {
   private final static Pattern splitPattern = Pattern.compile(
     "(?<=\\p{lower})()(?=\\p{upper})"
   );
 
-  protected SimpleProgram (String music, boolean hourly, String book) {
+  public SimpleProgram (String music, boolean hourly, String book) {
     super();
     setName(splitPattern.matcher(getClass().getSimpleName()).replaceAll(" "));
 

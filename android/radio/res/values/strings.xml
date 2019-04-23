@@ -7,7 +7,4 @@
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
   <string name="message_undefinedProgram">program not defined</string>
-  <string name="message_inaccessibleProgram">program not accessible</string>
-  <string name="message_uninstantiatableProgram">program won\'t start</string>
-  <string name="message_notProgram">not a program</string>
 </resources>
