@@ -97,6 +97,12 @@ public abstract class TextPlayer extends RadioPlayer {
       }
     };
 
+  private static boolean isEngineStarted () {
+    if (ttsReady) return true;
+    Log.w(LOG_TAG, "TTS not ready");
+    return false;
+  }
+
   private static int getMaximumInputLength () {
     int length = 4000;
 
@@ -104,69 +110,69 @@ public abstract class TextPlayer extends RadioPlayer {
       try {
         length = ttsObject.getMaxSpeechInputLength();
       } catch (IllegalArgumentException exception) {
-        Log.w(LOG_TAG, "get maximum TTS input length", exception);
+        Log.w(LOG_TAG, "can't get maximum TTS input length", exception);
       }
     }
 
     return length - 1; // Android returns the wrong value
   }
 
-  private static void setParameter (String key, String value) {
+  private static boolean setParameter (String key, String value) {
     if (useNewParadigm) {
-      synchronized (newParameters) {
-        newParameters.putString(key, value);
-      }
+      newParameters.putString(key, value);
     } else {
-      synchronized (oldParameters) {
-        oldParameters.put(key, value);
-      }
+      oldParameters.put(key, value);
+    }
+
+    return true;
+  }
+
+  private static boolean setParameter (String key, int value) {
+    return setParameter(key, Integer.toString(value));
+  }
+
+  private static boolean setParameter (String key, float value) {
+    return setParameter(key, Float.toString(value));
+  }
+
+  private static boolean setStream (int value) {
+    synchronized (TTS_LOCK) {
+      return setParameter(TextToSpeech.Engine.KEY_PARAM_STREAM, value);
     }
   }
 
-  public static void setParameter (String key, int value) {
-    setParameter(key, Integer.toString(value));
+  private static boolean setStream () {
+    return setStream(TextToSpeech.Engine.DEFAULT_STREAM);
   }
 
-  public static void setParameter (String key, float value) {
-    setParameter(key, Float.toString(value));
-  }
-
-  public static void setStream (int value) {
+  private static boolean setVolume (float value) {
     synchronized (TTS_LOCK) {
-      setParameter(TextToSpeech.Engine.KEY_PARAM_STREAM, value);
+      return setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
     }
   }
 
-  public static void setStream () {
-    setStream(TextToSpeech.Engine.DEFAULT_STREAM);
-  }
-
-  public static void setVolume (float value) {
+  private static boolean setBalance (float value) {
     synchronized (TTS_LOCK) {
-      setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
+      return setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
     }
   }
 
-  public static void setBalance (float value) {
+  private static boolean setRate (float value) {
     synchronized (TTS_LOCK) {
-      setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
+      if (!isEngineStarted()) return false;
+      return ttsObject.setSpeechRate(value) == TextToSpeech.SUCCESS;
     }
   }
 
-  public static void setRate (float value) {
+  private static boolean setPitch (float value) {
     synchronized (TTS_LOCK) {
-      ttsObject.setSpeechRate(value);
-    }
-  }
-
-  public static void setPitch (float value) {
-    synchronized (TTS_LOCK) {
-      ttsObject.setPitch(value);
+      if (!isEngineStarted()) return false;
+      return ttsObject.setPitch(value) == TextToSpeech.SUCCESS;
     }
   }
 
   private static boolean speakText (String text) {
-    if (ttsReady) {
+    if (isEngineStarted()) {
       int queueMode = TextToSpeech.QUEUE_FLUSH;
       String utterance = Integer.toString(++utteranceIdentifier);
       int status;
@@ -183,8 +189,6 @@ public abstract class TextPlayer extends RadioPlayer {
       } else {
         Log.e(LOG_TAG, ("TTS speak failed: " + status));
       }
-    } else {
-      Log.w(LOG_TAG, "TTS not ready");
     }
 
     return false;
