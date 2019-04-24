@@ -35,21 +35,12 @@ public class ProgramSelector extends ActivityComponent {
       new DialogInterface.OnClickListener() {
         @Override
         public void onClick (DialogInterface dialog, int position) {
-          RadioProgram program;
+          RadioPrograms programs = getRadioPrograms();
 
-          if (position == 0) {
-            program = null;
-          } else {
-            String name = items[position];
-            program = getRadioPrograms().getProgram(name);
+          programs.setProgram(
+            (position == 0)? null: programs.getProgram(items[position])
+          );
 
-            if (program == null) {
-              mainActivity.showMessage(R.string.message_undefinedProgram, name);
-              return;
-            }
-          }
-
-          getRadioPrograms().setProgram(program);
           updateButtonText();
         }
       }
