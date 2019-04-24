@@ -20,12 +20,8 @@ public abstract class CollectionPlayer extends FilePlayer {
     return collectionLibrary;
   }
 
-  private final static String[] audioExtensions = new String[] {
-    ".mp3", ".mid"
-  };
-
   protected static boolean hasAudioExtension (String name) {
-    for (String extension : audioExtensions) {
+    for (String extension : RadioParameters.AUDIO_EXTENSIONS) {
       if (name.endsWith(extension)) return true;
     }
 

@@ -6,8 +6,12 @@ import android.util.Log;
 
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+
 import android.os.Bundle;
 import java.util.HashMap;
+
+import android.media.AudioManager;
+import android.media.AudioAttributes;
 
 public abstract class TextPlayer extends RadioPlayer {
   private final static String LOG_TAG = TextPlayer.class.getName();
@@ -20,20 +24,20 @@ public abstract class TextPlayer extends RadioPlayer {
   private static TextToSpeech ttsObject = null;
   private static boolean ttsReady = false;
 
-  private final static boolean ttsNewParadigm = ApiTests.haveLollipop;
-  private static Bundle ttsNewParameters = null;
-  private static HashMap<String, String> ttsOldParameters = null;
+  private final static boolean useNewParadigm = ApiTests.haveLollipop;
+  private static Bundle newParameters = null;
+  private static HashMap<String, String> oldParameters = null;
 
   static {
-    if (ttsNewParadigm) {
-      ttsNewParameters = new Bundle();
+    if (useNewParadigm) {
+      newParameters = new Bundle();
     } else {
-      ttsOldParameters = new HashMap<String, String>();
+      oldParameters = new HashMap<String, String>();
     }
   }
 
-  private static int ttsMaximumInputLength = 0;
-  private static int ttsUtteranceIdentifier = 0;
+  private static int maximumInputLength = 0;
+  private static int utteranceIdentifier = 0;
 
   private static RadioPlayer currentPlayer = null;
 
@@ -49,7 +53,7 @@ public abstract class TextPlayer extends RadioPlayer {
     }
   }
 
-  private final static UtteranceProgressListener ttsUtteranceProgressListener =
+  private final static UtteranceProgressListener utteranceProgressListener =
     new UtteranceProgressListener() {
       @Override
       public void onStart (String identifier) {
@@ -107,29 +111,71 @@ public abstract class TextPlayer extends RadioPlayer {
     return length - 1; // Android returns the wrong value
   }
 
-  private static void ttsSet (String key, String value) {
-    if (ttsNewParadigm) {
-      synchronized (ttsNewParameters) {
-        ttsNewParameters.putString(key, value);
+  private static void setParameter (String key, String value) {
+    if (useNewParadigm) {
+      synchronized (newParameters) {
+        newParameters.putString(key, value);
       }
     } else {
-      synchronized (ttsOldParameters) {
-        ttsOldParameters.put(key, value);
+      synchronized (oldParameters) {
+        oldParameters.put(key, value);
       }
     }
   }
 
-  private static boolean ttsSpeak (String text) {
+  public static void setParameter (String key, int value) {
+    setParameter(key, Integer.toString(value));
+  }
+
+  public static void setParameter (String key, float value) {
+    setParameter(key, Float.toString(value));
+  }
+
+  public static void setStream (int value) {
+    synchronized (TTS_LOCK) {
+      setParameter(TextToSpeech.Engine.KEY_PARAM_STREAM, value);
+    }
+  }
+
+  public static void setStream () {
+    setStream(TextToSpeech.Engine.DEFAULT_STREAM);
+  }
+
+  public static void setVolume (float value) {
+    synchronized (TTS_LOCK) {
+      setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
+    }
+  }
+
+  public static void setBalance (float value) {
+    synchronized (TTS_LOCK) {
+      setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
+    }
+  }
+
+  public static void setRate (float value) {
+    synchronized (TTS_LOCK) {
+      ttsObject.setSpeechRate(value);
+    }
+  }
+
+  public static void setPitch (float value) {
+    synchronized (TTS_LOCK) {
+      ttsObject.setPitch(value);
+    }
+  }
+
+  private static boolean speakText (String text) {
     if (ttsReady) {
       int queueMode = TextToSpeech.QUEUE_FLUSH;
-      String utterance = Integer.toString(++ttsUtteranceIdentifier);
+      String utterance = Integer.toString(++utteranceIdentifier);
       int status;
 
-      if (ttsNewParadigm) {
-        status = ttsObject.speak(text, queueMode, ttsNewParameters, utterance);
+      if (useNewParadigm) {
+        status = ttsObject.speak(text, queueMode, newParameters, utterance);
       } else {
-        ttsSet(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utterance);
-        status = ttsObject.speak(text, queueMode, ttsOldParameters);
+        setParameter(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utterance);
+        status = ttsObject.speak(text, queueMode, oldParameters);
       }
 
       if (status == TextToSpeech.SUCCESS) {
@@ -144,7 +190,7 @@ public abstract class TextPlayer extends RadioPlayer {
     return false;
   }
 
-  private final static TextToSpeech.OnInitListener ttsInitializationListener =
+  private final static TextToSpeech.OnInitListener initializationListener =
     new TextToSpeech.OnInitListener() {
       @Override
       public void onInit (int status) {
@@ -155,8 +201,23 @@ public abstract class TextPlayer extends RadioPlayer {
             case TextToSpeech.SUCCESS: {
               Log.d(LOG_TAG, "TTS initialized successfully");
 
-              ttsObject.setOnUtteranceProgressListener(ttsUtteranceProgressListener);
-              ttsMaximumInputLength = getMaximumInputLength();
+              ttsObject.setOnUtteranceProgressListener(utteranceProgressListener);
+              maximumInputLength = getMaximumInputLength();
+
+              if (ApiTests.haveLollipop) {
+                AudioAttributes.Builder builder = new AudioAttributes.Builder();
+                builder.setUsage(AudioAttributes.USAGE_NOTIFICATION);
+                builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
+                builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
+                ttsObject.setAudioAttributes(builder.build());
+              } else {
+                setStream(AudioManager.STREAM_NOTIFICATION);
+              }
+
+              setVolume(1.0f);
+              setBalance(0.0f);
+              setRate(1.0f);
+              setPitch(1.0f);
 
               ttsReady = true;
               break;
@@ -174,7 +235,7 @@ public abstract class TextPlayer extends RadioPlayer {
                 new Runnable() {
                   @Override
                   public void run () {
-                    ttsStart();
+                    startEngine();
                   }
                 }
               );
@@ -185,10 +246,10 @@ public abstract class TextPlayer extends RadioPlayer {
       }
     };
 
-  private static void ttsStart () {
+  private static void startEngine () {
     synchronized (TTS_LOCK) {
       Log.d(LOG_TAG, "starting TTS");
-      ttsObject = new TextToSpeech(getContext(), ttsInitializationListener);
+      ttsObject = new TextToSpeech(getContext(), initializationListener);
     }
   }
 
@@ -196,7 +257,7 @@ public abstract class TextPlayer extends RadioPlayer {
     synchronized (TTS_LOCK) {
       logPlaying("text", text);
       currentPlayer = this;
-      if (ttsSpeak(text)) return true;
+      if (speakText(text)) return true;
       currentPlayer = null;
     }
 
@@ -218,6 +279,6 @@ public abstract class TextPlayer extends RadioPlayer {
   }
 
   static {
-    ttsStart();
+    startEngine();
   }
 }
