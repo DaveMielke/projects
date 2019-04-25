@@ -6,4 +6,7 @@
   <string name="action_selectProgram">Select Program</string>
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
+
+  <string name="label_title">Title</string>
+  <string name="label_artist">Artist</string>
 </resources>

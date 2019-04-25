@@ -24,6 +24,7 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
+      RadioApplication.enqueuePlaying(null);
       mediaPlayer.reset();
 
       if (currentPlayer != null) {
@@ -131,6 +132,7 @@ public abstract class FilePlayer extends RadioPlayer {
         return false;
       }
 
+      RadioApplication.enqueuePlaying(file.getAbsolutePath());
       currentPlayer = this;
       mediaPlayer.prepareAsync();
       return true;

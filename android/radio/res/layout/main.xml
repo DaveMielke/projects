@@ -13,4 +13,20 @@
     android:onClick="selectProgram"
     android:text=""
    />
+
+  <TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <TableRow>
+      <TextView android:text="@string/label_title" />
+      <TextView android:id="@+id/text_title" />
+    </TableRow>
+
+    <TableRow>
+      <TextView android:text="@string/label_artist" />
+      <TextView android:id="@+id/text_artist" />
+    </TableRow>
+  </TableLayout>
 </LinearLayout>
