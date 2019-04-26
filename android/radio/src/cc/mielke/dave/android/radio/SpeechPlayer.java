@@ -16,10 +16,6 @@ import android.media.AudioAttributes;
 public abstract class SpeechPlayer extends RadioPlayer {
   private final static String LOG_TAG = SpeechPlayer.class.getName();
 
-  protected SpeechPlayer (RadioProgram program) {
-    super(program);
-  }
-
   private final static Object TTS_LOCK = new Object();
   private static TextToSpeech ttsObject = null;
   private static boolean ttsReady = false;
@@ -118,20 +114,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
     return false;
   }
 
-  private static int getMaximumInputLength () {
-    int length = 4000;
-
-    if (ApiTests.haveJellyBeanMR2) {
-      try {
-        length = ttsObject.getMaxSpeechInputLength();
-      } catch (IllegalArgumentException exception) {
-        Log.w(LOG_TAG, "can't get maximum TTS input length", exception);
-      }
-    }
-
-    return length - 1; // Android returns the wrong value
-  }
-
   private static boolean setParameter (String key, String value) {
     if (useNewParadigm) {
       newParameters.putString(key, value);
@@ -210,13 +192,53 @@ public abstract class SpeechPlayer extends RadioPlayer {
     return false;
   }
 
+  protected final boolean play (String text) {
+    synchronized (TTS_LOCK) {
+      logPlaying("speech", text);
+
+      currentPlayer = this;
+      if (speakText(text)) return true;
+      currentPlayer = null;
+    }
+
+    return false;
+  }
+
+  @Override
+  public void stop () {
+    try {
+      synchronized (TTS_LOCK) {
+        if (ttsObject != null) {
+          ttsObject.stop();
+          ttsDone();
+        }
+      }
+    } finally {
+      super.stop();
+    }
+  }
+
+  private static int getMaximumInputLength () {
+    int length = 4000;
+
+    if (ApiTests.haveJellyBeanMR2) {
+      try {
+        length = ttsObject.getMaxSpeechInputLength();
+      } catch (IllegalArgumentException exception) {
+        Log.w(LOG_TAG, "can't get maximum TTS input length", exception);
+      }
+    }
+
+    return length - 1; // Android returns the wrong value
+  }
+
   private final static TextToSpeech.OnInitListener initializationListener =
     new TextToSpeech.OnInitListener() {
       @Override
       public void onInit (int status) {
-        synchronized (TTS_LOCK) {
-          Log.d(LOG_TAG, ("TTS initialization status: " + status));
+        Log.d(LOG_TAG, ("TTS initialization status: " + status));
 
+        synchronized (TTS_LOCK) {
           switch (status) {
             case TextToSpeech.SUCCESS: {
               Log.d(LOG_TAG, "TTS initialized successfully");
@@ -248,7 +270,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
               /* fall through */
             case TextToSpeech.ERROR:
               Log.w(LOG_TAG, "TTS failed to initialize");
-              ttsObject = null;
 
               post(
                 RadioParameters.TTS_RETRY_DELAY,
@@ -273,40 +294,11 @@ public abstract class SpeechPlayer extends RadioPlayer {
     }
   }
 
-  protected final boolean play (String text) {
+  protected SpeechPlayer (RadioProgram program) {
+    super(program);
+
     synchronized (TTS_LOCK) {
-      logPlaying("speech", text);
-
-      currentPlayer = this;
-      if (speakText(text)) return true;
-      currentPlayer = null;
+      if (ttsObject == null) startEngine();
     }
-
-    return false;
-  }
-
-  @Override
-  public void stop () {
-    try {
-      synchronized (TTS_LOCK) {
-        if (ttsObject != null) {
-          ttsObject.stop();
-          ttsDone();
-        }
-      }
-    } finally {
-      super.stop();
-    }
-  }
-
-  static {
-    post(
-      new Runnable() {
-        @Override
-        public void run () {
-          startEngine();
-        }
-      }
-    );
   }
 }

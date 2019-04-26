@@ -19,6 +19,7 @@ public class MainActivity extends BaseActivity {
 
     FilePlayer.setViewer(new FileViewer(this));
     SpeechPlayer.setViewer(new SpeechViewer(this));
+
     programSelector = new ProgramSelector(this);
   }
 }
