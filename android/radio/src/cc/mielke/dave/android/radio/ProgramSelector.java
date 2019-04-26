@@ -7,7 +7,8 @@ public class ProgramSelector extends ActivityComponent {
   private final Button selectorButton;
 
   private final void updateButtonText () {
-    RadioProgram program = getRadioPrograms().getProgram();
+    RadioPrograms programs = getRadioPrograms();
+    RadioProgram program = (programs != null)? programs.getProgram(): null;
 
     if (program != null) {
       selectorButton.setText(program.getName());
@@ -23,27 +24,33 @@ public class ProgramSelector extends ActivityComponent {
   }
 
   public final void selectProgram () {
-    String[] names = getRadioPrograms().getNames();
-    sort(names);
+    RadioPrograms programs = getRadioPrograms();
+    String[] names = (programs != null)? programs.getNames(): new String[]{};
 
-    final String[] items = new String[1 + names.length];
-    items[0] = getString(R.string.choice_noProgram);
-    System.arraycopy(names, 0, items, 1, names.length);
+    if (programs != null) {
+      sort(names);
 
-    mainActivity.selectItem(
-      R.string.action_selectProgram, items,
-      new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick (DialogInterface dialog, int position) {
-          RadioPrograms programs = getRadioPrograms();
+      final String[] items = new String[1 + names.length];
+      items[0] = getString(R.string.choice_noProgram);
+      System.arraycopy(names, 0, items, 1, names.length);
 
-          programs.setProgram(
-            (position == 0)? null: programs.getProgram(items[position])
-          );
+      mainActivity.selectItem(
+        R.string.action_selectProgram, items,
+        new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick (DialogInterface dialog, int position) {
+            RadioPrograms programs = getRadioPrograms();
 
-          updateButtonText();
+            programs.setProgram(
+              (position == 0)? null: programs.getProgram(items[position])
+            );
+
+            updateButtonText();
+          }
         }
-      }
-    );
+      );
+    } else {
+      mainActivity.showMessage(R.string.message_noPrograms);
+    }
   }
 }

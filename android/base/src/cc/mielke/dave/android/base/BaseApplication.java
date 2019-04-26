@@ -7,7 +7,7 @@ import android.app.Application;
 import android.content.pm.ApplicationInfo;
 import android.content.Context;
 
-public abstract class BaseApplication extends Application {
+public class BaseApplication extends Application {
   private static Context applicationContext = null;
 
   @Override
