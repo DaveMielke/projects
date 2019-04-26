@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import android.text.format.DateFormat;
 
-public class HourlyAnnouncementPlayer extends TextPlayer {
+public class HourlyAnnouncementPlayer extends SpeechPlayer {
   public HourlyAnnouncementPlayer (RadioProgram program) {
     super(program);
   }

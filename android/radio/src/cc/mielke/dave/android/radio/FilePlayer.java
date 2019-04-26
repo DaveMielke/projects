@@ -20,12 +20,25 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
+  private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
+
+  public static FileViewer getViewer () {
+    synchronized (PLAYER_LOCK) {
+      return fileViewer;
+    }
+  }
+
+  public static void setViewer (FileViewer viewer) {
+    synchronized (PLAYER_LOCK) {
+      fileViewer = viewer;
+    }
+  }
 
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
-      RadioApplication.enqueuePlaying(null);
       mediaPlayer.reset();
+      if (fileViewer != null) fileViewer.enqueueFile(null);
 
       if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
@@ -132,7 +145,7 @@ public abstract class FilePlayer extends RadioPlayer {
         return false;
       }
 
-      RadioApplication.enqueuePlaying(file.getAbsolutePath());
+      if (fileViewer != null) fileViewer.enqueueFile(file);
       currentPlayer = this;
       mediaPlayer.prepareAsync();
       return true;

@@ -15,18 +15,43 @@
    />
 
   <TableLayout
+    android:id="@+id/view_file"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:visibility="gone"
     >
 
+    <TableLayout android:stretchColumns="1">
+      <SeekBar android:id="@+id/file_seek" />
+
+      <TableRow>
+        <TextView android:id="@+id/file_current" />
+        <TextView />
+        <TextView android:id="@+id/file_remaining" android:gravity="right" />
+      </TableRow>
+    </TableLayout>
+
     <TableRow>
-      <TextView android:text="@string/label_title" />
-      <TextView android:id="@+id/text_title" />
+      <TextView android:text="@string/file_title" />
+      <TextView android:id="@+id/file_title" />
     </TableRow>
 
     <TableRow>
-      <TextView android:text="@string/label_artist" />
-      <TextView android:id="@+id/text_artist" />
+      <TextView android:text="@string/file_artist" />
+      <TextView android:id="@+id/file_artist" />
+    </TableRow>
+  </TableLayout>
+
+  <TableLayout
+    android:id="@+id/view_speech"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:visibility="gone"
+    >
+
+    <TableRow>
+      <TextView android:text="@string/speech_text" />
+      <TextView android:id="@+id/speech_text" />
     </TableRow>
   </TableLayout>
 </LinearLayout>

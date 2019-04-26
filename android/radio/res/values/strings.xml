@@ -7,6 +7,8 @@
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
 
-  <string name="label_title">Title</string>
-  <string name="label_artist">Artist</string>
+  <string name="file_title">Title</string>
+  <string name="file_artist">Artist</string>
+
+  <string name="speech_text">Text</string>
 </resources>

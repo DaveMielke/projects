@@ -13,10 +13,10 @@ import java.util.HashMap;
 import android.media.AudioManager;
 import android.media.AudioAttributes;
 
-public abstract class TextPlayer extends RadioPlayer {
-  private final static String LOG_TAG = TextPlayer.class.getName();
+public abstract class SpeechPlayer extends RadioPlayer {
+  private final static String LOG_TAG = SpeechPlayer.class.getName();
 
-  protected TextPlayer (RadioProgram program) {
+  protected SpeechPlayer (RadioProgram program) {
     super(program);
   }
 
@@ -39,10 +39,25 @@ public abstract class TextPlayer extends RadioPlayer {
   private static int maximumInputLength = 0;
   private static int utteranceIdentifier = 0;
 
+  private static SpeechViewer speechViewer = null;
   private static RadioPlayer currentPlayer = null;
+
+  public static SpeechViewer getViewer () {
+    synchronized (TTS_LOCK) {
+      return speechViewer;
+    }
+  }
+
+  public static void setViewer (SpeechViewer viewer) {
+    synchronized (TTS_LOCK) {
+      speechViewer = viewer;
+    }
+  }
 
   private static void ttsDone () {
     synchronized (TTS_LOCK) {
+      if (speechViewer != null) speechViewer.showText(null);
+
       if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
         currentPlayer = null;
@@ -185,6 +200,7 @@ public abstract class TextPlayer extends RadioPlayer {
       }
 
       if (status == TextToSpeech.SUCCESS) {
+        if (speechViewer != null) speechViewer.showText(text);
         return true;
       } else {
         Log.e(LOG_TAG, ("TTS speak failed: " + status));
@@ -259,7 +275,8 @@ public abstract class TextPlayer extends RadioPlayer {
 
   protected final boolean play (String text) {
     synchronized (TTS_LOCK) {
-      logPlaying("text", text);
+      logPlaying("speech", text);
+
       currentPlayer = this;
       if (speakText(text)) return true;
       currentPlayer = null;
@@ -283,6 +300,13 @@ public abstract class TextPlayer extends RadioPlayer {
   }
 
   static {
-    startEngine();
+    post(
+      new Runnable() {
+        @Override
+        public void run () {
+          startEngine();
+        }
+      }
+    );
   }
 }

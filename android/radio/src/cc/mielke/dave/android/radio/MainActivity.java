@@ -7,7 +7,6 @@ import android.view.View;
 
 public class MainActivity extends BaseActivity {
   private ProgramSelector programSelector = null;
-  private PlayingUpdater playingUpdater = null;
 
   public final void selectProgram (View view) {
     programSelector.selectProgram();
@@ -18,7 +17,8 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
+    FilePlayer.setViewer(new FileViewer(this));
+    SpeechPlayer.setViewer(new SpeechViewer(this));
     programSelector = new ProgramSelector(this);
-    playingUpdater = new PlayingUpdater(this);
   }
 }
