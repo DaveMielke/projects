@@ -11,13 +11,13 @@ public class SpeechViewer extends ActivityComponent {
     boolean visible;
 
     if (text == null) {
-      visible = true;
+      visible = false;
       text = "";
     } else {
       visible = true;
     }
 
-    setVisible(speechText, visible);
+    setVisible(speechView, visible);
     speechText.setText(text);
   }
 
