@@ -20,6 +20,7 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
+  private static Thread progressMonitor = null;
   private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
 
@@ -35,10 +36,50 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
+  private static void startProgressMonitor () {
+    synchronized (PLAYER_LOCK) {
+      if (fileViewer != null) {
+        if (progressMonitor == null) {
+          progressMonitor =
+            new Thread("file-player-progress-mnitor") {
+              @Override
+              public void run () {
+                Log.d(LOG_TAG, "progress monitor started");
+
+                while (true) {
+                  fileViewer.setPosition(mediaPlayer.getCurrentPosition());
+
+                  try {
+                    sleep(1000);
+                  } catch (InterruptedException exception) {
+                    break;
+                  }
+                }
+
+                Log.d(LOG_TAG, "progress monitor stopped");
+              }
+            };
+
+          progressMonitor.start();
+        }
+      }
+    }
+  }
+
+  private static void stopProgressMonitor () {
+    synchronized (PLAYER_LOCK) {
+      if (progressMonitor != null) {
+        progressMonitor.interrupt();
+        progressMonitor = null;
+      }
+    }
+  }
+
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
-      mediaPlayer.reset();
+      stopProgressMonitor();
       if (fileViewer != null) fileViewer.enqueueFile(null);
+      mediaPlayer.reset();
 
       if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
@@ -89,7 +130,13 @@ public abstract class FilePlayer extends RadioPlayer {
     new MediaPlayer.OnPreparedListener() {
       @Override
       public void onPrepared (MediaPlayer player) {
+        if (fileViewer != null) {
+          fileViewer.setDuration(mediaPlayer.getDuration());
+          fileViewer.setPosition(0);
+        }
+
         mediaPlayer.start();
+        startProgressMonitor();
       }
     };
 
