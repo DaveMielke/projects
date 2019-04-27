@@ -16,7 +16,7 @@ import android.media.AudioAttributes;
 public class TextSpeaker {
   private final static String LOG_TAG = TextSpeaker.class.getName();
 
-  protected void onSpeakingStarted (String identifier, String text) {
+  protected void onSpeakingStarted (String identifier, CharSequence text) {
   }
 
   protected void onSpeakingFinished (String identifier) {
@@ -161,7 +161,7 @@ public class TextSpeaker {
   private int maximumInputLength = 0;
   private int utteranceIdentifier = 0;
 
-  public final boolean speakText (String text, boolean flush) {
+  public final boolean speakText (CharSequence text, boolean flush) {
     if (isEngineStarted()) {
       int queueMode = flush? TextToSpeech.QUEUE_FLUSH: TextToSpeech.QUEUE_ADD;
       String identifier = Integer.toString(++utteranceIdentifier);
@@ -171,7 +171,7 @@ public class TextSpeaker {
         status = ttsObject.speak(text, queueMode, newParameters, identifier);
       } else {
         setParameter(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, identifier);
-        status = ttsObject.speak(text, queueMode, oldParameters);
+        status = ttsObject.speak(text.toString(), queueMode, oldParameters);
       }
 
       if (status == TextToSpeech.SUCCESS) {
@@ -185,7 +185,7 @@ public class TextSpeaker {
     return false;
   }
 
-  public final boolean speakText (String text) {
+  public final boolean speakText (CharSequence text) {
     return speakText(text, true);
   }
 
