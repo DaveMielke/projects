@@ -11,25 +11,15 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:onClick="selectProgram"
-    android:text=""
    />
 
   <TableLayout
     android:id="@+id/view_file"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:stretchColumns="1"
     android:visibility="gone"
     >
-
-    <TableLayout android:stretchColumns="1">
-      <SeekBar android:id="@+id/file_seek_bar" />
-
-      <TableRow>
-        <TextView android:id="@+id/file_seek_current" />
-        <TextView />
-        <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
-      </TableRow>
-    </TableLayout>
 
     <TableRow>
       <TextView android:text="@string/file_metadata_title" />
@@ -40,12 +30,23 @@
       <TextView android:text="@string/file_metadata_artist" />
       <TextView android:id="@+id/file_metadata_artist" />
     </TableRow>
+
+    <TableLayout android:stretchColumns="1">
+      <SeekBar android:id="@+id/file_seek_bar" />
+
+      <TableRow>
+        <TextView android:id="@+id/file_seek_current" />
+        <TextView />
+        <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
+      </TableRow>
+    </TableLayout>
   </TableLayout>
 
   <TableLayout
     android:id="@+id/view_speech"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:stretchColumns="1"
     android:visibility="gone"
     >
 

@@ -1,5 +1,7 @@
 package cc.mielke.dave.android.radio;
 
+import cc.mielke.dave.android.base.ApiTests;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -121,7 +123,12 @@ public class FileViewer extends ActivityComponent {
   }
 
   public final void setPosition (int milliseconds) {
-    seekBar.setProgress(milliseconds);
+    if (ApiTests.haveNougat) {
+      seekBar.setProgress(milliseconds, true);
+    } else {
+      seekBar.setProgress(milliseconds);
+    }
+
     seekCurrent.setText(toTime(milliseconds));
     seekRemaining.setText("-" + toTime(seekBar.getMax() - milliseconds));
   }
