@@ -23,11 +23,23 @@ public class ProgramSelector extends ActivityComponent {
     updateButtonText();
   }
 
-  public final void selectProgram () {
+  private final String[] getProgramNames () {
     RadioPrograms programs = getRadioPrograms();
-    String[] names = (programs != null)? programs.getNames(): new String[]{};
 
     if (programs != null) {
+      String[] names = programs.getNames();
+      if (names != null) return names;
+    }
+
+    return new String[]{};
+  }
+
+  public final void selectProgram () {
+    String[] names = getProgramNames();
+
+    if (names.length == 0) {
+      mainActivity.showMessage(R.string.message_noPrograms);
+    } else {
       sort(names);
 
       final String[] items = new String[1 + names.length];
@@ -49,8 +61,6 @@ public class ProgramSelector extends ActivityComponent {
           }
         }
       );
-    } else {
-      mainActivity.showMessage(R.string.message_noPrograms);
     }
   }
 }
