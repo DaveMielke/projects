@@ -96,6 +96,10 @@ public class FileViewer extends ActivityComponent {
   private TextView fileCurrent = null;
   private TextView fileRemaining = null;
 
+  public final void setDuration (int milliseconds) {
+    fileSeek.setMax(milliseconds);
+  }
+
   private final String toTime (int milliseconds) {
     StringBuilder time = new StringBuilder();
 
@@ -120,10 +124,6 @@ public class FileViewer extends ActivityComponent {
     fileSeek.setProgress(milliseconds);
     fileCurrent.setText(toTime(milliseconds));
     fileRemaining.setText("-" + toTime(fileSeek.getMax() - milliseconds));
-  }
-
-  public final void setDuration (int milliseconds) {
-    fileSeek.setMax(milliseconds);
   }
 
   public final void setOnSeekBarChangeListener (SeekBar.OnSeekBarChangeListener listener) {
