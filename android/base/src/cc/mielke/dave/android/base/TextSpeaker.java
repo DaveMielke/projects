@@ -98,11 +98,18 @@ public class TextSpeaker {
     return setStream(TextToSpeech.Engine.DEFAULT_STREAM);
   }
 
+  public final static float VOLUME_MINIMUM = 0f;
+  public final static float VOLUME_MAXIMUM = 1f;
+
   public final boolean setVolume (float value) {
     synchronized (this) {
       return setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
     }
   }
+
+  public final static float BALANCE_CENTER = 0f;
+  public final static float BALANCE_RIGHT = 1f;
+  public final static float BALANCE_LEFT = -BALANCE_RIGHT;
 
   public final boolean setBalance (float value) {
     synchronized (this) {
@@ -110,12 +117,18 @@ public class TextSpeaker {
     }
   }
 
+  public final static float RATE_MAXIMUM = 4f;
+  public final static float RATE_MINIMUM = 1f / RATE_MAXIMUM;
+
   public final boolean setRate (float value) {
     synchronized (this) {
       if (!isEngineStarted()) return false;
       return ttsObject.setSpeechRate(value) == TextToSpeech.SUCCESS;
     }
   }
+
+  public final static float PITCH_MAXIMUM = 4f;
+  public final static float PITCH_MINIMUM = 1f / PITCH_MAXIMUM;
 
   public final boolean setPitch (float value) {
     synchronized (this) {
@@ -188,8 +201,8 @@ public class TextSpeaker {
                 setStream(AudioManager.STREAM_NOTIFICATION);
               }
 
-              setVolume(1.0f);
-              setBalance(0.0f);
+              setVolume(VOLUME_MAXIMUM);
+              setBalance(BALANCE_CENTER);
               setRate(1.0f);
               setPitch(1.0f);
 
