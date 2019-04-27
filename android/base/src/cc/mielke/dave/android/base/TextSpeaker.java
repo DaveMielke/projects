@@ -1,8 +1,8 @@
 package cc.mielke.dave.android.base;
 
 import android.util.Log;
-import android.os.Handler;
 import android.content.Context;
+import android.os.Handler;
 
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
@@ -16,7 +16,14 @@ import android.media.AudioAttributes;
 public class TextSpeaker {
   private final static String LOG_TAG = TextSpeaker.class.getName();
 
+  protected void onSpeakingStarted (String identifier, String text) {
+  }
+
+  protected void onSpeakingFinished (String identifier) {
+  }
+
   private final Context ttsContext;
+  private final long ttsRetryDelay;
   private final Handler ttsHandler;
 
   private TextToSpeech ttsObject = null;
@@ -32,6 +39,7 @@ public class TextSpeaker {
       @Override
       public void onError (String identifier) {
         Log.w(LOG_TAG, ("utterance generation failed: " + identifier));
+        onSpeakingFinished(identifier);
       }
 
       @Override
@@ -42,6 +50,8 @@ public class TextSpeaker {
             error, identifier
           )
         );
+
+        onSpeakingFinished(identifier);
       }
 
       @Override
@@ -52,11 +62,14 @@ public class TextSpeaker {
             (interrupted? "interrupted": "stopped"), identifier
           )
         );
+
+        onSpeakingFinished(identifier);
       }
 
       @Override
       public void onDone (String identifier) {
         Log.d(LOG_TAG, ("utterance generation done: " + identifier));
+        onSpeakingFinished(identifier);
       }
     };
 
@@ -103,6 +116,8 @@ public class TextSpeaker {
 
   public final boolean setVolume (float value) {
     synchronized (this) {
+      if (value < VOLUME_MINIMUM) return false;
+      if (value > VOLUME_MAXIMUM) return false;
       return setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
     }
   }
@@ -113,25 +128,31 @@ public class TextSpeaker {
 
   public final boolean setBalance (float value) {
     synchronized (this) {
+      if (value < BALANCE_LEFT) return false;
+      if (value > BALANCE_RIGHT) return false;
       return setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
     }
   }
 
-  public final static float RATE_MAXIMUM = 4f;
+  public final static float RATE_MAXIMUM = 10f;
   public final static float RATE_MINIMUM = 1f / RATE_MAXIMUM;
 
   public final boolean setRate (float value) {
     synchronized (this) {
+      if (value < RATE_MINIMUM) return false;
+      if (value > RATE_MAXIMUM) return false;
       if (!isEngineStarted()) return false;
       return ttsObject.setSpeechRate(value) == TextToSpeech.SUCCESS;
     }
   }
 
-  public final static float PITCH_MAXIMUM = 4f;
+  public final static float PITCH_MAXIMUM = 10f;
   public final static float PITCH_MINIMUM = 1f / PITCH_MAXIMUM;
 
   public final boolean setPitch (float value) {
     synchronized (this) {
+      if (value < PITCH_MINIMUM) return false;
+      if (value > PITCH_MAXIMUM) return false;
       if (!isEngineStarted()) return false;
       return ttsObject.setPitch(value) == TextToSpeech.SUCCESS;
     }
@@ -140,20 +161,21 @@ public class TextSpeaker {
   private int maximumInputLength = 0;
   private int utteranceIdentifier = 0;
 
-  public final boolean speakText (String text) {
+  public final boolean speakText (String text, boolean flush) {
     if (isEngineStarted()) {
-      int queueMode = TextToSpeech.QUEUE_FLUSH;
-      String utterance = Integer.toString(++utteranceIdentifier);
+      int queueMode = flush? TextToSpeech.QUEUE_FLUSH: TextToSpeech.QUEUE_ADD;
+      String identifier = Integer.toString(++utteranceIdentifier);
       int status;
 
       if (useNewParadigm) {
-        status = ttsObject.speak(text, queueMode, newParameters, utterance);
+        status = ttsObject.speak(text, queueMode, newParameters, identifier);
       } else {
-        setParameter(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utterance);
+        setParameter(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, identifier);
         status = ttsObject.speak(text, queueMode, oldParameters);
       }
 
       if (status == TextToSpeech.SUCCESS) {
+        onSpeakingStarted(identifier, text);
         return true;
       } else {
         Log.e(LOG_TAG, ("TTS speak failed: " + status));
@@ -161,6 +183,33 @@ public class TextSpeaker {
     }
 
     return false;
+  }
+
+  public final boolean speakText (String text) {
+    return speakText(text, true);
+  }
+
+  public boolean stopSpeaking () {
+    synchronized (this) {
+      if (isEngineStarted()) {
+        int status = ttsObject.stop();
+
+        if (status == TextToSpeech.SUCCESS) {
+          return true;
+        } else {
+          Log.e(LOG_TAG, ("TTS stop failed: " + status));
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public boolean isSpeaking () {
+    synchronized (this) {
+      if (!isEngineStarted()) return false;
+      return ttsObject.isSpeaking();
+    }
   }
 
   private int getMaximumInputLength () {
@@ -203,8 +252,8 @@ public class TextSpeaker {
 
               setVolume(VOLUME_MAXIMUM);
               setBalance(BALANCE_CENTER);
-              setRate(1.0f);
-              setPitch(1.0f);
+              setRate(1f);
+              setPitch(1f);
 
               ttsReady = true;
               break;
@@ -225,7 +274,7 @@ public class TextSpeaker {
                   }
                 };
 
-              ttsHandler.postDelayed(retry, 30000);
+              ttsHandler.postDelayed(retry, ttsRetryDelay);
               break;
           }
         }
@@ -239,10 +288,11 @@ public class TextSpeaker {
     }
   }
 
-  public TextSpeaker (Context context) {
+  public TextSpeaker (Context context, long retryDelay) {
     super();
 
     ttsContext = context;
+    ttsRetryDelay = retryDelay;
     ttsHandler = new Handler();
 
     if (useNewParadigm) {
