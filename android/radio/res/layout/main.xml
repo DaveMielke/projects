@@ -22,23 +22,23 @@
     >
 
     <TableLayout android:stretchColumns="1">
-      <SeekBar android:id="@+id/file_seek" />
+      <SeekBar android:id="@+id/file_seek_bar" />
 
       <TableRow>
-        <TextView android:id="@+id/file_current" />
+        <TextView android:id="@+id/file_seek_current" />
         <TextView />
-        <TextView android:id="@+id/file_remaining" android:gravity="right" />
+        <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
       </TableRow>
     </TableLayout>
 
     <TableRow>
-      <TextView android:text="@string/file_title" />
-      <TextView android:id="@+id/file_title" />
+      <TextView android:text="@string/file_metadata_title" />
+      <TextView android:id="@+id/file_metadata_title" />
     </TableRow>
 
     <TableRow>
-      <TextView android:text="@string/file_artist" />
-      <TextView android:id="@+id/file_artist" />
+      <TextView android:text="@string/file_metadata_artist" />
+      <TextView android:id="@+id/file_metadata_artist" />
     </TableRow>
   </TableLayout>
 

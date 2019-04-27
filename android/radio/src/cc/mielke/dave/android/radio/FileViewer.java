@@ -16,8 +16,8 @@ public class FileViewer extends ActivityComponent {
   private final Handler updateHandler = getHandler();
 
   private View fileView = null;
-  private TextView fileTitle = null;
-  private TextView fileArtist = null;
+  private TextView metadataTitle = null;
+  private TextView metadataArtist = null;
 
   private final void updateText (TextView view, String text) {
     if (text == null) text = "";
@@ -44,8 +44,8 @@ public class FileViewer extends ActivityComponent {
           }
 
           setVisible(fileView, visible);
-          updateText(fileTitle, title);
-          updateText(fileArtist, artist);
+          updateText(metadataTitle, title);
+          updateText(metadataArtist, artist);
         }
       };
 
@@ -92,12 +92,12 @@ public class FileViewer extends ActivityComponent {
       }
     };
 
-  private SeekBar fileSeek = null;
-  private TextView fileCurrent = null;
-  private TextView fileRemaining = null;
+  private SeekBar seekBar = null;
+  private TextView seekCurrent = null;
+  private TextView seekRemaining = null;
 
   public final void setDuration (int milliseconds) {
-    fileSeek.setMax(milliseconds);
+    seekBar.setMax(milliseconds);
   }
 
   private final String toTime (int milliseconds) {
@@ -121,26 +121,26 @@ public class FileViewer extends ActivityComponent {
   }
 
   public final void setPosition (int milliseconds) {
-    fileSeek.setProgress(milliseconds);
-    fileCurrent.setText(toTime(milliseconds));
-    fileRemaining.setText("-" + toTime(fileSeek.getMax() - milliseconds));
+    seekBar.setProgress(milliseconds);
+    seekCurrent.setText(toTime(milliseconds));
+    seekRemaining.setText("-" + toTime(seekBar.getMax() - milliseconds));
   }
 
   public final void setOnSeekBarChangeListener (SeekBar.OnSeekBarChangeListener listener) {
-    fileSeek.setOnSeekBarChangeListener(listener);
+    seekBar.setOnSeekBarChangeListener(listener);
   }
 
   public FileViewer (MainActivity activity) {
     super(activity);
-
     fileView = mainActivity.findViewById(R.id.view_file);
-    fileTitle = mainActivity.findViewById(R.id.file_title);
-    fileArtist = mainActivity.findViewById(R.id.file_artist);
 
-    fileSeek = mainActivity.findViewById(R.id.file_seek);
-    fileCurrent = mainActivity.findViewById(R.id.file_current);
-    fileRemaining = mainActivity.findViewById(R.id.file_remaining);
-    fileSeek.setKeyProgressIncrement(10000);
+    metadataTitle = mainActivity.findViewById(R.id.file_metadata_title);
+    metadataArtist = mainActivity.findViewById(R.id.file_metadata_artist);
+
+    seekBar = mainActivity.findViewById(R.id.file_seek_bar);
+    seekCurrent = mainActivity.findViewById(R.id.file_seek_current);
+    seekRemaining = mainActivity.findViewById(R.id.file_seek_remaining);
+    seekBar.setKeyProgressIncrement(10000);
 
     dequeueThread = new Thread(fileDequeuer);
     dequeueThread.start();
