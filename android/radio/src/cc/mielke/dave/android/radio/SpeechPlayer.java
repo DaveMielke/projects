@@ -1,18 +1,8 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.TextSpeaker;
-import cc.mielke.dave.android.base.ApiTests;
 
 import android.util.Log;
-
-import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
-
-import android.os.Bundle;
-import java.util.HashMap;
-
-import android.media.AudioManager;
-import android.media.AudioAttributes;
 
 public abstract class SpeechPlayer extends RadioPlayer {
   private final static String LOG_TAG = SpeechPlayer.class.getName();
