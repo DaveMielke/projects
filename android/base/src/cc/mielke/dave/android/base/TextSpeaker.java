@@ -239,6 +239,7 @@ public class TextSpeaker {
 
               ttsObject.setOnUtteranceProgressListener(utteranceProgressListener);
               maximumInputLength = getMaximumInputLength();
+              ttsReady = true;
 
               if (ApiTests.haveLollipop) {
                 AudioAttributes.Builder builder = new AudioAttributes.Builder();
@@ -255,7 +256,6 @@ public class TextSpeaker {
               setRate(1f);
               setPitch(1f);
 
-              ttsReady = true;
               break;
             }
 
