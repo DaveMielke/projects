@@ -10,6 +10,7 @@ import android.util.Log;
 import android.media.MediaPlayer;
 import android.media.AudioAttributes;
 import android.net.Uri;
+import android.widget.SeekBar;
 
 public abstract class FilePlayer extends RadioPlayer {
   private final static String LOG_TAG = FilePlayer.class.getName();
@@ -20,31 +21,19 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
-  private static Thread progressMonitor = null;
+  private static Thread positionMonitor = null;
   private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
 
-  public static FileViewer getViewer () {
-    synchronized (PLAYER_LOCK) {
-      return fileViewer;
-    }
-  }
-
-  public static void setViewer (FileViewer viewer) {
-    synchronized (PLAYER_LOCK) {
-      fileViewer = viewer;
-    }
-  }
-
-  private static void startProgressMonitor () {
+  private static void startPositionMonitor () {
     synchronized (PLAYER_LOCK) {
       if (fileViewer != null) {
-        if (progressMonitor == null) {
-          progressMonitor =
-            new Thread("file-player-progress-mnitor") {
+        if (positionMonitor == null) {
+          positionMonitor =
+            new Thread("file-player-position-mnitor") {
               @Override
               public void run () {
-                Log.d(LOG_TAG, "progress monitor started");
+                Log.d(LOG_TAG, "position monitor started");
 
                 while (true) {
                   fileViewer.setPosition(mediaPlayer.getCurrentPosition());
@@ -56,28 +45,64 @@ public abstract class FilePlayer extends RadioPlayer {
                   }
                 }
 
-                Log.d(LOG_TAG, "progress monitor stopped");
+                Log.d(LOG_TAG, "position monitor stopped");
               }
             };
 
-          progressMonitor.start();
+          positionMonitor.start();
         }
       }
     }
   }
 
-  private static void stopProgressMonitor () {
+  private static void stopPositionMonitor () {
     synchronized (PLAYER_LOCK) {
-      if (progressMonitor != null) {
-        progressMonitor.interrupt();
-        progressMonitor = null;
+      if (positionMonitor != null) {
+        positionMonitor.interrupt();
+        positionMonitor = null;
       }
+    }
+  }
+
+  private final static SeekBar.OnSeekBarChangeListener positionChangedListener =
+    new SeekBar.OnSeekBarChangeListener() {
+      @Override
+      public void onProgressChanged (SeekBar seekBar, int position, boolean fromUser) {
+        if (fromUser) {
+          mediaPlayer.seekTo(position);
+        }
+      }
+
+      @Override
+      public void onStartTrackingTouch (SeekBar seekBar) {
+        stopPositionMonitor();
+      }
+
+      @Override
+      public void onStopTrackingTouch (SeekBar seekBar) {
+        startPositionMonitor();
+      }
+    };
+
+  public static FileViewer getViewer () {
+    synchronized (PLAYER_LOCK) {
+      return fileViewer;
+    }
+  }
+
+  public static void setViewer (FileViewer viewer) {
+    synchronized (PLAYER_LOCK) {
+      if (viewer != null) {
+        viewer.setOnSeekBarChangeListener(positionChangedListener);
+      }
+
+      fileViewer = viewer;
     }
   }
 
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
-      stopProgressMonitor();
+      stopPositionMonitor();
       if (fileViewer != null) fileViewer.enqueueFile(null);
       mediaPlayer.reset();
 
@@ -136,7 +161,7 @@ public abstract class FilePlayer extends RadioPlayer {
         }
 
         mediaPlayer.start();
-        startProgressMonitor();
+        startPositionMonitor();
       }
     };
 
