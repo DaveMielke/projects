@@ -69,7 +69,7 @@ public abstract class RadioPlayer extends RadioComponent {
     return setMaximumDelay(unit.toMillis(count));
   }
 
-  protected final void logPlaying (String type, String data) {
+  protected final void logPlaying (String type, CharSequence data) {
     Log.i(LOG_TAG, String.format("playing %s: %s", type, data));
   }
 

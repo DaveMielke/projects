@@ -7,7 +7,7 @@ public class SpeechViewer extends ActivityComponent {
   private View speechView = null;
   private TextView speechText = null;
 
-  public final void showText (String text) {
+  public final void showText (CharSequence text) {
     boolean visible;
 
     if (text == null) {
