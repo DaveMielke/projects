@@ -5,19 +5,27 @@ import java.io.File;
 import android.os.Environment;
 import android.app.Application;
 import android.content.pm.ApplicationInfo;
+
 import android.content.Context;
+import android.os.Handler;
 
 public class BaseApplication extends Application {
   private static Context applicationContext = null;
+  private static Handler applicationHandler = null;
 
   @Override
   public void onCreate () {
     super.onCreate();
     applicationContext = this;
+    applicationHandler = new Handler();
   }
 
   public static Context getContext () {
     return applicationContext;
+  }
+
+  public static Handler getHandler () {
+    return applicationHandler;
   }
 
   public static String getName (Context context) {

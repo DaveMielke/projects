@@ -35,18 +35,8 @@ public abstract class BaseComponent {
     return getContext().getString(string);
   }
 
-  protected static File getExternalStorageDirectory () {
-    return BaseApplication.getExternalStorageDirectory();
-  }
-
-  private final static Object HANDLER_LOCK = new Object();
-  private static Handler handler = null;
-
   protected static Handler getHandler () {
-    synchronized (HANDLER_LOCK) {
-      if (handler == null) handler = new Handler();
-      return handler;
-    }
+    return BaseApplication.getHandler();
   }
 
   protected static void post (Runnable runnable) {
@@ -55,6 +45,10 @@ public abstract class BaseComponent {
 
   protected static void post (long delay, Runnable runnable) {
     getHandler().postDelayed(runnable, delay);
+  }
+
+  protected static File getExternalStorageDirectory () {
+    return BaseApplication.getExternalStorageDirectory();
   }
 
   protected static long getCurrentTime () {
