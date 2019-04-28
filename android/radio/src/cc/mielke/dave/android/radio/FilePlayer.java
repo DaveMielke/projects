@@ -61,7 +61,9 @@ public abstract class FilePlayer extends RadioPlayer {
                   new Runnable() {
                     @Override
                     public void run () {
-                      fileViewer.setPosition(mediaPlayer.getCurrentPosition());
+                      synchronized (PLAYER_LOCK) {
+                        fileViewer.setPosition(mediaPlayer.getCurrentPosition());
+                      }
                     }
                   }
                 );
@@ -140,12 +142,10 @@ public abstract class FilePlayer extends RadioPlayer {
       stopPositionMonitor("media end");
       mediaPlayer.reset();
 
-      if (fileViewer != null) {
+      if (currentPlayer != null) {
         fileViewer.setPlayPauseButton(false);
         fileViewer.enqueueFile(null);
-      }
 
-      if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
         currentPlayer = null;
         player.onPlayEnd();
@@ -194,7 +194,7 @@ public abstract class FilePlayer extends RadioPlayer {
     new MediaPlayer.OnPreparedListener() {
       @Override
       public void onPrepared (MediaPlayer player) {
-        if (fileViewer != null) {
+        synchronized (PLAYER_LOCK) {
           fileViewer.setDuration(mediaPlayer.getDuration());
           fileViewer.setPosition(0);
           fileViewer.setPlayPauseButton(true);
@@ -241,7 +241,7 @@ public abstract class FilePlayer extends RadioPlayer {
         isPlaying = true;
       }
 
-      if (fileViewer != null) fileViewer.setPlayPauseButton(isPlaying);
+      fileViewer.setPlayPauseButton(isPlaying);
     }
   }
 
@@ -275,7 +275,7 @@ public abstract class FilePlayer extends RadioPlayer {
         return false;
       }
 
-      if (fileViewer != null) fileViewer.enqueueFile(file);
+      fileViewer.enqueueFile(file);
       currentPlayer = this;
       mediaPlayer.prepareAsync();
       return true;
