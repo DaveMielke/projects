@@ -7,9 +7,4 @@
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
   <string name="message_noPrograms">no programs have been defined</string>
-
-  <string name="file_metadata_title">Title</string>
-  <string name="file_metadata_artist">Artist</string>
-
-  <string name="speech_text">Text</string>
 </resources>

@@ -24,6 +24,7 @@ public class FileViewer extends ActivityComponent {
   private final void updateText (TextView view, String text) {
     if (text == null) text = "";
     view.setText(text);
+    setVisible(view, (text.length() > 0));
   }
 
   private final void updateMetadata (final String... arguments) {

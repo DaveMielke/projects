@@ -1,58 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:orientation="vertical"
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   >
 
-  <Button
-    android:id="@+id/button_selectProgram"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:onClick="selectProgram"
-   />
-
   <TableLayout
-    android:id="@+id/view_file"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:stretchColumns="1"
-    android:visibility="gone"
+    android:layout_alignParentTop="true"
     >
 
-    <TableRow>
-      <TextView android:text="@string/file_metadata_title" />
-      <TextView android:id="@+id/file_metadata_title" />
-    </TableRow>
+    <Button
+      android:id="@+id/button_selectProgram"
+      android:gravity="center_horizontal"
+      android:onClick="selectProgram"
+     />
+  </TableLayout>
 
-    <TableRow>
-      <TextView android:text="@string/file_metadata_artist" />
-      <TextView android:id="@+id/file_metadata_artist" />
-    </TableRow>
+  <TableLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    >
 
-    <TableLayout android:stretchColumns="1">
-      <SeekBar android:id="@+id/file_seek_bar" />
+    <TableLayout
+      android:id="@+id/view_file"
+      android:visibility="gone"
+      >
 
-      <TableRow>
-        <TextView android:id="@+id/file_seek_current" />
-        <TextView />
-        <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
-      </TableRow>
+      <TextView
+        android:id="@+id/file_metadata_title"
+        android:gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+       />
+
+      <TextView
+        android:id="@+id/file_metadata_artist"
+        android:gravity="center_horizontal"
+       />
+
+      <TableLayout android:padding="10dp" android:stretchColumns="1">
+        <SeekBar android:id="@+id/file_seek_bar" />
+
+        <TableRow>
+          <TextView android:id="@+id/file_seek_current" />
+          <TextView />
+          <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
+        </TableRow>
+      </TableLayout>
+    </TableLayout>
+
+    <TableLayout
+      android:id="@+id/view_speech"
+      android:stretchColumns="1"
+      android:visibility="gone"
+      >
+
+      <TextView
+        android:id="@+id/speech_text"
+        android:gravity="center_horizontal"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textStyle="bold"
+       />
     </TableLayout>
   </TableLayout>
-
-  <TableLayout
-    android:id="@+id/view_speech"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:stretchColumns="1"
-    android:visibility="gone"
-    >
-
-    <TableRow>
-      <TextView android:text="@string/speech_text" />
-      <TextView android:id="@+id/speech_text" />
-    </TableRow>
-  </TableLayout>
-</LinearLayout>
+</RelativeLayout>

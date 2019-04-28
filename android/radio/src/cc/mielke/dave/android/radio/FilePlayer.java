@@ -36,7 +36,14 @@ public abstract class FilePlayer extends RadioPlayer {
                 Log.d(LOG_TAG, "position monitor started");
 
                 while (true) {
-                  fileViewer.setPosition(mediaPlayer.getCurrentPosition());
+                  post(
+                    new Runnable() {
+                      @Override
+                      public void run () {
+                        fileViewer.setPosition(mediaPlayer.getCurrentPosition());
+                      }
+                    }
+                  );
 
                   try {
                     sleep(1000);
