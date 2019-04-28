@@ -26,8 +26,21 @@ public abstract class FilePlayer extends RadioPlayer {
   private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
 
-  private static void startPositionMonitor () {
+  private static void logPositionMonitorAction (String action, String reason) {
+    Log.d(LOG_TAG,
+      String.format(
+        "%s position monitor: %s: %d",
+        action, reason, positionMonitorStopDepth
+      )
+    );
+  }
+
+  private static void startPositionMonitor (String reason) {
     synchronized (PLAYER_LOCK) {
+      if (RadioParameters.LOG_POSITION_MONITOR) {
+        logPositionMonitorAction("start", reason);
+      }
+
       if (positionMonitorStopDepth <= 0) {
         throw new IllegalStateException("position monitor stop depth underflow");
       }
@@ -37,7 +50,10 @@ public abstract class FilePlayer extends RadioPlayer {
           new Thread("file-player-position-mnitor") {
             @Override
             public void run () {
-              Log.d(LOG_TAG, "position monitor started");
+              if (RadioParameters.LOG_POSITION_MONITOR) {
+                Log.d(LOG_TAG, "position monitor started");
+              }
+
               boolean stop = false;
 
               while (true) {
@@ -50,16 +66,17 @@ public abstract class FilePlayer extends RadioPlayer {
                   }
                 );
 
-                if (stop) {
-                  Log.d(LOG_TAG, "position monitor stopped");
-                  return;
-                }
+                if (stop) break;
 
                 try {
                   sleep(RadioParameters.FILE_POSITION_INTERVAL);
                 } catch (InterruptedException exception) {
                   stop = true;
                 }
+              }
+
+              if (RadioParameters.LOG_POSITION_MONITOR) {
+                Log.d(LOG_TAG, "position monitor stopped");
               }
             }
           };
@@ -69,8 +86,12 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  private static void stopPositionMonitor () {
+  private static void stopPositionMonitor (String reason) {
     synchronized (PLAYER_LOCK) {
+      if (RadioParameters.LOG_POSITION_MONITOR) {
+        logPositionMonitorAction("stop", reason);
+      }
+
       if (positionMonitorStopDepth++ == 0) {
         positionMonitorThread.interrupt();
         positionMonitorThread = null;
@@ -89,12 +110,12 @@ public abstract class FilePlayer extends RadioPlayer {
 
       @Override
       public void onStartTrackingTouch (SeekBar seekBar) {
-        stopPositionMonitor();
+        stopPositionMonitor("touch begin");
       }
 
       @Override
       public void onStopTrackingTouch (SeekBar seekBar) {
-        startPositionMonitor();
+        startPositionMonitor("touch end");
       }
     };
 
@@ -116,7 +137,7 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
-      stopPositionMonitor();
+      stopPositionMonitor("media end");
       mediaPlayer.reset();
 
       if (fileViewer != null) {
@@ -180,7 +201,7 @@ public abstract class FilePlayer extends RadioPlayer {
         }
 
         mediaPlayer.start();
-        startPositionMonitor();
+        startPositionMonitor("media begin");
       }
     };
 
@@ -212,11 +233,11 @@ public abstract class FilePlayer extends RadioPlayer {
         isPlaying = false;
       } else if (mediaPlayer.isPlaying()) {
         mediaPlayer.pause();
-        stopPositionMonitor();
+        stopPositionMonitor("pause");
         isPlaying = false;
       } else {
         mediaPlayer.start();
-        startPositionMonitor();
+        startPositionMonitor("play");
         isPlaying = true;
       }
 

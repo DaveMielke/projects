@@ -23,4 +23,6 @@ public abstract class RadioParameters {
   public final static long FILE_PREVIOUS_THRESHOLD = TimeUnit.SECONDS.toMillis(5);
 
   public final static long TTS_RETRY_DELAY = TimeUnit.SECONDS.toMillis(30);
+
+  public final static boolean LOG_POSITION_MONITOR = true;
 }
