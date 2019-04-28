@@ -7,7 +7,7 @@ import java.io.File;
 import android.util.Log;
 
 public abstract class CollectionPlayer extends FilePlayer {
-  private final String LOG_TAG = getClass().getName();
+  private final String LOG_TAG = CollectionPlayer.class.getName();
 
   protected final CollectionLibrary collectionLibrary;
 

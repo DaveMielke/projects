@@ -34,6 +34,7 @@ public abstract class FilePlayer extends RadioPlayer {
               @Override
               public void run () {
                 Log.d(LOG_TAG, "position monitor started");
+                boolean stop = false;
 
                 while (true) {
                   post(
@@ -45,14 +46,17 @@ public abstract class FilePlayer extends RadioPlayer {
                     }
                   );
 
+                  if (stop) {
+                    Log.d(LOG_TAG, "position monitor stopped");
+                    return;
+                  }
+
                   try {
-                    sleep(1000);
+                    sleep(RadioParameters.FILE_POSITION_INTERVAL);
                   } catch (InterruptedException exception) {
-                    break;
+                    stop = true;
                   }
                 }
-
-                Log.d(LOG_TAG, "position monitor stopped");
               }
             };
 
@@ -188,6 +192,22 @@ public abstract class FilePlayer extends RadioPlayer {
         mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
         mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
+      }
+    }
+  }
+
+  public static boolean playPause () {
+    synchronized (PLAYER_LOCK) {
+      if (mediaPlayer == null) return true;
+
+      if (mediaPlayer.isPlaying()) {
+        mediaPlayer.pause();
+        stopPositionMonitor();
+        return false;
+      } else {
+        mediaPlayer.start();
+        startPositionMonitor();
+        return true;
       }
     }
   }

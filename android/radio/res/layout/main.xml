@@ -51,6 +51,7 @@
            />
 
           <Button
+            android:id="@+id/button_playPause"
             android:layout_weight="1"
             android:onClick="playPause"
             android:text="@string/action_pauseFile"

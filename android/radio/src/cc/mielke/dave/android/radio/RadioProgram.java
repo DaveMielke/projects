@@ -46,7 +46,7 @@ public class RadioProgram extends RadioComponent {
 
   private final List<RadioPlayer> allPlayers = new LinkedList<>();
   private RadioPlayer currentPlayer = null;
-  private boolean isStarted = false;
+  private boolean isActive = false;
 
   protected final RadioProgram addPlayers (RadioPlayer... players) {
     synchronized (allPlayers) {
@@ -68,7 +68,7 @@ public class RadioProgram extends RadioComponent {
 
   public final void play () {
     synchronized (allPlayers) {
-      if (!isStarted) return;
+      if (!isActive) return;
 
       long now = getCurrentTime();
       long next = Long.MAX_VALUE;
@@ -99,10 +99,9 @@ public class RadioProgram extends RadioComponent {
 
   public final void start () {
     synchronized (allPlayers) {
-      if (!isStarted) {
+      if (!isActive) {
         logAction("starting");
-        isStarted = true;
-
+        isActive = true;
         play();
       }
     }
@@ -110,9 +109,9 @@ public class RadioProgram extends RadioComponent {
 
   public final void stop () {
     synchronized (allPlayers) {
-      if (isStarted) {
+      if (isActive) {
         logAction("stopping");
-        isStarted = false;
+        isActive = false;
 
         getHandler().removeCallbacks(playCallback);
         if (currentPlayer != null) currentPlayer.stop();

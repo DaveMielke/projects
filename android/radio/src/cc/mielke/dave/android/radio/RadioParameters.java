@@ -19,5 +19,8 @@ public abstract class RadioParameters {
   public final static double BOOK_RELATIVE_DELAY = 1.4d;
   public final static long BOOK_MAXIMUM_DELAY = TimeUnit.MINUTES.toMillis(25);
 
+  public final static long FILE_POSITION_INTERVAL = TimeUnit.SECONDS.toMillis(1);
+  public final static long FILE_PREVIOUS_THRESHOLD = TimeUnit.SECONDS.toMillis(5);
+
   public final static long TTS_RETRY_DELAY = TimeUnit.SECONDS.toMillis(30);
 }
