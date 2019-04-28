@@ -76,8 +76,8 @@ public abstract class CollectionPlayer extends FilePlayer {
     }
   }
 
-  private final static ArrayList<FileEntry> fileList = new ArrayList<>();
-  private static int currentFile = fileList.size();
+  private final ArrayList<FileEntry> fileList = new ArrayList<>();
+  private int currentFile = fileList.size();
   protected abstract int getAudioContentType ();
 
   protected File nextFile () {

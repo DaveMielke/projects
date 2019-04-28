@@ -1,7 +1,8 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.BaseActivity;
-import android.app.Activity;
+
+import android.os.Handler;
 
 import android.view.View;
 
@@ -12,6 +13,8 @@ public abstract class ActivityComponent extends RadioComponent {
     super();
     mainActivity = activity;
   }
+
+  public final Handler handler = getHandler();
 
   public final void setVisible (View view, boolean yes) {
     view.setVisibility(yes? View.VISIBLE: View.GONE);

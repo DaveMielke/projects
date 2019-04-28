@@ -43,33 +43,41 @@
 
       <TableLayout>
         <TableRow>
+          <Space android:layout_weight="1" />
+
           <Button
-            android:layout_weight="1"
             android:onClick="previousFile"
-            android:text="@string/action_previousFile"
+            android:background="@android:drawable/ic_media_previous"
+            android:contentDescription="@string/action_previousFile"
            />
+
+          <Space android:layout_weight="1" />
 
           <Button
             android:id="@+id/button_playPause"
-            android:layout_weight="1"
             android:onClick="playPause"
-            android:text="@string/action_pauseFile"
+            android:background="@android:drawable/ic_media_pause"
+            android:contentDescription="@string/action_pauseFile"
            />
 
+          <Space android:layout_weight="1" />
+
           <Button
-            android:layout_weight="1"
             android:onClick="nextFile"
-            android:text="@string/action_nextFile"
+            android:background="@android:drawable/ic_media_next"
+            android:contentDescription="@string/action_nextFile"
            />
+
+          <Space android:layout_weight="1" />
         </TableRow>
       </TableLayout>
 
-      <TableLayout android:padding="10dp" android:stretchColumns="1">
+      <TableLayout android:padding="25dp" android:stretchColumns="1">
         <SeekBar android:id="@+id/file_seek_bar" />
 
         <TableRow>
           <TextView android:id="@+id/file_seek_current" />
-          <TextView />
+          <Space />
           <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
         </TableRow>
       </TableLayout>

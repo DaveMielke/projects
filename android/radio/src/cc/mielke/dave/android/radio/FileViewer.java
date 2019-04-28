@@ -8,16 +8,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.io.File;
 import android.media.MediaMetadataRetriever;
 
-import android.os.Handler;
-
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.SeekBar;
 
 public class FileViewer extends ActivityComponent {
-  private final Handler updateHandler = getHandler();
-
   private View fileView = null;
   private TextView metadataTitle = null;
   private TextView metadataArtist = null;
@@ -53,7 +49,7 @@ public class FileViewer extends ActivityComponent {
         }
       };
 
-    updateHandler.post(updater);
+    handler.post(updater);
   }
 
   private final BlockingQueue<String> fileQueue = new LinkedBlockingQueue<>();
@@ -99,9 +95,19 @@ public class FileViewer extends ActivityComponent {
   private Button playPauseButton = null;
 
   public final void setPlayPauseButton (boolean isPlaying) {
-    playPauseButton.setText(
-      isPlaying? R.string.action_pauseFile: R.string.action_playFile
-    );
+    int label;
+    int image;
+
+    if (isPlaying) {
+      label = R.string.action_pauseFile;
+      image = android.R.drawable.ic_media_pause;
+    } else {
+      label = R.string.action_playFile;
+      image = android.R.drawable.ic_media_play;
+    }
+
+    playPauseButton.setContentDescription(getString(label));
+    playPauseButton.setBackgroundResource(image);
   }
 
   private SeekBar seekBar = null;

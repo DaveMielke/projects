@@ -8,7 +8,7 @@ public class SpeechViewer extends ActivityComponent {
   private TextView speechText = null;
 
   public final void showText (CharSequence text) {
-    boolean visible;
+    final boolean visible;
 
     if (text == null) {
       visible = false;
@@ -17,8 +17,17 @@ public class SpeechViewer extends ActivityComponent {
       visible = true;
     }
 
-    setVisible(speechView, visible);
-    speechText.setText(text);
+    final CharSequence message = text;
+
+    handler.post(
+      new Runnable() {
+        @Override
+        public void run () {
+          setVisible(speechView, visible);
+          speechText.setText(message);
+        }
+      }
+    );
   }
 
   public SpeechViewer (MainActivity activity) {
