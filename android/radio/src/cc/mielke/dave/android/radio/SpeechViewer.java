@@ -19,7 +19,7 @@ public class SpeechViewer extends ActivityComponent {
 
     final CharSequence message = text;
 
-    handler.post(
+    getHandler().post(
       new Runnable() {
         @Override
         public void run () {

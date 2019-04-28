@@ -25,7 +25,7 @@ public class FileViewer extends ActivityComponent {
   }
 
   private final void updateMetadata (final String... arguments) {
-    Runnable updater =
+    getHandler().post(
       new Runnable() {
         @Override
         public void run () {
@@ -47,9 +47,8 @@ public class FileViewer extends ActivityComponent {
           updateText(metadataTitle, title);
           updateText(metadataArtist, artist);
         }
-      };
-
-    handler.post(updater);
+      }
+    );
   }
 
   private final BlockingQueue<String> fileQueue = new LinkedBlockingQueue<>();

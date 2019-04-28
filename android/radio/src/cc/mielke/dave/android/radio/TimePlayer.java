@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 import java.text.SimpleDateFormat;
 import android.text.format.DateFormat;
 
-public abstract class TimeAnnouncementPlayer extends SpeechPlayer {
-  public TimeAnnouncementPlayer (RadioProgram program) {
+public abstract class TimePlayer extends SpeechPlayer {
+  public TimePlayer (RadioProgram program) {
     super(program);
   }
 

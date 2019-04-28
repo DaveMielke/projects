@@ -18,6 +18,7 @@ import java.io.IOException;
 import android.util.Log;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Handler;
 
 public abstract class BaseComponent {
@@ -33,6 +34,10 @@ public abstract class BaseComponent {
 
   protected static String getString (int string) {
     return getContext().getString(string);
+  }
+
+  protected static Resources getResources () {
+    return getContext().getResources();
   }
 
   protected static Handler getHandler () {

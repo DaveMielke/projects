@@ -1,7 +1,7 @@
 package cc.mielke.dave.android.radio;
 
-public class MinuteAnnouncementsPlayer extends TimeAnnouncementPlayer {
-  public MinuteAnnouncementsPlayer (RadioProgram program) {
+public class MinutePlayer extends TimePlayer {
+  public MinutePlayer (RadioProgram program) {
     super(program);
   }
 

@@ -56,8 +56,8 @@
           <Button
             android:id="@+id/button_playPause"
             android:onClick="playPause"
-            android:background="@android:drawable/ic_media_pause"
-            android:contentDescription="@string/action_pauseFile"
+            android:background="@android:drawable/ic_media_play"
+            android:contentDescription="@string/action_playFile"
            />
 
           <Space android:layout_weight="1" />

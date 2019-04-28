@@ -1,11 +1,11 @@
 package cc.mielke.dave.android.radio;
 
-public class HourAnnouncementsPlayer extends TimeAnnouncementPlayer {
-  public HourAnnouncementsPlayer (RadioProgram program) {
+public class HourPlayer extends TimePlayer {
+  public HourPlayer (RadioProgram program) {
     super(program);
   }
 
-  private static Long previousHour = null;
+  private Long previousHour = null;
 
   @Override
   public final boolean play () {
