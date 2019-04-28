@@ -51,6 +51,7 @@ public class RadioProgram extends RadioComponent {
   protected final RadioProgram addPlayers (RadioPlayer... players) {
     synchronized (allPlayers) {
       for (RadioPlayer player : players) {
+        player.setProgram(this);
         allPlayers.add(player);
       }
     }

@@ -15,8 +15,8 @@ import android.widget.SeekBar;
 public abstract class FilePlayer extends RadioPlayer {
   private final static String LOG_TAG = FilePlayer.class.getName();
 
-  protected FilePlayer (RadioProgram program) {
-    super(program);
+  protected FilePlayer () {
+    super();
   }
 
   private final static Object PLAYER_LOCK = new Object();

@@ -30,10 +30,29 @@ public class RadioPrograms extends RadioComponent {
 
           String music = properties.getProperty("music", null);
           String book = properties.getProperty("book", null);
-          boolean hourly = properties.getProperty("hourly", null) != null;
 
-          RadioProgram program = new SimpleProgram(music, hourly, book);
+          boolean hours = properties.getProperty("hours", null) != null;
+          boolean minutes = properties.getProperty("minutes", null) != null;
+
+          RadioProgram program = new RadioProgram();
           program.setName(name);
+
+          if (minutes) {
+            program.addPlayers(new MinutePlayer());
+          }
+
+          if (hours) {
+            program.addPlayers(new HourPlayer());
+          }
+
+          if (book != null) {
+            program.addPlayers(new BookPlayer().setCollection(book));
+          }
+
+          if (music != null) {
+            program.addPlayers(new MusicPlayer().setCollection(music));
+          }
+
           programs.put(name, program);
         }
       }
@@ -66,9 +85,11 @@ public class RadioPrograms extends RadioComponent {
 
   public final RadioPrograms setProgram (RadioProgram program) {
     synchronized (this) {
-      if (currentProgram != null) currentProgram.stop();
-      currentProgram = program;
-      if (currentProgram != null) currentProgram.start();
+      if (program != currentProgram) {
+        if (currentProgram != null) currentProgram.stop();
+        currentProgram = program;
+        if (currentProgram != null) currentProgram.start();
+      }
     }
 
     return this;

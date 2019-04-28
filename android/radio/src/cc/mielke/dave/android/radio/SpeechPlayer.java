@@ -74,7 +74,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
     }
   }
 
-  protected SpeechPlayer (RadioProgram program) {
-    super(program);
+  protected SpeechPlayer () {
+    super();
   }
 }

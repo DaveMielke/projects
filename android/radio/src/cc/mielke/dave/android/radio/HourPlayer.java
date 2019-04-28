@@ -1,8 +1,8 @@
 package cc.mielke.dave.android.radio;
 
 public class HourPlayer extends TimePlayer {
-  public HourPlayer (RadioProgram program) {
-    super(program);
+  public HourPlayer () {
+    super();
   }
 
   private Long previousHour = null;

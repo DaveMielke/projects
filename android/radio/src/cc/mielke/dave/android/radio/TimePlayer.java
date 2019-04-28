@@ -6,8 +6,8 @@ import java.text.SimpleDateFormat;
 import android.text.format.DateFormat;
 
 public abstract class TimePlayer extends SpeechPlayer {
-  public TimePlayer (RadioProgram program) {
-    super(program);
+  public TimePlayer () {
+    super();
   }
 
   protected final static long ONE_HOUR = TimeUnit.HOURS.toMillis(1);

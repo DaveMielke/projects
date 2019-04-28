@@ -11,8 +11,8 @@ import java.util.HashSet;
 import android.media.AudioAttributes;
 
 public class BookPlayer extends CollectionPlayer {
-  public BookPlayer (RadioProgram program) {
-    super(program, getBookLibrary());
+  public BookPlayer () {
+    super(getBookLibrary());
 
     setBaseDelay(RadioParameters.BOOK_BASE_DELAY);
     setRelativeDelay(RadioParameters.BOOK_RELATIVE_DELAY);

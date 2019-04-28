@@ -5,8 +5,8 @@ import java.io.File;
 import android.media.AudioAttributes;
 
 public class MusicPlayer extends CollectionPlayer {
-  public MusicPlayer (RadioProgram program) {
-    super(program, getMusicLibrary());
+  public MusicPlayer () {
+    super(getMusicLibrary());
   }
 
   @Override
