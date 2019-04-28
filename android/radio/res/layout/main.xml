@@ -14,7 +14,6 @@
 
     <Button
       android:id="@+id/button_selectProgram"
-      android:gravity="center_horizontal"
       android:onClick="selectProgram"
      />
   </TableLayout>

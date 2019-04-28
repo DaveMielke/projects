@@ -21,56 +21,59 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
-  private static Thread positionMonitor = null;
+  private static Thread positionMonitorThread = null;
+  private static int positionMonitorStopDepth = 1;
   private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
 
   private static void startPositionMonitor () {
     synchronized (PLAYER_LOCK) {
-      if (fileViewer != null) {
-        if (positionMonitor == null) {
-          positionMonitor =
-            new Thread("file-player-position-mnitor") {
-              @Override
-              public void run () {
-                Log.d(LOG_TAG, "position monitor started");
-                boolean stop = false;
+      if (positionMonitorStopDepth <= 0) {
+        throw new IllegalStateException("position monitor stop depth underflow");
+      }
 
-                while (true) {
-                  post(
-                    new Runnable() {
-                      @Override
-                      public void run () {
-                        fileViewer.setPosition(mediaPlayer.getCurrentPosition());
-                      }
+      if (--positionMonitorStopDepth == 0) {
+        positionMonitorThread =
+          new Thread("file-player-position-mnitor") {
+            @Override
+            public void run () {
+              Log.d(LOG_TAG, "position monitor started");
+              boolean stop = false;
+
+              while (true) {
+                post(
+                  new Runnable() {
+                    @Override
+                    public void run () {
+                      fileViewer.setPosition(mediaPlayer.getCurrentPosition());
                     }
-                  );
-
-                  if (stop) {
-                    Log.d(LOG_TAG, "position monitor stopped");
-                    return;
                   }
+                );
 
-                  try {
-                    sleep(RadioParameters.FILE_POSITION_INTERVAL);
-                  } catch (InterruptedException exception) {
-                    stop = true;
-                  }
+                if (stop) {
+                  Log.d(LOG_TAG, "position monitor stopped");
+                  return;
+                }
+
+                try {
+                  sleep(RadioParameters.FILE_POSITION_INTERVAL);
+                } catch (InterruptedException exception) {
+                  stop = true;
                 }
               }
-            };
+            }
+          };
 
-          positionMonitor.start();
-        }
+        positionMonitorThread.start();
       }
     }
   }
 
   private static void stopPositionMonitor () {
     synchronized (PLAYER_LOCK) {
-      if (positionMonitor != null) {
-        positionMonitor.interrupt();
-        positionMonitor = null;
+      if (positionMonitorStopDepth++ == 0) {
+        positionMonitorThread.interrupt();
+        positionMonitorThread = null;
       }
     }
   }
