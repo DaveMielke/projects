@@ -66,6 +66,20 @@ public abstract class CollectionPlayer extends FilePlayer {
     }
   }
 
+  private static class FileEntry {
+    private final File file;
+    private final int audioContentType;
+
+    public FileEntry (File file, int audioContentType) {
+      this.file = file;
+      this.audioContentType = audioContentType;
+    }
+  }
+
+  private final static ArrayList<FileEntry> fileList = new ArrayList<>();
+  private static int currentFile = fileList.size();
+  protected abstract int getAudioContentType ();
+
   protected File nextFile () {
     synchronized (collectionMembers) {
       if (collectionMembers.isEmpty()) {
@@ -89,10 +103,24 @@ public abstract class CollectionPlayer extends FilePlayer {
     }
   }
 
+  private final FileEntry nextFileEntry () {
+    synchronized (collectionMembers) {
+      if (currentFile == fileList.size()) {
+        File file = nextFile();
+        if (file == null) return null;
+
+        FileEntry next = new FileEntry(file, getAudioContentType());
+        fileList.add(next);
+      }
+
+      return fileList.get(currentFile++);
+    }
+  }
+
   @Override
   public final boolean play () {
-    File file = nextFile();
-    if (file == null) return false;
-    return play(file);
+    FileEntry next = nextFileEntry();
+    if (next == null) return false;
+    return play(next.file, next.audioContentType);
   }
 }

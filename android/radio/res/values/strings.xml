@@ -7,4 +7,9 @@
   <string name="choice_noProgram">Off</string>
   <string name="message_noProgram">no program selected</string>
   <string name="message_noPrograms">no programs have been defined</string>
+
+  <string name="action_nextFile">Next</string>
+  <string name="action_previousFile">Previous</string>
+  <string name="action_playFile">Play</string>
+  <string name="action_pauseFile">Pause</string>
 </resources>

@@ -12,6 +12,15 @@ public class MainActivity extends BaseActivity {
     programSelector.selectProgram();
   }
 
+  public final void previousFile (View view) {
+  }
+
+  public final void playPause (View view) {
+  }
+
+  public final void nextFile (View view) {
+  }
+
   @Override
   public void onCreate (Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

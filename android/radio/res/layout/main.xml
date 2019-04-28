@@ -42,6 +42,28 @@
         android:gravity="center_horizontal"
        />
 
+      <TableLayout>
+        <TableRow>
+          <Button
+            android:layout_weight="1"
+            android:onClick="previousFile"
+            android:text="@string/action_previousFile"
+           />
+
+          <Button
+            android:layout_weight="1"
+            android:onClick="playPause"
+            android:text="@string/action_pauseFile"
+           />
+
+          <Button
+            android:layout_weight="1"
+            android:onClick="nextFile"
+            android:text="@string/action_nextFile"
+           />
+        </TableRow>
+      </TableLayout>
+
       <TableLayout android:padding="10dp" android:stretchColumns="1">
         <SeekBar android:id="@+id/file_seek_bar" />
 

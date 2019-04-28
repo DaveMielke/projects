@@ -192,9 +192,7 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  protected abstract int getAudioContentType ();
-
-  protected final boolean play (File file) {
+  protected final boolean play (File file, int audioContentType) {
     if (file == null) return false;
 
     if (!file.isFile()) {
@@ -213,7 +211,7 @@ public abstract class FilePlayer extends RadioPlayer {
       if (ApiTests.haveLollipop) {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
-        builder.setContentType(getAudioContentType());
+        builder.setContentType(audioContentType);
         mediaPlayer.setAudioAttributes(builder.build());
       }
 
