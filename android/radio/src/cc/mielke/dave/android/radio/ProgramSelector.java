@@ -43,7 +43,7 @@ public class ProgramSelector extends ActivityComponent {
       sort(names);
 
       final String[] items = new String[1 + names.length];
-      items[0] = getString(R.string.choice_noProgram);
+      items[0] = getString(R.string.name_noProgram);
       System.arraycopy(names, 0, items, 1, names.length);
 
       mainActivity.selectItem(

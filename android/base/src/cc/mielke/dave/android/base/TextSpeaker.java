@@ -243,7 +243,7 @@ public class TextSpeaker {
 
               if (ApiTests.haveLollipop) {
                 AudioAttributes.Builder builder = new AudioAttributes.Builder();
-                builder.setUsage(AudioAttributes.USAGE_NOTIFICATION);
+                builder.setUsage(AudioAttributes.USAGE_MEDIA);
                 builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
                 builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
                 ttsObject.setAudioAttributes(builder.build());
