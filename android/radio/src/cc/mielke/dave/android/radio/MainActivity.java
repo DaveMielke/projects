@@ -33,4 +33,19 @@ public class MainActivity extends BaseActivity {
 
     programSelector = new ProgramSelector(this);
   }
+
+  @Override
+  public void onResume () {
+    super.onResume();
+    FilePlayer.setVisible();
+  }
+
+  @Override
+  public void onPause () {
+    try {
+      FilePlayer.setInvisible();
+    } finally {
+      super.onPause();
+    }
+  }
 }

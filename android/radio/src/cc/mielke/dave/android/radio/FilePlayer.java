@@ -29,6 +29,7 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private static enum PositionMonitorStopReason {
     INACTIVE(true),
+    INVISIBLE(true),
     PAUSE(false),
     TOUCH(false),
     ; // end of enumeration
@@ -236,6 +237,14 @@ public abstract class FilePlayer extends RadioPlayer {
         mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
       }
     }
+  }
+
+  public static void setVisible () {
+    startPositionMonitor(PositionMonitorStopReason.INVISIBLE);
+  }
+
+  public static void setInvisible () {
+    stopPositionMonitor(PositionMonitorStopReason.INVISIBLE);
   }
 
   public static void playPause () {
