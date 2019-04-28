@@ -248,7 +248,7 @@ public class TextSpeaker {
                 builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
                 ttsObject.setAudioAttributes(builder.build());
               } else {
-                setStream(AudioManager.STREAM_NOTIFICATION);
+                setStream(AudioManager.STREAM_MUSIC);
               }
 
               setVolume(VOLUME_MAXIMUM);

@@ -21,31 +21,47 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
-  private static Thread positionMonitorThread = null;
-  private static int positionMonitorStopDepth = 1;
   private static FileViewer fileViewer = null;
   private static RadioPlayer currentPlayer = null;
 
-  private static void logPositionMonitorAction (String action, String reason) {
-    Log.d(LOG_TAG,
-      String.format(
-        "%s position monitor: %s: %d",
-        action, reason, positionMonitorStopDepth
-      )
-    );
-  }
+  private static Thread positionMonitorThread = null;
+  private static int positionMonitorStopDepth = 0;
 
-  private static void startPositionMonitor (String reason) {
-    synchronized (PLAYER_LOCK) {
-      if (RadioParameters.LOG_POSITION_MONITOR) {
-        logPositionMonitorAction("start", reason);
-      }
+  private static enum PositionMonitorStopReason {
+    INACTIVE(true),
+    PAUSE(false),
+    TOUCH(false),
+    ; // end of enumeration
+
+    private boolean currentState = false;
+
+    private final boolean set (boolean state) {
+      if (state == currentState) return false;
+      if ((currentState = state)) return positionMonitorStopDepth++ == 0;
 
       if (positionMonitorStopDepth <= 0) {
-        throw new IllegalStateException("position monitor stop depth underflow");
+        throw new IllegalStateException("stop depth underflow");
       }
 
-      if (--positionMonitorStopDepth == 0) {
+      return --positionMonitorStopDepth == 0;
+    }
+
+    public final boolean begin () {
+      return set(true);
+    }
+
+    public final boolean end () {
+      return set(false);
+    }
+
+    PositionMonitorStopReason (boolean state) {
+      set(state);
+    }
+  }
+
+  private static void startPositionMonitor (PositionMonitorStopReason reason) {
+    synchronized (PLAYER_LOCK) {
+      if (reason.end()) {
         positionMonitorThread =
           new Thread("file-player-position-mnitor") {
             @Override
@@ -88,13 +104,9 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  private static void stopPositionMonitor (String reason) {
+  private static void stopPositionMonitor (PositionMonitorStopReason reason) {
     synchronized (PLAYER_LOCK) {
-      if (RadioParameters.LOG_POSITION_MONITOR) {
-        logPositionMonitorAction("stop", reason);
-      }
-
-      if (positionMonitorStopDepth++ == 0) {
+      if (reason.begin()) {
         positionMonitorThread.interrupt();
         positionMonitorThread = null;
       }
@@ -112,12 +124,12 @@ public abstract class FilePlayer extends RadioPlayer {
 
       @Override
       public void onStartTrackingTouch (SeekBar seekBar) {
-        stopPositionMonitor("touch begin");
+        stopPositionMonitor(PositionMonitorStopReason.TOUCH);
       }
 
       @Override
       public void onStopTrackingTouch (SeekBar seekBar) {
-        startPositionMonitor("touch end");
+        startPositionMonitor(PositionMonitorStopReason.TOUCH);
       }
     };
 
@@ -139,7 +151,8 @@ public abstract class FilePlayer extends RadioPlayer {
 
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
-      stopPositionMonitor("media end");
+      stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
+      PositionMonitorStopReason.PAUSE.end();
       mediaPlayer.reset();
 
       if (currentPlayer != null) {
@@ -201,7 +214,7 @@ public abstract class FilePlayer extends RadioPlayer {
         }
 
         mediaPlayer.start();
-        startPositionMonitor("media begin");
+        startPositionMonitor(PositionMonitorStopReason.INACTIVE);
       }
     };
 
@@ -233,11 +246,11 @@ public abstract class FilePlayer extends RadioPlayer {
         isPlaying = false;
       } else if (mediaPlayer.isPlaying()) {
         mediaPlayer.pause();
-        stopPositionMonitor("pause");
+        stopPositionMonitor(PositionMonitorStopReason.PAUSE);
         isPlaying = false;
       } else {
         mediaPlayer.start();
-        startPositionMonitor("play");
+        startPositionMonitor(PositionMonitorStopReason.PAUSE);
         isPlaying = true;
       }
 
