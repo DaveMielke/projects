@@ -12,6 +12,7 @@ import android.os.Handler;
 
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Button;
 import android.widget.SeekBar;
 
 public class FileViewer extends ActivityComponent {
@@ -95,6 +96,14 @@ public class FileViewer extends ActivityComponent {
       }
     };
 
+  private Button playPauseButton = null;
+
+  public final void setPlayPauseButton (boolean isPlaying) {
+    playPauseButton.setText(
+      isPlaying? R.string.action_pauseFile: R.string.action_playFile
+    );
+  }
+
   private SeekBar seekBar = null;
   private TextView seekCurrent = null;
   private TextView seekRemaining = null;
@@ -144,6 +153,8 @@ public class FileViewer extends ActivityComponent {
 
     metadataTitle = mainActivity.findViewById(R.id.file_metadata_title);
     metadataArtist = mainActivity.findViewById(R.id.file_metadata_artist);
+
+    playPauseButton = mainActivity.findViewById(R.id.button_playPause);
 
     seekBar = mainActivity.findViewById(R.id.file_seek_bar);
     seekCurrent = mainActivity.findViewById(R.id.file_seek_current);

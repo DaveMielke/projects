@@ -8,7 +8,6 @@ import android.widget.Button;
 
 public class MainActivity extends BaseActivity {
   private ProgramSelector programSelector = null;
-  private Button playPauseButton = null;
 
   public final void selectProgram (View view) {
     programSelector.selectProgram();
@@ -18,15 +17,7 @@ public class MainActivity extends BaseActivity {
   }
 
   public final void playPause (View view) {
-    int label;
-
-    if (FilePlayer.playPause()) {
-      label = R.string.action_pauseFile;
-    } else {
-      label = R.string.action_playFile;
-    }
-
-    playPauseButton.setText(label);
+    FilePlayer.playPause();
   }
 
   public final void nextFile (View view) {
@@ -41,6 +32,5 @@ public class MainActivity extends BaseActivity {
     SpeechPlayer.setViewer(new SpeechViewer(this));
 
     programSelector = new ProgramSelector(this);
-    playPauseButton = findViewById(R.id.button_playPause);
   }
 }

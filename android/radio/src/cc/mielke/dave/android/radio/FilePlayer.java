@@ -117,8 +117,12 @@ public abstract class FilePlayer extends RadioPlayer {
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
       stopPositionMonitor();
-      if (fileViewer != null) fileViewer.enqueueFile(null);
       mediaPlayer.reset();
+
+      if (fileViewer != null) {
+        fileViewer.setPlayPauseButton(false);
+        fileViewer.enqueueFile(null);
+      }
 
       if (currentPlayer != null) {
         RadioPlayer player = currentPlayer;
@@ -172,6 +176,7 @@ public abstract class FilePlayer extends RadioPlayer {
         if (fileViewer != null) {
           fileViewer.setDuration(mediaPlayer.getDuration());
           fileViewer.setPosition(0);
+          fileViewer.setPlayPauseButton(true);
         }
 
         mediaPlayer.start();
@@ -199,19 +204,23 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  public static boolean playPause () {
+  public static void playPause () {
     synchronized (PLAYER_LOCK) {
-      if (mediaPlayer == null) return true;
+      boolean isPlaying;
 
-      if (mediaPlayer.isPlaying()) {
+      if (mediaPlayer == null) {
+        isPlaying = false;
+      } else if (mediaPlayer.isPlaying()) {
         mediaPlayer.pause();
         stopPositionMonitor();
-        return false;
+        isPlaying = false;
       } else {
         mediaPlayer.start();
         startPositionMonitor();
-        return true;
+        isPlaying = true;
       }
+
+      if (fileViewer != null) fileViewer.setPlayPauseButton(isPlaying);
     }
   }
 
