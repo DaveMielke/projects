@@ -128,18 +128,21 @@ public abstract class RadioPlayer extends RadioComponent {
       long delay = getBaseDelay();
       delay += Math.round((double)duration * getRelativeDelay());
       delay = Math.min(delay, getMaximumDelay());
-
       setEarliestTime(now + delay);
-    }
 
-    post(
-      new Runnable() {
-        @Override
-        public void run () {
-          getProgram().play();
+      post(
+        new Runnable() {
+          @Override
+          public void run () {
+            getProgram().play();
+          }
         }
-      }
-    );
+      );
+    }
+  }
+
+  protected static void onPlayerDone () {
+    getRadioPlayer().onPlayEnd();
   }
 
   public void stop () {

@@ -22,6 +22,10 @@ public class RadioProgram extends RadioComponent {
 
   public final RadioProgram setName (String name) {
     synchronized (this) {
+      if (programName != null) {
+        throw new IllegalStateException("name already set");
+      }
+
       programName = name;
       return this;
     }
@@ -48,8 +52,14 @@ public class RadioProgram extends RadioComponent {
   private RadioPlayer currentPlayer = null;
   private boolean isActive = false;
 
+  public final RadioPlayer getCurrentPlayer () {
+    synchronized (this) {
+      return currentPlayer;
+    }
+  }
+
   protected final RadioProgram addPlayers (RadioPlayer... players) {
-    synchronized (allPlayers) {
+    synchronized (this) {
       for (RadioPlayer player : players) {
         player.setProgram(this);
         allPlayers.add(player);
@@ -68,7 +78,7 @@ public class RadioProgram extends RadioComponent {
     };
 
   public final void play () {
-    synchronized (allPlayers) {
+    synchronized (this) {
       if (!isActive) return;
 
       long now = getCurrentTime();
@@ -99,7 +109,7 @@ public class RadioProgram extends RadioComponent {
   }
 
   public final void start () {
-    synchronized (allPlayers) {
+    synchronized (this) {
       if (!isActive) {
         logAction("starting");
         isActive = true;
@@ -109,7 +119,7 @@ public class RadioProgram extends RadioComponent {
   }
 
   public final void stop () {
-    synchronized (allPlayers) {
+    synchronized (this) {
       if (isActive) {
         logAction("stopping");
         isActive = false;

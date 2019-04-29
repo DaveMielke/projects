@@ -21,6 +21,18 @@ public abstract class RadioComponent extends BaseComponent {
     return RadioApplication.getRadioPrograms();
   }
 
+  protected static RadioProgram getRadioProgram () {
+    RadioPrograms programs = getRadioPrograms();
+    if (programs == null) return null;
+    return programs.getProgram();
+  }
+
+  protected static RadioPlayer getRadioPlayer () {
+    RadioProgram program = getRadioProgram();
+    if (program == null) return null;
+    return program.getCurrentPlayer();
+  }
+
   protected final <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {
     if (list.isEmpty()) return null;
     int index = (int)Math.round(Math.floor((double)list.size() * Math.random()));

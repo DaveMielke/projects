@@ -22,7 +22,6 @@ public abstract class FilePlayer extends RadioPlayer {
   private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
   private static FileViewer fileViewer = null;
-  private static RadioPlayer currentPlayer = null;
 
   private static Thread positionMonitorThread = null;
   private static int positionMonitorStopDepth = 0;
@@ -39,8 +38,8 @@ public abstract class FilePlayer extends RadioPlayer {
     private final boolean set (boolean state, String action) {
       if (state == currentState) return false;
 
-      if (action != null) {
-        if (RadioParameters.LOG_POSITION_MONITOR) {
+      if (RadioParameters.LOG_POSITION_MONITOR) {
+        if (action != null) {
           Log.d(LOG_TAG,
             String.format(
               "%s position monitor: %s: %d",
@@ -102,7 +101,7 @@ public abstract class FilePlayer extends RadioPlayer {
                 if (stop) break;
 
                 try {
-                  sleep(RadioParameters.FILE_POSITION_INTERVAL);
+                  sleep(RadioParameters.POSITION_MONITOR_INTERVAL);
                 } catch (InterruptedException exception) {
                   stop = true;
                 }
@@ -167,19 +166,11 @@ public abstract class FilePlayer extends RadioPlayer {
   private static void onMediaPlayerDone () {
     synchronized (PLAYER_LOCK) {
       stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
-      PositionMonitorStopReason.PAUSE.end();
+      startPositionMonitor(PositionMonitorStopReason.PAUSE);
+      fileViewer.setPlayPauseButton(false);
+      fileViewer.enqueueFile(null);
       mediaPlayer.reset();
-
-      if (currentPlayer != null) {
-        fileViewer.setPlayPauseButton(false);
-        fileViewer.enqueueFile(null);
-
-        RadioPlayer player = currentPlayer;
-        currentPlayer = null;
-        player.onPlayEnd();
-      } else {
-        Log.w(LOG_TAG, "no current player");
-      }
+      onPlayerDone();
     }
   }
 
@@ -299,10 +290,6 @@ public abstract class FilePlayer extends RadioPlayer {
     logPlaying("file", file.getAbsolutePath());
 
     synchronized (PLAYER_LOCK) {
-      if (currentPlayer != null) {
-        throw new IllegalStateException("already playing");
-      }
-
       if (ApiTests.haveLollipop) {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
@@ -318,7 +305,6 @@ public abstract class FilePlayer extends RadioPlayer {
       }
 
       fileViewer.enqueueFile(file);
-      currentPlayer = this;
       mediaPlayer.prepareAsync();
       return true;
     }

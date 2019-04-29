@@ -9,7 +9,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
   private final static Object LOCK = new Object();
   private static SpeechViewer speechViewer = null;
-  private static RadioPlayer currentPlayer = null;
 
   public static SpeechViewer getViewer () {
     synchronized (LOCK) {
@@ -25,15 +24,8 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
   private static void ttsDone () {
     synchronized (LOCK) {
-      if (speechViewer != null) speechViewer.showText(null);
-
-      if (currentPlayer != null) {
-        RadioPlayer player = currentPlayer;
-        currentPlayer = null;
-        player.onPlayEnd();
-      } else {
-        Log.w(LOG_TAG, "no current player");
-      }
+      speechViewer.showText(null);
+      onPlayerDone();
     }
   }
 
@@ -41,7 +33,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
     new TextSpeaker(getContext(), RadioParameters.TTS_RETRY_DELAY) {
       @Override
       protected void onSpeakingStarted (String identifier, CharSequence text) {
-        if (speechViewer != null) speechViewer.showText(text);
+        speechViewer.showText(text);
       }
 
       @Override
@@ -53,13 +45,8 @@ public abstract class SpeechPlayer extends RadioPlayer {
   protected final boolean play (CharSequence text) {
     synchronized (LOCK) {
       logPlaying("speech", text);
-
-      currentPlayer = this;
-      if (textSpeaker.speakText(text)) return true;
-      currentPlayer = null;
+      return textSpeaker.speakText(text);
     }
-
-    return false;
   }
 
   @Override
