@@ -36,9 +36,23 @@ public abstract class FilePlayer extends RadioPlayer {
 
     private boolean currentState = false;
 
-    private final boolean set (boolean state) {
+    private final boolean set (boolean state, String action) {
       if (state == currentState) return false;
-      if ((currentState = state)) return positionMonitorStopDepth++ == 0;
+
+      if (action != null) {
+        if (RadioParameters.LOG_POSITION_MONITOR) {
+          Log.d(LOG_TAG,
+            String.format(
+              "%s position monitor: %s: %d",
+              action, name(), positionMonitorStopDepth
+            )
+          );
+        }
+      }
+
+      if ((currentState = state)) {
+        return positionMonitorStopDepth++ == 0;
+      }
 
       if (positionMonitorStopDepth <= 0) {
         throw new IllegalStateException("stop depth underflow");
@@ -48,15 +62,15 @@ public abstract class FilePlayer extends RadioPlayer {
     }
 
     public final boolean begin () {
-      return set(true);
+      return set(true, "stop");
     }
 
     public final boolean end () {
-      return set(false);
+      return set(false, "start");
     }
 
     PositionMonitorStopReason (boolean state) {
-      set(state);
+      set(state, null);
     }
   }
 
@@ -265,6 +279,12 @@ public abstract class FilePlayer extends RadioPlayer {
 
       fileViewer.setPlayPauseButton(isPlaying);
     }
+  }
+
+  public static void playNext () {
+  }
+
+  public static void playPrevious () {
   }
 
   protected final boolean play (File file, int audioContentType) {

@@ -46,9 +46,9 @@
           <Space android:layout_weight="1" />
 
           <Button
-            android:onClick="previousFile"
+            android:onClick="playPrevious"
             android:background="@android:drawable/ic_media_previous"
-            android:contentDescription="@string/action_previousFile"
+            android:contentDescription="@string/action_playPrevious"
            />
 
           <Space android:layout_weight="1" />
@@ -63,9 +63,9 @@
           <Space android:layout_weight="1" />
 
           <Button
-            android:onClick="nextFile"
+            android:onClick="playNext"
             android:background="@android:drawable/ic_media_next"
-            android:contentDescription="@string/action_nextFile"
+            android:contentDescription="@string/action_playNext"
            />
 
           <Space android:layout_weight="1" />

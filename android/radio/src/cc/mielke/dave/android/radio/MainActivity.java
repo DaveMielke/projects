@@ -13,14 +13,16 @@ public class MainActivity extends BaseActivity {
     programSelector.selectProgram();
   }
 
-  public final void previousFile (View view) {
-  }
-
   public final void playPause (View view) {
     FilePlayer.playPause();
   }
 
-  public final void nextFile (View view) {
+  public final void playNext (View view) {
+    FilePlayer.playNext();
+  }
+
+  public final void playPrevious (View view) {
+    FilePlayer.playPrevious();
   }
 
   @Override
