@@ -7,23 +7,23 @@ import android.util.Log;
 public abstract class SpeechPlayer extends RadioPlayer {
   private final static String LOG_TAG = SpeechPlayer.class.getName();
 
-  private final static Object LOCK = new Object();
+  private final static Object SPEECH_LOCK = new Object();
   private static SpeechViewer speechViewer = null;
 
   public static SpeechViewer getViewer () {
-    synchronized (LOCK) {
+    synchronized (SPEECH_LOCK) {
       return speechViewer;
     }
   }
 
   public static void setViewer (SpeechViewer viewer) {
-    synchronized (LOCK) {
+    synchronized (SPEECH_LOCK) {
       speechViewer = viewer;
     }
   }
 
-  private static void ttsDone () {
-    synchronized (LOCK) {
+  private static void onSpeechDone () {
+    synchronized (SPEECH_LOCK) {
       speechViewer.showText(null);
       onPlayerDone();
     }
@@ -38,12 +38,12 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
       @Override
       protected void onSpeakingFinished (String identifier) {
-        ttsDone();
+        onSpeechDone();
       }
     };
 
   protected final boolean play (CharSequence text) {
-    synchronized (LOCK) {
+    synchronized (SPEECH_LOCK) {
       logPlaying("speech", text);
       return textSpeaker.speakText(text);
     }
@@ -52,9 +52,9 @@ public abstract class SpeechPlayer extends RadioPlayer {
   @Override
   public void stop () {
     try {
-      synchronized (LOCK) {
+      synchronized (SPEECH_LOCK) {
         textSpeaker.stopSpeaking();
-        ttsDone();
+        onSpeechDone();
       }
     } finally {
       super.stop();

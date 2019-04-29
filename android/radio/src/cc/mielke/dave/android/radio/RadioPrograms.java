@@ -87,16 +87,8 @@ public class RadioPrograms extends RadioComponent {
     }
   }
 
-  private final String getProgramName (RadioProgram program) {
-    if (program == null) return getString(R.string.name_noProgram);
-
-    String name = program.getName();
-    if ((name == null) || name.isEmpty()) return getString(R.string.name_anonymousProgram);
-    return name;
-  }
-
   private final String getProgramName () {
-    return getProgramName(currentProgram);
+    return RadioProgram.getName(currentProgram);
   }
 
   public final RadioPrograms setProgram (RadioProgram program) {
@@ -104,16 +96,15 @@ public class RadioPrograms extends RadioComponent {
       if (program != currentProgram) {
         StringBuilder log = new StringBuilder("changing program: ");
 
-        if (currentProgram != null) currentProgram.stop();
         log.append(getProgramName());
+        if (currentProgram != null) currentProgram.stop();
 
         currentProgram = program;
         log.append(" -> ");
-
-        if (currentProgram != null) currentProgram.start();
         log.append(getProgramName());
 
         Log.i(LOG_TAG, log.toString());
+        if (currentProgram != null) currentProgram.start();
       }
     }
 

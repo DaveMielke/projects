@@ -14,12 +14,6 @@ public class RadioProgram extends RadioComponent {
 
   private String programName = null;
 
-  public final String getName () {
-    synchronized (this) {
-      return programName;
-    }
-  }
-
   public final RadioProgram setName (String name) {
     synchronized (this) {
       if (programName != null) {
@@ -29,6 +23,20 @@ public class RadioProgram extends RadioComponent {
       programName = name;
       return this;
     }
+  }
+
+  public final String getName () {
+    synchronized (this) {
+      return programName;
+    }
+  }
+
+  public static String getName (RadioProgram program) {
+    if (program == null) return getString(R.string.name_noProgram);
+
+    String name = program.getName();
+    if ((name == null) || name.isEmpty()) return getString(R.string.name_anonymousProgram);
+    return name;
   }
 
   protected final void logAction (String action) {
@@ -69,7 +77,7 @@ public class RadioProgram extends RadioComponent {
     return this;
   }
 
-  private final Runnable playCallback =
+  private final Runnable retryCallback =
     new Runnable() {
       @Override
       public void run () {
@@ -103,7 +111,7 @@ public class RadioProgram extends RadioComponent {
       {
         Log.i(LOG_TAG, "nothing to play");
         long delay = Math.max((next - now), 0);
-        post(delay, playCallback);
+        post(delay, retryCallback);
       }
     }
   }
@@ -124,7 +132,7 @@ public class RadioProgram extends RadioComponent {
         logAction("stopping");
         isActive = false;
 
-        getHandler().removeCallbacks(playCallback);
+        getHandler().removeCallbacks(retryCallback);
         if (currentPlayer != null) currentPlayer.stop();
       }
     }

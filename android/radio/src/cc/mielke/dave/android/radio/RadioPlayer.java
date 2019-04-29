@@ -142,7 +142,13 @@ public abstract class RadioPlayer extends RadioComponent {
   }
 
   protected static void onPlayerDone () {
-    getRadioPlayer().onPlayEnd();
+    RadioPlayer player = getRadioPlayer();
+
+    if (player != null) {
+      player.onPlayEnd();
+    } else {
+      Log.w(LOG_TAG, "no active player");
+    }
   }
 
   public void stop () {
