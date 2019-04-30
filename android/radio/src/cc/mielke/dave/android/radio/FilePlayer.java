@@ -163,7 +163,7 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  private static void onFilePlayerFinished () {
+  private static void onFilePlayerFinished (FilePlayer player) {
     synchronized (PLAYER_LOCK) {
       stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
       startPositionMonitor(PositionMonitorStopReason.PAUSE);
@@ -172,8 +172,12 @@ public abstract class FilePlayer extends RadioPlayer {
       fileViewer.enqueueFile(null);
 
       mediaPlayer.reset();
-      onRadioPlayerFinished();
+      onRadioPlayerFinished(player);
     }
+  }
+
+  private static void onFilePlayerFinished () {
+    onFilePlayerFinished(null);
   }
 
   private final static MediaPlayer.OnErrorListener mediaPlayerErrorListener =
@@ -323,10 +327,14 @@ public abstract class FilePlayer extends RadioPlayer {
   @Override
   public void stop () {
     try {
+      if (RadioParameters.LOG_FILE_PLAYER) {
+        Log.d(LOG_TAG, "stopping");
+      }
+
       synchronized (PLAYER_LOCK) {
         if (mediaPlayer != null) {
           mediaPlayer.stop();
-          onFilePlayerFinished();
+          onFilePlayerFinished(this);
         }
       }
     } finally {

@@ -141,8 +141,10 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
-  protected static void onRadioPlayerFinished () {
-    RadioPlayer player = getRadioPlayer();
+  protected static void onRadioPlayerFinished (RadioPlayer player) {
+    if (player == null) {
+      player = getRadioPlayer();
+    }
 
     if (player != null) {
       player.onPlayEnd();
