@@ -264,14 +264,19 @@ public class TextSpeaker {
               maximumInputLength = getMaximumInputLength();
               ttsReady = true;
 
-              if (ApiTests.haveLollipop) {
-                AudioAttributes.Builder builder = new AudioAttributes.Builder();
-                builder.setUsage(AudioAttributes.USAGE_MEDIA);
-                builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
-                builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
-                ttsObject.setAudioAttributes(builder.build());
-              } else {
-                setStream(AudioManager.STREAM_MUSIC);
+              {
+                int stream = AudioManager.STREAM_MUSIC;
+
+                if (ApiTests.haveLollipop) {
+                  AudioAttributes.Builder builder = new AudioAttributes.Builder();
+                  builder.setLegacyStreamType(stream);
+                  builder.setUsage(AudioAttributes.USAGE_MEDIA);
+                  builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
+                  builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
+                  ttsObject.setAudioAttributes(builder.build());
+                } else {
+                  setStream(stream);
+                }
               }
 
               setVolume(VOLUME_MAXIMUM);

@@ -1,6 +1,7 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.ApiTests;
+import static cc.mielke.dave.android.base.TimeConstants.*;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -117,15 +118,15 @@ public class FileViewer extends ActivityComponent {
     seekBar.setMax(milliseconds);
   }
 
-  private final String toTime (int milliseconds) {
+  private final String toTime (long milliseconds) {
     StringBuilder time = new StringBuilder();
 
-    int seconds = (milliseconds + 499) / 1000;
-    int minutes = seconds / 60;
-    seconds %= 60;
+    long seconds = (milliseconds + (HALF_SECOND - 1)) / ONE_SECOND;
+    long minutes = seconds / SECONDS_PER_MINUTE;
+    seconds %= SECONDS_PER_MINUTE;
 
-    int hours = minutes / 60;
-    minutes %= 60;
+    long hours = minutes / MINUTES_PER_HOUR;
+    minutes %= MINUTES_PER_HOUR;
 
     if (hours > 0) {
       time.append(String.format("%d:%02d", hours, minutes));

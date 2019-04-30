@@ -1,5 +1,7 @@
 package cc.mielke.dave.android.radio;
 
+import static cc.mielke.dave.android.base.TimeConstants.*;
+
 public class HourPlayer extends TimePlayer {
   public HourPlayer () {
     super();

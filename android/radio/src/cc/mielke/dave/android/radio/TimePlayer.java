@@ -1,5 +1,6 @@
 package cc.mielke.dave.android.radio;
 
+import static cc.mielke.dave.android.base.TimeConstants.*;
 import java.util.concurrent.TimeUnit;
 
 import java.text.SimpleDateFormat;
@@ -9,12 +10,6 @@ public abstract class TimePlayer extends SpeechPlayer {
   public TimePlayer () {
     super();
   }
-
-  protected final static long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
-  protected final static long HALF_HOUR = ONE_HOUR / 2;
-
-  protected final static long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
-  protected final static long HALF_MINUTE = ONE_MINUTE / 2;
 
   protected final String toTimeString (long time) {
     boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
