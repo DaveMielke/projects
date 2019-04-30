@@ -94,11 +94,21 @@ public class TextSpeaker {
   }
 
   private final boolean setParameter (String key, int value) {
-    return setParameter(key, Integer.toString(value));
+    if (useNewParadigm) {
+      newParameters.putInt(key, value);
+      return true;
+    } else {
+      return setParameter(key, Integer.toString(value));
+    }
   }
 
   private final boolean setParameter (String key, float value) {
-    return setParameter(key, Float.toString(value));
+    if (useNewParadigm) {
+      newParameters.putFloat(key, value);
+      return true;
+    } else {
+      return setParameter(key, Float.toString(value));
+    }
   }
 
   private final boolean setStream (int value) {
