@@ -41,12 +41,12 @@ public class RadioPrograms extends RadioComponent {
           RadioProgram program = new RadioProgram();
           program.setName(name);
 
-          if (minutes) {
-            program.addPlayers(new MinutePlayer());
-          }
-
           if (hours) {
             program.addPlayers(new HourPlayer());
+          }
+
+          if (minutes) {
+            program.addPlayers(new MinutePlayer());
           }
 
           if (book != null) {

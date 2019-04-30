@@ -171,6 +171,10 @@ public abstract class FilePlayer extends RadioPlayer {
       fileViewer.setPlayPauseButton(false);
       fileViewer.enqueueFile(null);
 
+      if (RadioParameters.LOG_FILE_PLAYER) {
+        Log.d(LOG_TAG, "resetting media player");
+      }
+
       mediaPlayer.reset();
       onRadioPlayerFinished(player);
     }
@@ -227,6 +231,10 @@ public abstract class FilePlayer extends RadioPlayer {
           fileViewer.setDuration(mediaPlayer.getDuration());
           fileViewer.setPosition(0);
           fileViewer.setPlayPauseButton(true);
+        }
+
+        if (RadioParameters.LOG_FILE_PLAYER) {
+          Log.d(LOG_TAG, "starting media player");
         }
 
         mediaPlayer.start();
@@ -312,14 +320,24 @@ public abstract class FilePlayer extends RadioPlayer {
       }
 
       try {
-        mediaPlayer.setDataSource(getContext(), Uri.fromFile(file));
+        Uri uri = Uri.fromFile(file);
+
+        if (RadioParameters.LOG_FILE_PLAYER) {
+          Log.d(LOG_TAG, ("setting media player data source: " + uri.toString()));
+        }
+
+        mediaPlayer.setDataSource(getContext(), uri);
       } catch (IOException exception) {
         Log.w(LOG_TAG, ("media player source error: " + exception.getMessage()));
         return false;
       }
 
-      fileViewer.enqueueFile(file);
+      if (RadioParameters.LOG_FILE_PLAYER) {
+        Log.d(LOG_TAG, "preparing media player");
+      }
+
       mediaPlayer.prepareAsync();
+      fileViewer.enqueueFile(file);
       return true;
     }
   }
