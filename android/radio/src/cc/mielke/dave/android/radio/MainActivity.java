@@ -14,15 +14,15 @@ public class MainActivity extends BaseActivity {
   }
 
   public final void playPause (View view) {
-    FilePlayer.playPause();
+    UriPlayer.playPause();
   }
 
   public final void playNext (View view) {
-    FilePlayer.playNext();
+    UriPlayer.playNext();
   }
 
   public final void playPrevious (View view) {
-    FilePlayer.playPrevious();
+    UriPlayer.playPrevious();
   }
 
   @Override
@@ -30,7 +30,7 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    FilePlayer.setViewer(new FileViewer(this));
+    UriPlayer.setViewer(new UriViewer(this));
     SpeechPlayer.setViewer(new SpeechViewer(this));
 
     programSelector = new ProgramSelector(this);
@@ -39,13 +39,13 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onResume () {
     super.onResume();
-    FilePlayer.setVisible();
+    UriPlayer.setVisible();
   }
 
   @Override
   public void onPause () {
     try {
-      FilePlayer.setInvisible();
+      UriPlayer.setInvisible();
     } finally {
       super.onPause();
     }

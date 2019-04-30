@@ -6,16 +6,17 @@ import static cc.mielke.dave.android.base.TimeConstants.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import java.io.File;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.SeekBar;
 
-public class FileViewer extends ActivityComponent {
-  private View fileView = null;
+public class UriViewer extends ActivityComponent {
+  private View uriView = null;
   private TextView metadataTitle = null;
   private TextView metadataArtist = null;
 
@@ -44,7 +45,7 @@ public class FileViewer extends ActivityComponent {
             artist = arguments[1];
           }
 
-          setVisible(fileView, visible);
+          setVisible(uriView, visible);
           updateText(metadataTitle, title);
           updateText(metadataArtist, artist);
         }
@@ -52,34 +53,36 @@ public class FileViewer extends ActivityComponent {
     );
   }
 
-  private final BlockingQueue<String> fileQueue = new LinkedBlockingQueue<>();
+  private final BlockingQueue<String> uriQueue = new LinkedBlockingQueue<>();
   private Thread dequeueThread = null;
 
-  public final void enqueueFile (File file) {
-    fileQueue.offer((file != null)? file.getAbsolutePath(): "");
+  public final void enqueueUri (Uri uri) {
+    uriQueue.offer((uri != null)? uri.toString(): "");
   }
 
-  public final String dequeueFile () {
+  public final String dequeueUri () {
     while (true) {
       try {
-        return fileQueue.take();
+        return uriQueue.take();
       } catch (InterruptedException exception) {
       }
     }
   }
 
-  private final Runnable fileDequeuer =
+  private final Runnable uriDequeuer =
     new Runnable() {
       @Override
       public void run () {
-        while (true) {
-          String path = dequeueFile();
+        Context context = getContext();
 
-          if (path.isEmpty()) {
+        while (true) {
+          String uri = dequeueUri();
+
+          if (uri.isEmpty()) {
             updateMetadata();
           } else {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(path);
+            retriever.setDataSource(context, Uri.parse(uri));
 
             updateMetadata(
               retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
@@ -153,9 +156,9 @@ public class FileViewer extends ActivityComponent {
     seekBar.setOnSeekBarChangeListener(listener);
   }
 
-  public FileViewer (MainActivity activity) {
+  public UriViewer (MainActivity activity) {
     super(activity);
-    fileView = mainActivity.findViewById(R.id.view_file);
+    uriView = mainActivity.findViewById(R.id.view_file);
 
     metadataTitle = mainActivity.findViewById(R.id.file_metadata_title);
     metadataArtist = mainActivity.findViewById(R.id.file_metadata_artist);
@@ -167,7 +170,7 @@ public class FileViewer extends ActivityComponent {
     seekRemaining = mainActivity.findViewById(R.id.file_seek_remaining);
     seekBar.setKeyProgressIncrement(10000);
 
-    dequeueThread = new Thread(fileDequeuer);
+    dequeueThread = new Thread(uriDequeuer);
     dequeueThread.start();
   }
 }
