@@ -102,10 +102,10 @@ public class UriViewer extends ActivityComponent {
     int image;
 
     if (isPlaying) {
-      label = R.string.action_pauseFile;
+      label = R.string.action_uriPause;
       image = android.R.drawable.ic_media_pause;
     } else {
-      label = R.string.action_playFile;
+      label = R.string.action_uriPlay;
       image = android.R.drawable.ic_media_play;
     }
 
@@ -158,16 +158,16 @@ public class UriViewer extends ActivityComponent {
 
   public UriViewer (MainActivity activity) {
     super(activity);
-    uriView = mainActivity.findViewById(R.id.view_file);
+    uriView = mainActivity.findViewById(R.id.view_uri);
 
-    metadataTitle = mainActivity.findViewById(R.id.file_metadata_title);
-    metadataArtist = mainActivity.findViewById(R.id.file_metadata_artist);
+    metadataTitle = mainActivity.findViewById(R.id.uri_metadata_title);
+    metadataArtist = mainActivity.findViewById(R.id.uri_metadata_artist);
 
-    playPauseButton = mainActivity.findViewById(R.id.button_playPause);
+    playPauseButton = mainActivity.findViewById(R.id.button_uriPlayPause);
 
-    seekBar = mainActivity.findViewById(R.id.file_seek_bar);
-    seekCurrent = mainActivity.findViewById(R.id.file_seek_current);
-    seekRemaining = mainActivity.findViewById(R.id.file_seek_remaining);
+    seekBar = mainActivity.findViewById(R.id.uri_seek_bar);
+    seekCurrent = mainActivity.findViewById(R.id.uri_seek_current);
+    seekRemaining = mainActivity.findViewById(R.id.uri_seek_remaining);
     seekBar.setKeyProgressIncrement(10000);
 
     dequeueThread = new Thread(uriDequeuer);

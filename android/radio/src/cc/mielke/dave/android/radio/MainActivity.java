@@ -13,15 +13,15 @@ public class MainActivity extends BaseActivity {
     programSelector.selectProgram();
   }
 
-  public final void playPause (View view) {
+  public final void uriPlayPause (View view) {
     UriPlayer.playPause();
   }
 
-  public final void playNext (View view) {
+  public final void uriNext (View view) {
     UriPlayer.playNext();
   }
 
-  public final void playPrevious (View view) {
+  public final void uriPrevious (View view) {
     UriPlayer.playPrevious();
   }
 

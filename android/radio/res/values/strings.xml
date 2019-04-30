@@ -9,8 +9,8 @@
   <string name="message_noProgram">program not selected</string>
   <string name="message_noPrograms">no programs have been defined</string>
 
-  <string name="action_playNext">Next</string>
-  <string name="action_playPrevious">Previous</string>
-  <string name="action_playFile">Play</string>
-  <string name="action_pauseFile">Pause</string>
+  <string name="action_uriNext">Next</string>
+  <string name="action_uriPrevious">Previous</string>
+  <string name="action_uriPlay">Play</string>
+  <string name="action_uriPause">Pause</string>
 </resources>

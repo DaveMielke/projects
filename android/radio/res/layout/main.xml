@@ -25,19 +25,19 @@
     >
 
     <TableLayout
-      android:id="@+id/view_file"
+      android:id="@+id/view_uri"
       android:visibility="gone"
       >
 
       <TextView
-        android:id="@+id/file_metadata_title"
+        android:id="@+id/uri_metadata_title"
         android:gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold"
        />
 
       <TextView
-        android:id="@+id/file_metadata_artist"
+        android:id="@+id/uri_metadata_artist"
         android:gravity="center_horizontal"
        />
 
@@ -46,26 +46,26 @@
           <Space android:layout_weight="1" />
 
           <Button
-            android:onClick="playPrevious"
+            android:onClick="uriPrevious"
             android:background="@android:drawable/ic_media_previous"
-            android:contentDescription="@string/action_playPrevious"
+            android:contentDescription="@string/action_uriPrevious"
            />
 
           <Space android:layout_weight="1" />
 
           <Button
-            android:id="@+id/button_playPause"
-            android:onClick="playPause"
+            android:id="@+id/button_uriPlayPause"
+            android:onClick="uriPlayPause"
             android:background="@android:drawable/ic_media_play"
-            android:contentDescription="@string/action_playFile"
+            android:contentDescription="@string/action_uriPlay"
            />
 
           <Space android:layout_weight="1" />
 
           <Button
-            android:onClick="playNext"
+            android:onClick="uriNext"
             android:background="@android:drawable/ic_media_next"
-            android:contentDescription="@string/action_playNext"
+            android:contentDescription="@string/action_uriNext"
            />
 
           <Space android:layout_weight="1" />
@@ -73,12 +73,12 @@
       </TableLayout>
 
       <TableLayout android:padding="25dp" android:stretchColumns="1">
-        <SeekBar android:id="@+id/file_seek_bar" />
+        <SeekBar android:id="@+id/uri_seek_bar" />
 
         <TableRow>
-          <TextView android:id="@+id/file_seek_current" />
+          <TextView android:id="@+id/uri_seek_current" />
           <Space />
-          <TextView android:id="@+id/file_seek_remaining" android:gravity="right" />
+          <TextView android:id="@+id/uri_seek_remaining" android:gravity="right" />
         </TableRow>
       </TableLayout>
     </TableLayout>
