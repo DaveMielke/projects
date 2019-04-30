@@ -31,8 +31,9 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
   private final static TextSpeaker textSpeaker =
     new TextSpeaker(getContext(), RadioParameters.TTS_RETRY_DELAY) {
-      {
-        setLogEvents(RadioParameters.LOG_SPEECH_PLAYER);
+      @Override
+      protected boolean getLogEvents () {
+        return RadioParameters.LOG_SPEECH_PLAYER;
       }
 
       @Override

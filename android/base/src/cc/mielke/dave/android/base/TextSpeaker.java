@@ -16,25 +16,14 @@ import android.media.AudioAttributes;
 public class TextSpeaker {
   private final static String LOG_TAG = TextSpeaker.class.getName();
 
+  protected boolean getLogEvents () {
+    return false;
+  }
+
   protected void onSpeakingStarted (String identifier, CharSequence text) {
   }
 
   protected void onSpeakingFinished (String identifier) {
-  }
-
-  private boolean logEvents = false;
-
-  public final boolean getLogEvents () {
-    synchronized (this) {
-      return logEvents;
-    }
-  }
-
-  public final TextSpeaker setLogEvents (boolean yes) {
-    synchronized (this) {
-      logEvents = yes;
-      return this;
-    }
   }
 
   private final Context ttsContext;
@@ -48,7 +37,7 @@ public class TextSpeaker {
     new UtteranceProgressListener() {
       @Override
       public void onStart (String identifier) {
-        if (logEvents) {
+        if (getLogEvents()) {
           Log.d(LOG_TAG, ("utterance generation starting: " + identifier));
         }
       }
@@ -85,7 +74,7 @@ public class TextSpeaker {
 
       @Override
       public void onDone (String identifier) {
-        if (logEvents) {
+        if (getLogEvents()) {
           Log.d(LOG_TAG, ("utterance generation done: " + identifier));
         }
 
@@ -260,14 +249,14 @@ public class TextSpeaker {
     new TextToSpeech.OnInitListener() {
       @Override
       public void onInit (int status) {
-        if (logEvents) {
+        if (getLogEvents()) {
           Log.d(LOG_TAG, ("TTS initialization status: " + status));
         }
 
         synchronized (TextSpeaker.this) {
           switch (status) {
             case TextToSpeech.SUCCESS: {
-              if (logEvents) {
+              if (getLogEvents()) {
                 Log.d(LOG_TAG, "TTS initialized successfully");
               }
 
@@ -317,7 +306,7 @@ public class TextSpeaker {
 
   private final void startEngine () {
     synchronized (this) {
-      if (logEvents) {
+      if (getLogEvents()) {
         Log.d(LOG_TAG, "starting TTS");
       }
 
