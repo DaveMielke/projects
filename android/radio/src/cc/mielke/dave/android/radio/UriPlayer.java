@@ -76,7 +76,7 @@ public abstract class UriPlayer extends RadioPlayer {
     synchronized (PLAYER_LOCK) {
       if (reason.end()) {
         positionMonitorThread =
-          new Thread("file-player-position-mnitor") {
+          new Thread("position-mnitor") {
             @Override
             public void run () {
               if (RadioParameters.LOG_POSITION_MONITOR) {
@@ -183,6 +183,37 @@ public abstract class UriPlayer extends RadioPlayer {
     onUriPlayerFinished(null);
   }
 
+  private final static MediaPlayer.OnInfoListener mediaPlayerInfoListener =
+    new MediaPlayer.OnInfoListener() {
+      private final String getInfoMessage (int info) {
+        switch (info) {
+          default:
+            return null;
+        }
+      }
+
+      @Override
+      public boolean onInfo (MediaPlayer player, int info, int extra) {
+        StringBuilder log = new StringBuilder();
+        log.append("media player info ");
+        log.append(info);
+        log.append('.');
+        log.append(extra);
+
+        {
+          String message = getInfoMessage(info);
+
+          if (message != null) {
+            log.append(": ");
+            log.append(message);
+          }
+        }
+
+        Log.w(LOG_TAG, log.toString());
+        return false;
+      }
+    };
+
   private final static MediaPlayer.OnErrorListener mediaPlayerErrorListener =
     new MediaPlayer.OnErrorListener() {
       private final String getErrorMessage (int error) {
@@ -213,8 +244,7 @@ public abstract class UriPlayer extends RadioPlayer {
         }
 
         Log.e(LOG_TAG, log.toString());
-        onUriPlayerFinished();
-        return true;
+        return false;
       }
     };
 
@@ -258,7 +288,9 @@ public abstract class UriPlayer extends RadioPlayer {
       if (mediaPlayer == null) {
         mediaPlayer = new MediaPlayer();
 
+        mediaPlayer.setOnInfoListener(mediaPlayerInfoListener);
         mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
+
         mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
       }

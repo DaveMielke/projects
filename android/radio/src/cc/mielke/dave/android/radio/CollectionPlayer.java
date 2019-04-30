@@ -85,7 +85,10 @@ public abstract class CollectionPlayer extends FilePlayer {
       if (collectionMembers.isEmpty()) {
         String name = getCollectionName();
         if (name == null) return null;
-        Log.i(LOG_TAG, String.format("loading collection: %s", name));
+
+        if (RadioParameters.LOG_COLLECTION_PLAYER) {
+          Log.d(LOG_TAG, String.format("loading collection: %s", name));
+        }
 
         CollectionLibrary library = getLibrary();
         if (library == null) return null;
