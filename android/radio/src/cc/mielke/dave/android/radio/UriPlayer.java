@@ -170,7 +170,7 @@ public abstract class UriPlayer extends RadioPlayer {
       uriViewer.setPlayPauseButton(false);
       uriViewer.enqueueUri(null);
 
-      if (RadioParameters.LOG_FILE_PLAYER) {
+      if (RadioParameters.LOG_URI_PLAYER) {
         Log.d(LOG_TAG, "resetting media player");
       }
 
@@ -252,7 +252,7 @@ public abstract class UriPlayer extends RadioPlayer {
     new MediaPlayer.OnPreparedListener() {
       @Override
       public void onPrepared (MediaPlayer player) {
-        if (RadioParameters.LOG_FILE_PLAYER) {
+        if (RadioParameters.LOG_URI_PLAYER) {
           Log.d(LOG_TAG, "media layer prepared");
         }
 
@@ -262,7 +262,7 @@ public abstract class UriPlayer extends RadioPlayer {
           uriViewer.setPlayPauseButton(true);
         }
 
-        if (RadioParameters.LOG_FILE_PLAYER) {
+        if (RadioParameters.LOG_URI_PLAYER) {
           Log.d(LOG_TAG, "starting media player");
         }
 
@@ -275,7 +275,7 @@ public abstract class UriPlayer extends RadioPlayer {
     new MediaPlayer.OnCompletionListener() {
       @Override
       public void onCompletion (MediaPlayer player) {
-        if (RadioParameters.LOG_FILE_PLAYER) {
+        if (RadioParameters.LOG_URI_PLAYER) {
           Log.d(LOG_TAG, "media layer finished");
         }
 
@@ -346,7 +346,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       try {
-        if (RadioParameters.LOG_FILE_PLAYER) {
+        if (RadioParameters.LOG_URI_PLAYER) {
           Log.d(LOG_TAG, ("setting media player data source: " + uri.toString()));
         }
 
@@ -362,7 +362,7 @@ public abstract class UriPlayer extends RadioPlayer {
         return false;
       }
 
-      if (RadioParameters.LOG_FILE_PLAYER) {
+      if (RadioParameters.LOG_URI_PLAYER) {
         Log.d(LOG_TAG, "preparing media player");
       }
 
@@ -375,7 +375,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   public void stop () {
     try {
-      if (RadioParameters.LOG_FILE_PLAYER) {
+      if (RadioParameters.LOG_URI_PLAYER) {
         Log.d(LOG_TAG, "stopping");
       }
 
