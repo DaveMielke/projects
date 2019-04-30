@@ -40,20 +40,22 @@ public class RadioProgram extends RadioComponent {
   }
 
   protected final void logAction (String action) {
-    StringBuilder log = new StringBuilder(action);
+    if (RadioParameters.LOG_RADIO_PROGRAMS) {
+      StringBuilder log = new StringBuilder(action);
 
-    {
-      String name = getName();
+      {
+        String name = getName();
 
-      if (name != null) {
-        if (!name.isEmpty()) {
-          log.append(": ");
-          log.append(name);
+        if (name != null) {
+          if (!name.isEmpty()) {
+            log.append(": ");
+            log.append(name);
+          }
         }
       }
-    }
 
-    Log.d(LOG_TAG, log.toString());
+      Log.d(LOG_TAG, log.toString());
+    }
   }
 
   private final List<RadioPlayer> allPlayers = new LinkedList<>();
@@ -108,8 +110,11 @@ public class RadioProgram extends RadioComponent {
         next = Math.min(next, player.getEarliestTime());
       }
 
+      if (RadioParameters.LOG_RADIO_PROGRAMS) {
+        Log.d(LOG_TAG, "nothing to play");
+      }
+
       {
-        Log.i(LOG_TAG, "nothing to play");
         long delay = Math.max((next - now), 0);
         post(delay, retryCallback);
       }

@@ -22,6 +22,21 @@ public class TextSpeaker {
   protected void onSpeakingFinished (String identifier) {
   }
 
+  private boolean logEvents = false;
+
+  public final boolean getLogEvents () {
+    synchronized (this) {
+      return logEvents;
+    }
+  }
+
+  public final TextSpeaker setLogEvents (boolean yes) {
+    synchronized (this) {
+      logEvents = yes;
+      return this;
+    }
+  }
+
   private final Context ttsContext;
   private final long ttsRetryDelay;
   private final Handler ttsHandler;
@@ -33,18 +48,20 @@ public class TextSpeaker {
     new UtteranceProgressListener() {
       @Override
       public void onStart (String identifier) {
-        Log.d(LOG_TAG, ("utterance generation starting: " + identifier));
+        if (logEvents) {
+          Log.d(LOG_TAG, ("utterance generation starting: " + identifier));
+        }
       }
 
       @Override
       public void onError (String identifier) {
-        Log.w(LOG_TAG, ("utterance generation failed: " + identifier));
+        Log.e(LOG_TAG, ("utterance generation failed: " + identifier));
         onSpeakingFinished(identifier);
       }
 
       @Override
       public void onError (String identifier, int error) {
-        Log.w(LOG_TAG,
+        Log.e(LOG_TAG,
           String.format(
             "utterance generation error %d: %s",
             error, identifier
@@ -68,7 +85,10 @@ public class TextSpeaker {
 
       @Override
       public void onDone (String identifier) {
-        Log.d(LOG_TAG, ("utterance generation done: " + identifier));
+        if (logEvents) {
+          Log.d(LOG_TAG, ("utterance generation done: " + identifier));
+        }
+
         onSpeakingFinished(identifier);
       }
     };
@@ -240,12 +260,16 @@ public class TextSpeaker {
     new TextToSpeech.OnInitListener() {
       @Override
       public void onInit (int status) {
-        Log.d(LOG_TAG, ("TTS initialization status: " + status));
+        if (logEvents) {
+          Log.d(LOG_TAG, ("TTS initialization status: " + status));
+        }
 
         synchronized (TextSpeaker.this) {
           switch (status) {
             case TextToSpeech.SUCCESS: {
-              Log.d(LOG_TAG, "TTS initialized successfully");
+              if (logEvents) {
+                Log.d(LOG_TAG, "TTS initialized successfully");
+              }
 
               ttsObject.setOnUtteranceProgressListener(utteranceProgressListener);
               maximumInputLength = getMaximumInputLength();
@@ -270,10 +294,10 @@ public class TextSpeaker {
             }
 
             default:
-              Log.d(LOG_TAG, ("unexpected TTS initialization status: " + status));
+              Log.w(LOG_TAG, ("unexpected TTS initialization status: " + status));
               /* fall through */
             case TextToSpeech.ERROR:
-              Log.w(LOG_TAG, "TTS failed to initialize");
+              Log.e(LOG_TAG, "TTS failed to initialize");
               ttsObject = null;
 
               Runnable retry =
@@ -293,7 +317,10 @@ public class TextSpeaker {
 
   private final void startEngine () {
     synchronized (this) {
-      Log.d(LOG_TAG, "starting TTS");
+      if (logEvents) {
+        Log.d(LOG_TAG, "starting TTS");
+      }
+
       ttsObject = new TextToSpeech(ttsContext, initializationListener);
     }
   }

@@ -163,14 +163,16 @@ public abstract class FilePlayer extends RadioPlayer {
     }
   }
 
-  private static void onMediaPlayerDone () {
+  private static void onFilePlayerFinished () {
     synchronized (PLAYER_LOCK) {
       stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
       startPositionMonitor(PositionMonitorStopReason.PAUSE);
+
       fileViewer.setPlayPauseButton(false);
       fileViewer.enqueueFile(null);
+
       mediaPlayer.reset();
-      onPlayerDone();
+      onRadioPlayerFinished();
     }
   }
 
@@ -204,7 +206,7 @@ public abstract class FilePlayer extends RadioPlayer {
         }
 
         Log.e(LOG_TAG, log.toString());
-        onMediaPlayerDone();
+        onFilePlayerFinished();
         return true;
       }
     };
@@ -213,6 +215,10 @@ public abstract class FilePlayer extends RadioPlayer {
     new MediaPlayer.OnPreparedListener() {
       @Override
       public void onPrepared (MediaPlayer player) {
+        if (RadioParameters.LOG_FILE_PLAYER) {
+          Log.d(LOG_TAG, "media layer prepared");
+        }
+
         synchronized (PLAYER_LOCK) {
           fileViewer.setDuration(mediaPlayer.getDuration());
           fileViewer.setPosition(0);
@@ -228,7 +234,11 @@ public abstract class FilePlayer extends RadioPlayer {
     new MediaPlayer.OnCompletionListener() {
       @Override
       public void onCompletion (MediaPlayer player) {
-        onMediaPlayerDone();
+        if (RadioParameters.LOG_FILE_PLAYER) {
+          Log.d(LOG_TAG, "media layer finished");
+        }
+
+        onFilePlayerFinished();
       }
     };
 
@@ -300,7 +310,7 @@ public abstract class FilePlayer extends RadioPlayer {
       try {
         mediaPlayer.setDataSource(getContext(), Uri.fromFile(file));
       } catch (IOException exception) {
-        Log.e(LOG_TAG, ("media player source error: " + exception.getMessage()));
+        Log.w(LOG_TAG, ("media player source error: " + exception.getMessage()));
         return false;
       }
 
@@ -316,7 +326,7 @@ public abstract class FilePlayer extends RadioPlayer {
       synchronized (PLAYER_LOCK) {
         if (mediaPlayer != null) {
           mediaPlayer.stop();
-          onMediaPlayerDone();
+          onFilePlayerFinished();
         }
       }
     } finally {

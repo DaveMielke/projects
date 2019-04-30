@@ -22,15 +22,19 @@ public abstract class SpeechPlayer extends RadioPlayer {
     }
   }
 
-  private static void onSpeechDone () {
+  private static void onSpeechPlayerFinished () {
     synchronized (SPEECH_LOCK) {
       speechViewer.showText(null);
-      onPlayerDone();
+      onRadioPlayerFinished();
     }
   }
 
   private final static TextSpeaker textSpeaker =
     new TextSpeaker(getContext(), RadioParameters.TTS_RETRY_DELAY) {
+      {
+        setLogEvents(RadioParameters.LOG_SPEECH_PLAYER);
+      }
+
       @Override
       protected void onSpeakingStarted (String identifier, CharSequence text) {
         speechViewer.showText(text);
@@ -38,7 +42,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
       @Override
       protected void onSpeakingFinished (String identifier) {
-        onSpeechDone();
+        onSpeechPlayerFinished();
       }
     };
 
@@ -54,7 +58,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
     try {
       synchronized (SPEECH_LOCK) {
         textSpeaker.stopSpeaking();
-        onSpeechDone();
+        onSpeechPlayerFinished();
       }
     } finally {
       super.stop();

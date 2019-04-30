@@ -92,10 +92,17 @@ public abstract class CollectionPlayer extends FilePlayer {
 
         File root = library.getRoot(name);
         if (root == null) return null;
-        Log.i(LOG_TAG, String.format("collection root: %s: %s", name, root.getAbsolutePath()));
+
+        if (RadioParameters.LOG_COLLECTION_PLAYER) {
+          Log.d(LOG_TAG, String.format("collection root: %s: %s", name, root.getAbsolutePath()));
+        }
 
         findMembers(root);
-        Log.i(LOG_TAG, String.format("collection size: %s: %d", name, collectionMembers.size()));
+
+        if (RadioParameters.LOG_COLLECTION_PLAYER) {
+          Log.d(LOG_TAG, String.format("collection size: %s: %d", name, collectionMembers.size()));
+        }
+
         if (collectionMembers.isEmpty()) return null;
       }
 
