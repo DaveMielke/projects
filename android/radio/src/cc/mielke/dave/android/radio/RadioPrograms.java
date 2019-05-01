@@ -88,7 +88,7 @@ public class RadioPrograms extends RadioComponent {
   }
 
   private final String getProgramName () {
-    return RadioProgram.getName(currentProgram);
+    return RadioProgram.getExternalName(currentProgram);
   }
 
   public final RadioPrograms setProgram (RadioProgram program) {

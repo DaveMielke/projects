@@ -85,6 +85,10 @@ public abstract class RadioPlayer extends RadioComponent {
     return setMaximumDelay(unit.toMillis(count));
   }
 
+  public String getName () {
+    return getClass().getSimpleName();
+  }
+
   protected final void logPlaying (String type, CharSequence data) {
     Log.i(LOG_TAG, String.format("playing %s: %s", type, data));
   }
@@ -113,8 +117,12 @@ public abstract class RadioPlayer extends RadioComponent {
     return ensureDelay(unit.toMillis(count));
   }
 
-  public final void onPlayStart () {
+  protected final void onPlayStart () {
     synchronized (this) {
+      if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+        Log.d(LOG_TAG, ("playing started: " + getName()));
+      }
+
       startTime = getCurrentTime();
     }
   }
@@ -130,14 +138,11 @@ public abstract class RadioPlayer extends RadioComponent {
       delay = Math.min(delay, getMaximumDelay());
       setEarliestTime(now + delay);
 
-      post(
-        new Runnable() {
-          @Override
-          public void run () {
-            getProgram().play();
-          }
-        }
-      );
+      if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+        Log.d(LOG_TAG, ("playing ended: " + getName()));
+      }
+
+      getProgram().onPlayerFinished(this);
     }
   }
 

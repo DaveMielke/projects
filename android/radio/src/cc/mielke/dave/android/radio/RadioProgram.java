@@ -31,30 +31,27 @@ public class RadioProgram extends RadioComponent {
     }
   }
 
-  public static String getName (RadioProgram program) {
-    if (program == null) return getString(R.string.name_noProgram);
+  public final String getExternalName () {
+    {
+      String name = getName();
+      if ((name != null) && !name.isEmpty()) return name;
+    }
 
-    String name = program.getName();
-    if ((name == null) || name.isEmpty()) return getString(R.string.name_anonymousProgram);
-    return name;
+    return getString(R.string.name_anonymousProgram);
+  }
+
+  public static String getExternalName (RadioProgram program) {
+    if (program == null) return getString(R.string.name_noProgram);
+    return program.getExternalName();
   }
 
   protected final void logAction (String action) {
     if (RadioParameters.LOG_RADIO_PROGRAMS) {
-      StringBuilder log = new StringBuilder(action);
-
-      {
-        String name = getName();
-
-        if (name != null) {
-          if (!name.isEmpty()) {
-            log.append(": ");
-            log.append(name);
-          }
-        }
-      }
-
-      Log.d(LOG_TAG, log.toString());
+      Log.d(LOG_TAG,
+        String.format(
+          "%s: %s", action, getExternalName()
+        )
+      );
     }
   }
 
@@ -83,23 +80,38 @@ public class RadioProgram extends RadioComponent {
     new Runnable() {
       @Override
       public void run () {
+        if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+          Log.d(LOG_TAG, ("asynchronous player start: " + getExternalName()));
+        }
+
         play();
       }
     };
 
-  public final void play () {
+  private final void play () {
     synchronized (this) {
-      if (!isActive) return;
+      if (currentPlayer != null) {
+        throw new IllegalStateException("already playing");
+      }
+
+      if (isActive) {
+        if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+          Log.d(LOG_TAG, ("selecting player: " + getExternalName()));
+        }
+      } else {
+        if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+          Log.d(LOG_TAG, ("program not active: " + getExternalName()));
+        }
+
+        return;
+      }
 
       long now = getCurrentTime();
       long next = Long.MAX_VALUE;
 
-      currentPlayer = null;
-
       for (RadioPlayer player : allPlayers) {
         if (now >= player.getEarliestTime()) {
           if (player.play()) {
-            player.onPlayStart();
             currentPlayer = player;
             return;
           }
@@ -110,7 +122,7 @@ public class RadioProgram extends RadioComponent {
         next = Math.min(next, player.getEarliestTime());
       }
 
-      if (RadioParameters.LOG_RADIO_PROGRAMS) {
+      if (RadioParameters.LOG_PLAYER_SCHEDULING) {
         Log.d(LOG_TAG, "nothing to play");
       }
 
@@ -118,6 +130,17 @@ public class RadioProgram extends RadioComponent {
         long delay = Math.max((next - now), 0);
         post(delay, retryCallback);
       }
+    }
+  }
+
+  public final void onPlayerFinished (RadioPlayer player) {
+    if (RadioParameters.LOG_PLAYER_SCHEDULING) {
+      Log.d(LOG_TAG, ("player finished: " + player.getName()));
+    }
+
+    synchronized (this) {
+      currentPlayer = null;
+      post(retryCallback);
     }
   }
 

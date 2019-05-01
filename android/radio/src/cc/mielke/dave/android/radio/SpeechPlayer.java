@@ -54,7 +54,10 @@ public abstract class SpeechPlayer extends RadioPlayer {
   protected final boolean play (CharSequence text) {
     synchronized (SPEECH_LOCK) {
       logPlaying("speech", text);
-      return textSpeaker.speakText(text);
+      if (!textSpeaker.speakText(text)) return false;
+
+      onPlayStart();
+      return true;
     }
   }
 

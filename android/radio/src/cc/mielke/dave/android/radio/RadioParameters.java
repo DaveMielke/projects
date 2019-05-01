@@ -25,6 +25,7 @@ public abstract class RadioParameters {
   public final static long TTS_RETRY_DELAY = TimeUnit.SECONDS.toMillis(30);
 
   public final static boolean LOG_COLLECTION_PLAYER = true;
+  public final static boolean LOG_PLAYER_SCHEDULING = true;
   public final static boolean LOG_POSITION_MONITOR = false;
   public final static boolean LOG_RADIO_PROGRAMS = true;
   public final static boolean LOG_SPEECH_PLAYER = true;

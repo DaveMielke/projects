@@ -366,6 +366,7 @@ public abstract class UriPlayer extends RadioPlayer {
         Log.d(LOG_TAG, "preparing media player");
       }
 
+      onPlayStart();
       mediaPlayer.prepareAsync();
       uriViewer.enqueueUri(uri);
       return true;
