@@ -8,4 +8,7 @@
 
   <!-- Android 4.1 (JellyBean) -->
   <uses-sdk android:minSdkVersion="16" />
+
+  <!-- Android 8.0 (Oreo) -->
+  <uses-sdk android:targetSdkVersion="26" />
 </manifest>
