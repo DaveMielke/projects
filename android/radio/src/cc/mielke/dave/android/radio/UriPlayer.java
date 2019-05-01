@@ -170,11 +170,6 @@ public abstract class UriPlayer extends RadioPlayer {
       uriViewer.setPlayPauseButton(false);
       uriViewer.enqueueUri(null);
 
-      if (RadioParameters.LOG_URI_PLAYER) {
-        Log.d(LOG_TAG, "resetting media player");
-      }
-
-      mediaPlayer.reset();
       onRadioPlayerFinished(player);
     }
   }
@@ -294,6 +289,12 @@ public abstract class UriPlayer extends RadioPlayer {
         mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
         mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
       }
+
+      if (RadioParameters.LOG_URI_PLAYER) {
+        Log.d(LOG_TAG, "resetting media player");
+      }
+
+      mediaPlayer.reset();
     }
   }
 
@@ -383,6 +384,7 @@ public abstract class UriPlayer extends RadioPlayer {
       synchronized (PLAYER_LOCK) {
         if (mediaPlayer != null) {
           mediaPlayer.stop();
+          mediaPlayer.reset();
           onUriPlayerFinished(this);
         }
       }
