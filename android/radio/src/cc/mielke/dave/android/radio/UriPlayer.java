@@ -178,6 +178,18 @@ public abstract class UriPlayer extends RadioPlayer {
     onUriPlayerFinished(null);
   }
 
+  private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
+    new MediaPlayer.OnCompletionListener() {
+      @Override
+      public void onCompletion (MediaPlayer player) {
+        if (RadioParameters.LOG_URI_PLAYER) {
+          Log.d(LOG_TAG, "media layer finished");
+        }
+
+        onUriPlayerFinished();
+      }
+    };
+
   private final static MediaPlayer.OnInfoListener mediaPlayerInfoListener =
     new MediaPlayer.OnInfoListener() {
       private final String getInfoMessage (int info) {
@@ -266,18 +278,6 @@ public abstract class UriPlayer extends RadioPlayer {
       }
     };
 
-  private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
-    new MediaPlayer.OnCompletionListener() {
-      @Override
-      public void onCompletion (MediaPlayer player) {
-        if (RadioParameters.LOG_URI_PLAYER) {
-          Log.d(LOG_TAG, "media layer finished");
-        }
-
-        onUriPlayerFinished();
-      }
-    };
-
   private static void ensureMediaPlayer () {
     synchronized (PLAYER_LOCK) {
       if (mediaPlayer == null) {
@@ -296,40 +296,6 @@ public abstract class UriPlayer extends RadioPlayer {
 
       mediaPlayer.reset();
     }
-  }
-
-  public static void setVisible () {
-    startPositionMonitor(PositionMonitorStopReason.INVISIBLE);
-  }
-
-  public static void setInvisible () {
-    stopPositionMonitor(PositionMonitorStopReason.INVISIBLE);
-  }
-
-  public static void playPause () {
-    synchronized (PLAYER_LOCK) {
-      boolean isPlaying;
-
-      if (mediaPlayer == null) {
-        isPlaying = false;
-      } else if (mediaPlayer.isPlaying()) {
-        mediaPlayer.pause();
-        stopPositionMonitor(PositionMonitorStopReason.PAUSE);
-        isPlaying = false;
-      } else {
-        mediaPlayer.start();
-        startPositionMonitor(PositionMonitorStopReason.PAUSE);
-        isPlaying = true;
-      }
-
-      uriViewer.setPlayPauseButton(isPlaying);
-    }
-  }
-
-  public static void playNext () {
-  }
-
-  public static void playPrevious () {
   }
 
   protected final boolean play (Uri uri, int audioContentType) {
@@ -391,5 +357,39 @@ public abstract class UriPlayer extends RadioPlayer {
     } finally {
       super.stop();
     }
+  }
+
+  public static void playPause () {
+    synchronized (PLAYER_LOCK) {
+      boolean isPlaying;
+
+      if (mediaPlayer == null) {
+        isPlaying = false;
+      } else if (mediaPlayer.isPlaying()) {
+        mediaPlayer.pause();
+        stopPositionMonitor(PositionMonitorStopReason.PAUSE);
+        isPlaying = false;
+      } else {
+        mediaPlayer.start();
+        startPositionMonitor(PositionMonitorStopReason.PAUSE);
+        isPlaying = true;
+      }
+
+      uriViewer.setPlayPauseButton(isPlaying);
+    }
+  }
+
+  public static void playNext () {
+  }
+
+  public static void playPrevious () {
+  }
+
+  public static void setVisible () {
+    startPositionMonitor(PositionMonitorStopReason.INVISIBLE);
+  }
+
+  public static void setInvisible () {
+    stopPositionMonitor(PositionMonitorStopReason.INVISIBLE);
   }
 }

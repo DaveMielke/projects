@@ -7,14 +7,12 @@ import android.util.Log;
 public abstract class SpeechPlayer extends RadioPlayer {
   private final static String LOG_TAG = SpeechPlayer.class.getName();
 
+  protected SpeechPlayer () {
+    super();
+  }
+
   private final static Object SPEECH_LOCK = new Object();
   private static SpeechViewer speechViewer = null;
-
-  public static SpeechViewer getViewer () {
-    synchronized (SPEECH_LOCK) {
-      return speechViewer;
-    }
-  }
 
   public static void setViewer (SpeechViewer viewer) {
     synchronized (SPEECH_LOCK) {
@@ -75,9 +73,5 @@ public abstract class SpeechPlayer extends RadioPlayer {
     } finally {
       super.stop();
     }
-  }
-
-  protected SpeechPlayer () {
-    super();
   }
 }
