@@ -12,11 +12,11 @@ public class RadioNotification extends BaseNotification {
 
   @Override
   protected int getSmallIcon () {
-    return R.drawable.ic_launcher;
+    return R.drawable.radio;
   }
 
   @Override
   protected int getLargeIcon () {
-    return R.drawable.ic_launcher;
+    return R.drawable.radio;
   }
 }
