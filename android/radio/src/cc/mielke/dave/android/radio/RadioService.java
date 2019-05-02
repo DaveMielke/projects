@@ -6,19 +6,19 @@ import android.app.Service;
 import android.os.IBinder;
 import android.content.Intent;
 
-public class PlayerService extends Service {
-  private final static String LOG_TAG = PlayerService.class.getName();
+public class RadioService extends Service {
+  private final static String LOG_TAG = RadioService.class.getName();
 
-  private final static Object NOTIFICATION_LOCK = new Object();
-  private static PlayerNotification playerNotification = null;
+  private final static Object SERVICE_LOCK = new Object();
+  private static RadioNotification radioNotification = null;
 
   @Override
   public void onCreate () {
     super.onCreate();
     Log.d(LOG_TAG, "starting");
 
-    synchronized (NOTIFICATION_LOCK) {
-      playerNotification = new PlayerNotification(this);
+    synchronized (SERVICE_LOCK) {
+      radioNotification = new RadioNotification(this);
     }
   }
 
@@ -27,9 +27,9 @@ public class PlayerService extends Service {
     try {
       Log.d(LOG_TAG, "stopping");
 
-      synchronized (NOTIFICATION_LOCK) {
-        playerNotification.cancel();
-        playerNotification = null;
+      synchronized (SERVICE_LOCK) {
+        radioNotification.cancel();
+        radioNotification = null;
       }
     } finally {
       super.onDestroy();
@@ -47,7 +47,7 @@ public class PlayerService extends Service {
   }
 
   public static Intent makeIntent () {
-    return new Intent(RadioApplication.getContext(), PlayerService.class);
+    return new Intent(RadioApplication.getContext(), RadioService.class);
   }
 
   public static void start () {
@@ -59,17 +59,17 @@ public class PlayerService extends Service {
   }
 
   public static void cancel () {
-    synchronized (NOTIFICATION_LOCK) {
-      playerNotification.cancel();
+    synchronized (SERVICE_LOCK) {
+      if (radioNotification != null) radioNotification.cancel();
     }
   }
 
   public static void show (CharSequence title, CharSequence text) {
-    synchronized (NOTIFICATION_LOCK) {
-      if (playerNotification != null) {
-        playerNotification.setTitle(title);
-        playerNotification.setText(text);
-        playerNotification.show(true);
+    synchronized (SERVICE_LOCK) {
+      if (radioNotification != null) {
+        radioNotification.setTitle(title);
+        radioNotification.setText(text);
+        radioNotification.show(true);
       }
     }
   }

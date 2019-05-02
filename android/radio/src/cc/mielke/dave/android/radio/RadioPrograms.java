@@ -98,10 +98,10 @@ public class RadioPrograms extends RadioComponent {
         log.append(getProgramName());
 
         if (currentProgram == null) {
-          PlayerService.show();
+          RadioService.show();
         } else {
           currentProgram.stop();
-          if (newProgram == null) PlayerService.cancel();
+          if (newProgram == null) RadioService.cancel();
         }
 
         currentProgram = newProgram;

@@ -35,13 +35,13 @@ public class MainActivity extends BaseActivity {
 
     programSelector = new ProgramSelector(this);
 
-    PlayerService.start();
+    RadioService.start();
   }
 
   @Override
   public void onDestroy () {
     try {
-      PlayerService.stop();
+      RadioService.stop();
     } finally {
       super.onDestroy();
     }

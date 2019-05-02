@@ -4,8 +4,8 @@ import cc.mielke.dave.android.base.BaseNotification;
 
 import android.app.Service;
 
-public class PlayerNotification extends BaseNotification {
-  public PlayerNotification (Service service) {
+public class RadioNotification extends BaseNotification {
+  public RadioNotification (Service service) {
     super(service);
   }
 

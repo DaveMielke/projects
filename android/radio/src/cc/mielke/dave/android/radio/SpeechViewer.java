@@ -23,7 +23,7 @@ public class SpeechViewer extends ActivityComponent {
       new Runnable() {
         @Override
         public void run () {
-          PlayerService.show(message, null);
+          RadioService.show(message, null);
           setVisible(speechView, visible);
           speechText.setText(message);
         }
