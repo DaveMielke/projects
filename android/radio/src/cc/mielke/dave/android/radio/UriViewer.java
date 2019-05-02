@@ -45,7 +45,7 @@ public class UriViewer extends ActivityComponent {
             artist = arguments[1];
           }
 
-          RadioService.show(title, artist);
+          updateNotification(title, artist);
           setVisible(uriView, visible);
           updateText(metadataTitle, title);
           updateText(metadataArtist, artist);

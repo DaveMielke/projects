@@ -32,7 +32,7 @@
     </activity>
 
     <service
-      android:name="PlayerService"
+      android:name="RadioService"
       android:label="@string/player_service_label"
       >
     </service>

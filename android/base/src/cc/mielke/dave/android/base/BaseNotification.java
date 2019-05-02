@@ -146,14 +146,8 @@ public abstract class BaseNotification extends BaseComponent {
     show(false);
   }
 
-  public final void cancel () {
-    synchronized (this) {
-      notificationManager.cancel(notificationIdentifier);
-    }
-  }
-
   public final void setTitle (CharSequence text) {
-    if (text == null text = "";
+    if (text == null) text = "";
 
     synchronized (this) {
       notificationBuilder.setContentTitle(text);
@@ -161,7 +155,7 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   public final void setText (CharSequence text) {
-    if (text == null text = "";
+    if (text == null) text = "";
 
     synchronized (this) {
       notificationBuilder.setContentText(text);
@@ -169,7 +163,7 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   public final void setSubText (CharSequence text) {
-    if (text == null text = "";
+    if (text == null) text = "";
 
     synchronized (this) {
       notificationBuilder.setSubText(text);

@@ -7,6 +7,7 @@ import android.app.Service;
 public class RadioNotification extends BaseNotification {
   public RadioNotification (Service service) {
     super(service);
+    show(true);
   }
 
   @Override

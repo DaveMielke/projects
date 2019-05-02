@@ -33,6 +33,18 @@ public abstract class RadioComponent extends BaseComponent {
     return program.getCurrentPlayer();
   }
 
+  protected static void updateNotification (CharSequence title, CharSequence text) {
+    RadioService.updateNotification(title, text);
+  }
+
+  protected static void updateNotification (CharSequence title) {
+    updateNotification(title, null);
+  }
+
+  protected static void updateNotification () {
+    updateNotification(null);
+  }
+
   protected final <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {
     if (list.isEmpty()) return null;
     int index = (int)Math.round(Math.floor((double)list.size() * Math.random()));

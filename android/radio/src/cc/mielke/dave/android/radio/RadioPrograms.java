@@ -95,14 +95,9 @@ public class RadioPrograms extends RadioComponent {
     synchronized (this) {
       if (newProgram != currentProgram) {
         StringBuilder log = new StringBuilder("changing program: ");
-        log.append(getProgramName());
 
-        if (currentProgram == null) {
-          RadioService.show();
-        } else {
-          currentProgram.stop();
-          if (newProgram == null) RadioService.cancel();
-        }
+        log.append(getProgramName());
+        if (currentProgram != null) currentProgram.stop();
 
         currentProgram = newProgram;
         log.append(" -> ");

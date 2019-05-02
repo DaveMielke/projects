@@ -28,7 +28,6 @@ public class RadioService extends Service {
       Log.d(LOG_TAG, "stopping");
 
       synchronized (SERVICE_LOCK) {
-        radioNotification.cancel();
         radioNotification = null;
       }
     } finally {
@@ -58,27 +57,13 @@ public class RadioService extends Service {
     RadioApplication.getContext().stopService(makeIntent());
   }
 
-  public static void cancel () {
-    synchronized (SERVICE_LOCK) {
-      if (radioNotification != null) radioNotification.cancel();
-    }
-  }
-
-  public static void show (CharSequence title, CharSequence text) {
+  public static void updateNotification (CharSequence title, CharSequence text) {
     synchronized (SERVICE_LOCK) {
       if (radioNotification != null) {
         radioNotification.setTitle(title);
         radioNotification.setText(text);
-        radioNotification.show(true);
+        radioNotification.show();
       }
     }
-  }
-
-  public static void show (CharSequence title) {
-    show(title, null);
-  }
-
-  public static void show () {
-    show(null);
   }
 }
