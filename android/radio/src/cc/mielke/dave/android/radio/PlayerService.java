@@ -6,16 +6,16 @@ import android.app.Service;
 import android.os.IBinder;
 import android.content.Intent;
 
-public class RadioService extends Service {
-  private final static String LOG_TAG = RadioService.class.getName();
+public class PlayerService extends Service {
+  private final static String LOG_TAG = PlayerService.class.getName();
 
-  private RadioNotification radioNotification = null;
+  private PlayerNotification playerNotification = null;
 
   @Override
   public void onCreate () {
     super.onCreate();
     Log.d(LOG_TAG, "starting");
-    radioNotification = new RadioNotification(this);
+    playerNotification = new PlayerNotification(this);
   }
 
   @Override
@@ -38,6 +38,10 @@ public class RadioService extends Service {
   }
 
   public static Intent makeIntent () {
-    return new Intent(RadioApplication.getContext(), RadioService.class);
+    return new Intent(RadioApplication.getContext(), PlayerService.class);
+  }
+
+  public static void start () {
+    RadioApplication.getContext().startService(makeIntent());
   }
 }

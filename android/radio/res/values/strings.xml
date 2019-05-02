@@ -2,6 +2,7 @@
 
 <resources>
   <string name="app_name">DM Radio</string>
+  <string name="player_service_label">DM Radio Player Service</string>
 
   <string name="action_selectProgram">Select Program</string>
   <string name="name_noProgram">Off</string>

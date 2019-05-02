@@ -30,5 +30,11 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
+    <service
+      android:name="PlayerService"
+      android:label="@string/player_service_label"
+      >
+    </service>
   </application>
 </manifest>

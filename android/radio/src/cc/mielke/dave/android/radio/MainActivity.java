@@ -34,6 +34,8 @@ public class MainActivity extends BaseActivity {
     SpeechPlayer.setViewer(new SpeechViewer(this));
 
     programSelector = new ProgramSelector(this);
+
+    PlayerService.start();
   }
 
   @Override
