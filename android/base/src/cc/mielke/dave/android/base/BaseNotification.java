@@ -16,25 +16,8 @@ import android.graphics.BitmapFactory;
 public abstract class BaseNotification extends BaseComponent {
   private final static String LOG_TAG = BaseNotification.class.getName();
 
-  private final static Object IDENTIFIER_LOCK = new Object();
-  private static int uniqueIdentifier = 0;
-  protected final Integer notificationIdentifier;
-
-  protected BaseNotification () {
-    super();
-
-    synchronized (IDENTIFIER_LOCK) {
-      notificationIdentifier = ++uniqueIdentifier;
-    }
-  }
-
-  protected int getSmallIcon () {
-    return 0;
-  }
-
-  protected int getLargeIcon () {
-    return 0;
-  }
+  protected abstract int getSmallIcon ();
+  protected abstract int getLargeIcon ();
 
   protected String getChannelIdentifier () {
     return BaseApplication.getName();
@@ -64,18 +47,9 @@ public abstract class BaseNotification extends BaseComponent {
     return null;
   }
 
-  private NotificationManager notificationManager = null;
-  private Notification.Builder notificationBuilder = null;
-
-  private final NotificationManager getManager () {
-    if (notificationManager == null) {
-      notificationManager = (NotificationManager)
-                            getContext()
-                           .getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    return notificationManager;
-  }
+  private final Service notificationService;
+  private final NotificationManager notificationManager;
+  private final Notification.Builder notificationBuilder;
 
   protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass) {
     Context context = getContext();
@@ -89,106 +63,106 @@ public abstract class BaseNotification extends BaseComponent {
     return PendingIntent.getActivity(context, 0, intent, 0);
   }
 
-  private final void makeBuilder () {
-    Context context = getContext();
+  private final Notification.Builder makeNotificationBuilder (Context context) {
+    Notification.Builder builder;
 
     if (ApiTests.haveOreo) {
-      NotificationManager manager = getManager();
       String identifier = getChannelIdentifier();
-      NotificationChannel channel = manager.getNotificationChannel(identifier);
+      NotificationChannel channel = notificationManager.getNotificationChannel(identifier);
 
       if (channel == null) {
         channel = new NotificationChannel(
           identifier, getChannelName(), getImportance()
         );
 
-        manager.createNotificationChannel(channel);
+        notificationManager.createNotificationChannel(channel);
       }
 
-      notificationBuilder = new Notification.Builder(context, identifier);
+      builder = new Notification.Builder(context, identifier);
     } else {
-      notificationBuilder = new Notification.Builder(context)
+      builder = new Notification.Builder(context)
         .setPriority(getPriority())
         ;
     }
 
-    notificationBuilder
-      .setOngoing(true)
-      .setOnlyAlertOnce(true)
-      ;
+    builder.setOngoing(true).setOnlyAlertOnce(true);
 
     {
       int icon = getSmallIcon();
-      if (icon != 0) notificationBuilder.setSmallIcon(icon);
+      if (icon != 0) builder.setSmallIcon(icon);
     }
 
     {
       int icon = getLargeIcon();
-
-      if (icon != 0) {
-        notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(getResources(), icon));
-      }
+      if (icon != 0) builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), icon));
     }
 
     {
       String title = getTitle();
-      if (title != null) notificationBuilder.setContentTitle(title);
+      if (title != null) builder.setContentTitle(title);
     }
 
     {
       Class<? extends Activity> activity = getMainActivityClass();
-
-      if (activity != null) {
-        notificationBuilder.setContentIntent(newPendingIntent(activity));
-      }
+      if (activity != null) builder.setContentIntent(newPendingIntent(activity));
     }
 
     if (ApiTests.haveJellyBeanMR1) {
-      notificationBuilder.setShowWhen(true);
+      builder.setShowWhen(true);
     }
 
     if (ApiTests.haveLollipop) {
-      notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
-      notificationBuilder.setVisibility(getVisibility());
+      builder.setCategory(Notification.CATEGORY_SERVICE);
+      builder.setVisibility(getVisibility());
     }
+
+    return builder;
   }
 
-  private final boolean haveBuilder () {
-    return notificationBuilder != null;
+  private final static Object IDENTIFIER_LOCK = new Object();
+  private static int uniqueIdentifier = 0;
+  protected final Integer notificationIdentifier;
+
+  protected BaseNotification (Service service) {
+    super();
+
+    synchronized (IDENTIFIER_LOCK) {
+      notificationIdentifier = ++uniqueIdentifier;
+    }
+
+    notificationService = service;
+    notificationManager = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationBuilder = makeNotificationBuilder(service);
   }
 
-  private final Notification buildNotification () {
+  private final Notification build () {
     return notificationBuilder.build();
   }
 
-  protected final void refreshNotification () {
-    getManager().notify(notificationIdentifier, buildNotification());
+  public final void show (boolean foreground) {
+    Notification notification = build();
+
+    if (foreground) {
+      notificationService.startForeground(notificationIdentifier, notification);
+    } else {
+      notificationManager.notify(notificationIdentifier, notification);
+    }
   }
 
-  protected final void setPrimaryText (CharSequence text) {
+  public final void show () {
+    show(false);
+  }
+
+  public final void hide () {
+    notificationManager.cancel(notificationIdentifier);
+  }
+
+  public final void setPrimaryText (CharSequence text) {
     notificationBuilder.setContentText(text);
   }
 
-  public final void updatePrimaryText (CharSequence text) {
-    synchronized (notificationIdentifier) {
-      if (haveBuilder()) {
-        setPrimaryText(text);
-        refreshNotification();
-      }
-    }
-  }
-
-  protected final void setSecondaryText (CharSequence text) {
+  public final void setSecondaryText (CharSequence text) {
     notificationBuilder.setSubText(text);
-  }
-
-  public final void updateSecondaryText (CharSequence text) {
-    synchronized (notificationIdentifier) {
-      if (haveBuilder()) {
-        setSecondaryText(text);
-        refreshNotification();
-      }
-    }
   }
 
 /*

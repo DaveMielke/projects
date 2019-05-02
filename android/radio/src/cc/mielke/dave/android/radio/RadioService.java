@@ -9,10 +9,13 @@ import android.content.Intent;
 public class RadioService extends Service {
   private final static String LOG_TAG = RadioService.class.getName();
 
+  private RadioNotification radioNotification = null;
+
   @Override
   public void onCreate () {
     super.onCreate();
     Log.d(LOG_TAG, "starting");
+    radioNotification = new RadioNotification(this);
   }
 
   @Override
