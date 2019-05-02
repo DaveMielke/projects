@@ -21,6 +21,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
 
+import android.app.AlarmManager;
+
 public abstract class BaseComponent {
   private final static String LOG_TAG = BaseComponent.class.getName();
 
@@ -40,16 +42,37 @@ public abstract class BaseComponent {
     return getContext().getResources();
   }
 
+  protected static AlarmManager getAlarmManager () {
+    return (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
+  }
+
   protected static Handler getHandler () {
     return BaseApplication.getHandler();
   }
 
-  protected static void post (Runnable runnable) {
-    getHandler().post(runnable);
+  protected static void post (Runnable callback) {
+    getHandler().post(callback);
   }
 
-  protected static void post (long delay, Runnable runnable) {
-    getHandler().postDelayed(runnable, delay);
+  protected static void post (final long delay, final Runnable callback) {
+    if (ApiTests.haveNougat) {
+      AlarmManager am = getAlarmManager();
+
+      AlarmManager.OnAlarmListener listener =
+        new AlarmManager.OnAlarmListener() {
+          @Override
+          public void onAlarm () {
+            callback.run();
+          }
+        };
+
+      am.setExact(
+        AlarmManager.RTC_WAKEUP, (getCurrentTime() + delay),
+        "delayed-post", listener, null
+      );
+    } else {
+      getHandler().postDelayed(callback, delay);
+    }
   }
 
   protected static File getExternalStorageDirectory () {
