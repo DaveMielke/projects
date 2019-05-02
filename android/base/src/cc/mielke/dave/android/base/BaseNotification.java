@@ -153,18 +153,24 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   public final void setTitle (CharSequence text) {
+    if (text == null text = "";
+
     synchronized (this) {
       notificationBuilder.setContentTitle(text);
     }
   }
 
   public final void setText (CharSequence text) {
+    if (text == null text = "";
+
     synchronized (this) {
       notificationBuilder.setContentText(text);
     }
   }
 
   public final void setSubText (CharSequence text) {
+    if (text == null text = "";
+
     synchronized (this) {
       notificationBuilder.setSubText(text);
     }

@@ -67,9 +67,6 @@ public class PlayerService extends Service {
   public static void show (CharSequence title, CharSequence text) {
     synchronized (NOTIFICATION_LOCK) {
       if (playerNotification != null) {
-        if (title == null) title = "";
-        if (text == null) text = "";
-
         playerNotification.setTitle(title);
         playerNotification.setText(text);
         playerNotification.show(true);
