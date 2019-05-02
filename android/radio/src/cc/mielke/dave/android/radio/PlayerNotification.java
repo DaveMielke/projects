@@ -7,7 +7,6 @@ import android.app.Service;
 public class PlayerNotification extends BaseNotification {
   public PlayerNotification (Service service) {
     super(service);
-    show(true);
   }
 
   @Override

@@ -164,30 +164,4 @@ public abstract class BaseNotification extends BaseComponent {
   public final void setSecondaryText (CharSequence text) {
     notificationBuilder.setSubText(text);
   }
-
-/*
-  private static boolean create (boolean refresh) {
-    synchronized (notificationIdentifier) {
-      if (haveBuilder()) return false;
-
-      makeBuilder();
-      setSessionState(R.string.session_stateOff, null);
-      setAlertCount();
-
-      if (refresh) refreshNotification();
-      return true;
-    }
-  }
-
-  public static void create () {
-    create(true);
-  }
-
-  public static void create (Service service) {
-    synchronized (notificationIdentifier) {
-      create(false);
-      service.startForeground(notificationIdentifier, buildNotification());
-    }
-  }
-*/
 }

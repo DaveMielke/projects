@@ -15,13 +15,18 @@ public class PlayerService extends Service {
   public void onCreate () {
     super.onCreate();
     Log.d(LOG_TAG, "starting");
+
     playerNotification = new PlayerNotification(this);
+    playerNotification.show(true);
   }
 
   @Override
   public void onDestroy () {
     try {
       Log.d(LOG_TAG, "stopping");
+
+      playerNotification.hide();
+      playerNotification = null;
     } finally {
       super.onDestroy();
     }
@@ -43,5 +48,9 @@ public class PlayerService extends Service {
 
   public static void start () {
     RadioApplication.getContext().startService(makeIntent());
+  }
+
+  public static void stop () {
+    RadioApplication.getContext().stopService(makeIntent());
   }
 }

@@ -39,6 +39,15 @@ public class MainActivity extends BaseActivity {
   }
 
   @Override
+  public void onDestroy () {
+    try {
+      PlayerService.stop();
+    } finally {
+      super.onDestroy();
+    }
+  }
+
+  @Override
   public void onResume () {
     super.onResume();
     UriPlayer.setVisible();
