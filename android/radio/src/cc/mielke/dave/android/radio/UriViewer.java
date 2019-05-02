@@ -45,6 +45,7 @@ public class UriViewer extends ActivityComponent {
             artist = arguments[1];
           }
 
+          PlayerService.show(title, artist);
           setVisible(uriView, visible);
           updateText(metadataTitle, title);
           updateText(metadataArtist, artist);

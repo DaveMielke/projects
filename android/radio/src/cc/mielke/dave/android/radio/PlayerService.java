@@ -9,15 +9,17 @@ import android.content.Intent;
 public class PlayerService extends Service {
   private final static String LOG_TAG = PlayerService.class.getName();
 
-  private PlayerNotification playerNotification = null;
+  private final static Object NOTIFICATION_LOCK = new Object();
+  private static PlayerNotification playerNotification = null;
 
   @Override
   public void onCreate () {
     super.onCreate();
     Log.d(LOG_TAG, "starting");
 
-    playerNotification = new PlayerNotification(this);
-    playerNotification.show(true);
+    synchronized (NOTIFICATION_LOCK) {
+      playerNotification = new PlayerNotification(this);
+    }
   }
 
   @Override
@@ -25,8 +27,10 @@ public class PlayerService extends Service {
     try {
       Log.d(LOG_TAG, "stopping");
 
-      playerNotification.hide();
-      playerNotification = null;
+      synchronized (NOTIFICATION_LOCK) {
+        playerNotification.cancel();
+        playerNotification = null;
+      }
     } finally {
       super.onDestroy();
     }
@@ -52,5 +56,32 @@ public class PlayerService extends Service {
 
   public static void stop () {
     RadioApplication.getContext().stopService(makeIntent());
+  }
+
+  public static void cancel () {
+    synchronized (NOTIFICATION_LOCK) {
+      playerNotification.cancel();
+    }
+  }
+
+  public static void show (CharSequence title, CharSequence text) {
+    synchronized (NOTIFICATION_LOCK) {
+      if (playerNotification != null) {
+        if (title == null) title = "";
+        if (text == null) text = "";
+
+        playerNotification.setTitle(title);
+        playerNotification.setText(text);
+        playerNotification.show(true);
+      }
+    }
+  }
+
+  public static void show (CharSequence title) {
+    show(title, null);
+  }
+
+  public static void show () {
+    show(null);
   }
 }

@@ -39,10 +39,6 @@ public abstract class BaseNotification extends BaseComponent {
     return Notification.VISIBILITY_PUBLIC;
   }
 
-  protected String getTitle () {
-    return BaseApplication.getName();
-  }
-
   protected Class<? extends Activity> getMainActivityClass () {
     return null;
   }
@@ -98,11 +94,6 @@ public abstract class BaseNotification extends BaseComponent {
     }
 
     {
-      String title = getTitle();
-      if (title != null) builder.setContentTitle(title);
-    }
-
-    {
       Class<? extends Activity> activity = getMainActivityClass();
       if (activity != null) builder.setContentIntent(newPendingIntent(activity));
     }
@@ -121,7 +112,7 @@ public abstract class BaseNotification extends BaseComponent {
 
   private final static Object IDENTIFIER_LOCK = new Object();
   private static int uniqueIdentifier = 0;
-  protected final Integer notificationIdentifier;
+  protected final int notificationIdentifier;
 
   protected BaseNotification (Service service) {
     super();
@@ -140,12 +131,14 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   public final void show (boolean foreground) {
-    Notification notification = build();
+    synchronized (this) {
+      Notification notification = build();
 
-    if (foreground) {
-      notificationService.startForeground(notificationIdentifier, notification);
-    } else {
-      notificationManager.notify(notificationIdentifier, notification);
+      if (foreground) {
+        notificationService.startForeground(notificationIdentifier, notification);
+      } else {
+        notificationManager.notify(notificationIdentifier, notification);
+      }
     }
   }
 
@@ -153,15 +146,27 @@ public abstract class BaseNotification extends BaseComponent {
     show(false);
   }
 
-  public final void hide () {
-    notificationManager.cancel(notificationIdentifier);
+  public final void cancel () {
+    synchronized (this) {
+      notificationManager.cancel(notificationIdentifier);
+    }
   }
 
-  public final void setPrimaryText (CharSequence text) {
-    notificationBuilder.setContentText(text);
+  public final void setTitle (CharSequence text) {
+    synchronized (this) {
+      notificationBuilder.setContentTitle(text);
+    }
   }
 
-  public final void setSecondaryText (CharSequence text) {
-    notificationBuilder.setSubText(text);
+  public final void setText (CharSequence text) {
+    synchronized (this) {
+      notificationBuilder.setContentText(text);
+    }
+  }
+
+  public final void setSubText (CharSequence text) {
+    synchronized (this) {
+      notificationBuilder.setSubText(text);
+    }
   }
 }

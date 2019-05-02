@@ -91,15 +91,20 @@ public class RadioPrograms extends RadioComponent {
     return RadioProgram.getExternalName(currentProgram);
   }
 
-  public final RadioPrograms setProgram (RadioProgram program) {
+  public final RadioPrograms setProgram (RadioProgram newProgram) {
     synchronized (this) {
-      if (program != currentProgram) {
+      if (newProgram != currentProgram) {
         StringBuilder log = new StringBuilder("changing program: ");
-
         log.append(getProgramName());
-        if (currentProgram != null) currentProgram.stop();
 
-        currentProgram = program;
+        if (currentProgram == null) {
+          PlayerService.show();
+        } else {
+          currentProgram.stop();
+          if (newProgram == null) PlayerService.cancel();
+        }
+
+        currentProgram = newProgram;
         log.append(" -> ");
         log.append(getProgramName());
 
