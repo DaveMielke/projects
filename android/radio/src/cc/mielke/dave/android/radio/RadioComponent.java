@@ -34,6 +34,11 @@ public abstract class RadioComponent extends BaseComponent {
   }
 
   protected static void updateNotification (CharSequence title, CharSequence text) {
+    if (getRadioProgram() == null) {
+      title = getString(R.string.state_noProgram);
+      text = null;
+    }
+
     RadioService.updateNotification(title, text);
   }
 

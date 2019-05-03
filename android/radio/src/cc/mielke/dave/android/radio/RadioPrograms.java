@@ -115,9 +115,13 @@ public class RadioPrograms extends RadioComponent {
         currentProgram = newProgram;
         log.append(" -> ");
         log.append(getProgramName());
-
         Log.i(LOG_TAG, log.toString());
-        if (currentProgram != null) currentProgram.start();
+
+        if (currentProgram != null) {
+          currentProgram.start();
+        } else {
+          updateNotification();
+        }
       }
     }
 

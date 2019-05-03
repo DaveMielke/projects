@@ -56,7 +56,9 @@ public abstract class BaseNotification extends BaseComponent {
       Intent.FLAG_ACTIVITY_NEW_TASK
     );
 
-    return PendingIntent.getActivity(context, 0, intent, 0);
+    return PendingIntent.getActivity(
+      context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
+    );
   }
 
   private final Notification.Builder makeNotificationBuilder (Context context) {
@@ -95,7 +97,11 @@ public abstract class BaseNotification extends BaseComponent {
 
     {
       Class<? extends Activity> activity = getMainActivityClass();
-      if (activity != null) builder.setContentIntent(newPendingIntent(activity));
+      if (activity != null) {
+        builder.setContentIntent(newPendingIntent(activity))
+               .setAutoCancel(true)
+               ;
+      }
     }
 
     if (ApiTests.haveJellyBeanMR1) {
