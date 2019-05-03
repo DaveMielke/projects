@@ -3,7 +3,6 @@ package cc.mielke.dave.android.radio;
 import cc.mielke.dave.android.base.BaseNotification;
 
 import android.app.Service;
-import android.app.Activity;
 
 public class RadioNotification extends BaseNotification {
   public RadioNotification (Service service) {
@@ -19,10 +18,5 @@ public class RadioNotification extends BaseNotification {
   @Override
   protected int getLargeIcon () {
     return R.drawable.radio;
-  }
-
-  @Override
-  protected Class<? extends Activity> getMainActivityClass () {
-    return MainActivity.class;
   }
 }

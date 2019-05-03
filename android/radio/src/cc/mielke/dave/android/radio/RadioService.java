@@ -15,7 +15,7 @@ public class RadioService extends Service {
   @Override
   public void onCreate () {
     super.onCreate();
-    Log.d(LOG_TAG, "starting");
+    Log.d(LOG_TAG, "creating");
 
     synchronized (SERVICE_LOCK) {
       radioNotification = new RadioNotification(this);
@@ -25,7 +25,7 @@ public class RadioService extends Service {
   @Override
   public void onDestroy () {
     try {
-      Log.d(LOG_TAG, "stopping");
+      Log.d(LOG_TAG, "destroying");
 
       synchronized (SERVICE_LOCK) {
         radioNotification = null;
