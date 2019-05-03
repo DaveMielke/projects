@@ -126,10 +126,7 @@ public class RadioProgram extends RadioComponent {
         Log.d(LOG_TAG, "nothing to play");
       }
 
-      {
-        long delay = Math.max((next - now), 0);
-        post(delay, retryCallback);
-      }
+      postAt(next, retryCallback);
     }
   }
 

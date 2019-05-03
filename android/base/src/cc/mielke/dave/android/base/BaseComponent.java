@@ -54,8 +54,10 @@ public abstract class BaseComponent {
     getHandler().post(callback);
   }
 
-  protected static void post (final long delay, final Runnable callback) {
-    if (ApiTests.haveNougat) {
+  private final static boolean CAN_SCHEDULE_ACCURATELY = ApiTests.haveNougat;
+
+  protected static void postAt (final long when, final Runnable callback) {
+    if (CAN_SCHEDULE_ACCURATELY) {
       AlarmManager am = getAlarmManager();
 
       AlarmManager.OnAlarmListener listener =
@@ -67,9 +69,16 @@ public abstract class BaseComponent {
         };
 
       am.setExact(
-        AlarmManager.RTC_WAKEUP, (getCurrentTime() + delay),
-        "delayed-post", listener, null
+        AlarmManager.RTC_WAKEUP, when, "delayed-post", listener, null
       );
+    } else {
+      postIn((when - getCurrentTime()), callback);
+    }
+  }
+
+  protected static void postIn (final long delay, final Runnable callback) {
+    if (CAN_SCHEDULE_ACCURATELY) {
+      postAt((getCurrentTime() + delay), callback);
     } else {
       getHandler().postDelayed(callback, delay);
     }
