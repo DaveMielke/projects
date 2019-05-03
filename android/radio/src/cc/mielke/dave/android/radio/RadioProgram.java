@@ -68,6 +68,8 @@ public class RadioProgram extends RadioComponent {
   protected final RadioProgram addPlayers (RadioPlayer... players) {
     synchronized (this) {
       for (RadioPlayer player : players) {
+        if (player == null) continue;
+
         player.setProgram(this);
         allPlayers.add(player);
       }
@@ -124,8 +126,8 @@ public class RadioProgram extends RadioComponent {
 
       {
         String till = toTimeString(next);
-        updateNotification(getContext().getString(R.string.state_waitingTill, till));
         Log.i(LOG_TAG, ("nothing to play - waiting till " + till));
+        updateNotification(getContext().getString(R.string.state_waitingTill, till));
       }
 
       postAt(next, retryCallback);

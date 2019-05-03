@@ -32,30 +32,43 @@ public class RadioPrograms extends RadioComponent {
           String name = properties.getProperty("name", null);
           if (name == null) name = file.getName();
 
-          String music = properties.getProperty("music", null);
-          String book = properties.getProperty("book", null);
+          boolean announceHours = properties.getProperty("hours", null) != null;
+          RadioPlayer hourPlayer = null;
 
-          boolean hours = properties.getProperty("hours", null) != null;
-          boolean minutes = properties.getProperty("minutes", null) != null;
+          boolean announceMinutes = properties.getProperty("minutes", null) != null;
+          RadioPlayer minutePlayer = null;
+
+          String bookCollection = properties.getProperty("book", null);
+          RadioPlayer bookPlayer = null;
+
+          String musicCollection = properties.getProperty("music", null);
+          RadioPlayer musicPlayer = null;
+
+          if (announceHours) {
+            hourPlayer = new HourPlayer();
+          }
+
+          if (announceMinutes) {
+            minutePlayer = new MinutePlayer();
+          }
+
+          if (bookCollection != null) {
+            bookPlayer = new BookPlayer().setCollection(bookCollection);
+          }
+
+          if (musicCollection != null) {
+            musicPlayer = new MusicPlayer().setCollection(musicCollection);
+          }
 
           RadioProgram program = new RadioProgram();
           program.setName(name);
 
-          if (hours) {
-            program.addPlayers(new HourPlayer());
-          }
-
-          if (minutes) {
-            program.addPlayers(new MinutePlayer());
-          }
-
-          if (book != null) {
-            program.addPlayers(new BookPlayer().setCollection(book));
-          }
-
-          if (music != null) {
-            program.addPlayers(new MusicPlayer().setCollection(music));
-          }
+          program.addPlayers(
+            hourPlayer,
+            minutePlayer,
+            bookPlayer,
+            musicPlayer
+          );
 
           programs.put(name, program);
         }
