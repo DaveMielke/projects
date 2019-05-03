@@ -118,7 +118,15 @@ public class RadioProgram extends RadioComponent {
             return;
           }
 
-          player.ensureDelay(player.getBaseDelay());
+          {
+            long delay = player.getBaseDelay();
+
+            if (delay > 0) {
+              player.ensureDelay(delay);
+            } else if (player.getEarliestTime() <= now) {
+              continue;
+            }
+          }
         }
 
         next = Math.min(next, player.getEarliestTime());
