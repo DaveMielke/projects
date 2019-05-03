@@ -11,7 +11,7 @@ public abstract class TimePlayer extends SpeechPlayer {
     super();
   }
 
-  protected final String toTimeString (long time) {
+  private final String makeTimeString (long time) {
     boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
     String format = use24HourFormat? "H": "h";
     SimpleDateFormat formatter = new SimpleDateFormat(format);
@@ -41,5 +41,9 @@ public abstract class TimePlayer extends SpeechPlayer {
 
     text.append('.');
     return text.toString();
+  }
+
+  protected final boolean play (long time) {
+    return play(makeTimeString(time));
   }
 }

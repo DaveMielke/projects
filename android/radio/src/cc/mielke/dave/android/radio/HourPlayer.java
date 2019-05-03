@@ -30,6 +30,6 @@ public class HourPlayer extends TimePlayer {
       if (!announce) return false;
     }
 
-    return play(toTimeString(time));
+    return play(time);
   }
 }

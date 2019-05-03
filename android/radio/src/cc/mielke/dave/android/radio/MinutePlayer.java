@@ -16,6 +16,6 @@ public class MinutePlayer extends TimePlayer {
       setEarliestTime(next);
     }
 
-    return play(toTimeString(now));
+    return play(now);
   }
 }

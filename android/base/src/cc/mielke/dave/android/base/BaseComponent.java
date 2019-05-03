@@ -5,6 +5,9 @@ import java.util.Comparator;
 
 import java.util.Properties;
 
+import java.text.SimpleDateFormat;
+import cc.mielke.dave.android.base.TimeConstants;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -90,6 +93,18 @@ public abstract class BaseComponent {
 
   protected static long getCurrentTime () {
     return System.currentTimeMillis();
+  }
+
+  protected static String toTimeString (long time, String format) {
+    return new SimpleDateFormat(format).format(time);
+  }
+
+  protected static String toTimeString (long time) {
+    return toTimeString(time, TimeConstants.ISO_FORMAT);
+  }
+
+  protected static String toTimeString () {
+    return toTimeString(getCurrentTime());
   }
 
   protected static void sort (String[] strings) {

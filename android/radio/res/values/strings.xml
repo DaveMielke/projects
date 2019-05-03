@@ -14,4 +14,6 @@
   <string name="action_uriPrevious">Previous</string>
   <string name="action_uriPlay">Play</string>
   <string name="action_uriPause">Pause</string>
+
+  <string name="state_waitingTill">waiting till %s</string>
 </resources>
