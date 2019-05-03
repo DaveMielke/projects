@@ -7,6 +7,7 @@ import android.app.Service;
 public class RadioNotification extends BaseNotification {
   public RadioNotification (Service service) {
     super(service);
+    setTitle(getService().getString(R.string.state_noProgram));
     show(true);
   }
 

@@ -16,8 +16,16 @@ import android.graphics.BitmapFactory;
 public abstract class BaseNotification extends BaseComponent {
   private final static String LOG_TAG = BaseNotification.class.getName();
 
+  private final Service notificationService;
+  private final NotificationManager notificationManager;
+  private final Notification.Builder notificationBuilder;
+
+  protected final Service getService () {
+    return notificationService;
+  }
+
   protected int getLargeIcon () {
-    return notificationService.getApplicationInfo().icon;
+    return getService().getApplicationInfo().icon;
   }
 
   protected int getSmallIcon () {
@@ -41,16 +49,12 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   protected int getVisibility () {
-    return Notification.VISIBILITY_PUBLIC;
+    return Notification.VISIBILITY_PRIVATE;
   }
 
   protected Class<? extends Activity> getActivityClass () {
     return null;
   }
-
-  private final Service notificationService;
-  private final NotificationManager notificationManager;
-  private final Notification.Builder notificationBuilder;
 
   protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass) {
     Context context = getContext();
@@ -146,7 +150,7 @@ public abstract class BaseNotification extends BaseComponent {
       Notification notification = build();
 
       if (foreground) {
-        notificationService.startForeground(notificationIdentifier, notification);
+        getService().startForeground(notificationIdentifier, notification);
       } else {
         notificationManager.notify(notificationIdentifier, notification);
       }
