@@ -16,8 +16,13 @@ import android.graphics.BitmapFactory;
 public abstract class BaseNotification extends BaseComponent {
   private final static String LOG_TAG = BaseNotification.class.getName();
 
-  protected abstract int getSmallIcon ();
-  protected abstract int getLargeIcon ();
+  protected int getLargeIcon () {
+    return notificationService.getApplicationInfo().icon;
+  }
+
+  protected int getSmallIcon () {
+    return getLargeIcon();
+  }
 
   protected String getChannelIdentifier () {
     return BaseApplication.getName();
@@ -39,7 +44,7 @@ public abstract class BaseNotification extends BaseComponent {
     return Notification.VISIBILITY_PUBLIC;
   }
 
-  protected Class<? extends Activity> getMainActivityClass () {
+  protected Class<? extends Activity> getActivityClass () {
     return null;
   }
 
@@ -86,19 +91,19 @@ public abstract class BaseNotification extends BaseComponent {
     builder.setOngoing(true).setOnlyAlertOnce(true);
 
     {
-      int icon = getSmallIcon();
-      if (icon != 0) builder.setSmallIcon(icon);
-    }
-
-    {
       int icon = getLargeIcon();
       if (icon != 0) builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), icon));
     }
 
     {
-      Class<? extends Activity> activity = getMainActivityClass();
-      if (activity != null) {
-        builder.setContentIntent(newPendingIntent(activity))
+      int icon = getSmallIcon();
+      if (icon != 0) builder.setSmallIcon(icon);
+    }
+
+    {
+      Class<? extends Activity> activityClass = getActivityClass();
+      if (activityClass != null) {
+        builder.setContentIntent(newPendingIntent(activityClass))
                .setAutoCancel(true)
                ;
       }

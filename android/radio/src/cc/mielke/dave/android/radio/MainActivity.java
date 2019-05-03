@@ -33,7 +33,7 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onCreate (Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    Log.d(LOG_TAG, "create");
+    Log.d(LOG_TAG, "creating");
     setContentView(R.layout.main);
 
     UriPlayer.setViewer(new UriViewer(this));
@@ -52,26 +52,11 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onDestroy () {
     try {
-      Log.d(LOG_TAG, "destroy");
+      Log.d(LOG_TAG, "destroying");
 
       RadioService.stop();
     } finally {
       super.onDestroy();
-    }
-  }
-
-  @Override
-  public void onStart () {
-    super.onStart();
-    Log.d(LOG_TAG, "start");
-  }
-
-  @Override
-  public void onStop () {
-    try {
-      Log.d(LOG_TAG, "Stop");
-    } finally {
-      super.onStop();
     }
   }
 
