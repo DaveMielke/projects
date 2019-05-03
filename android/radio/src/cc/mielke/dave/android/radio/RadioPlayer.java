@@ -1,5 +1,8 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.Set;
+import java.util.LinkedHashSet;
+
 import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
@@ -12,9 +15,10 @@ public abstract class RadioPlayer extends RadioComponent {
   }
 
   private RadioProgram radioProgram = null;
-  private long baseDelay = 0;
-  private double relativeDelay = 0d;
-  private long maximumDelay = Long.MAX_VALUE;
+
+  public String getName () {
+    return getClass().getSimpleName();
+  }
 
   public final RadioProgram getProgram () {
     synchronized (this) {
@@ -37,6 +41,20 @@ public abstract class RadioPlayer extends RadioComponent {
       return this;
     }
   }
+
+  public static interface OnFinishedListener {
+    public void onFinished (RadioPlayer player);
+  }
+
+  private final Set<OnFinishedListener> onFinishedListeners = new LinkedHashSet<>();
+
+  public final void addOnFinishedListener (OnFinishedListener listener) {
+    onFinishedListeners.add(listener);
+  }
+
+  private long baseDelay = 0;
+  private double relativeDelay = 0d;
+  private long maximumDelay = Long.MAX_VALUE;
 
   public final long getBaseDelay () {
     synchronized (this) {
@@ -83,10 +101,6 @@ public abstract class RadioPlayer extends RadioComponent {
 
   public final RadioPlayer setMaximumDelay (long count, TimeUnit unit) {
     return setMaximumDelay(unit.toMillis(count));
-  }
-
-  public String getName () {
-    return getClass().getSimpleName();
   }
 
   protected final void logPlaying (String type, CharSequence data) {
@@ -137,6 +151,10 @@ public abstract class RadioPlayer extends RadioComponent {
       delay += Math.round((double)duration * getRelativeDelay());
       delay = Math.min(delay, getMaximumDelay());
       setEarliestTime(now + delay);
+
+      for (OnFinishedListener listener : onFinishedListeners) {
+        listener.onFinished(this);
+      }
 
       if (RadioParameters.LOG_PLAYER_SCHEDULING) {
         Log.d(LOG_TAG, ("playing ended: " + getName()));

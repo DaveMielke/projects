@@ -32,32 +32,52 @@ public class RadioPrograms extends RadioComponent {
           String name = properties.getProperty("name", null);
           if (name == null) name = file.getName();
 
+          String musicCollection = properties.getProperty("music", null);
+          RadioPlayer musicPlayer = null;
+
+          String bookCollection = properties.getProperty("book", null);
+          RadioPlayer bookPlayer = null;
+
           boolean announceHours = properties.getProperty("hours", null) != null;
           RadioPlayer hourPlayer = null;
 
           boolean announceMinutes = properties.getProperty("minutes", null) != null;
           RadioPlayer minutePlayer = null;
 
-          String bookCollection = properties.getProperty("book", null);
-          RadioPlayer bookPlayer = null;
-
-          String musicCollection = properties.getProperty("music", null);
-          RadioPlayer musicPlayer = null;
-
-          if (announceHours) {
-            hourPlayer = new HourPlayer();
-          }
-
-          if (announceMinutes) {
-            minutePlayer = new MinutePlayer();
+          if (musicCollection != null) {
+            musicPlayer = new MusicPlayer().setCollection(musicCollection);
           }
 
           if (bookCollection != null) {
             bookPlayer = new BookPlayer().setCollection(bookCollection);
+
+            if (musicPlayer != null) {
+              bookPlayer.setBaseDelay(RadioParameters.BOOK_BASE_DELAY);
+              bookPlayer.setRelativeDelay(RadioParameters.BOOK_RELATIVE_DELAY);
+              bookPlayer.setMaximumDelay(RadioParameters.BOOK_MAXIMUM_DELAY);
+              bookPlayer.ensureDelay(RadioParameters.BOOK_INITIAL_DELAY);
+            }
           }
 
-          if (musicCollection != null) {
-            musicPlayer = new MusicPlayer().setCollection(musicCollection);
+          if (announceHours) {
+            hourPlayer = new HourPlayer();
+
+            if ((bookPlayer != null) && (musicPlayer != null)) {
+              final RadioPlayer book = bookPlayer;
+
+              hourPlayer.addOnFinishedListener(
+                new RadioPlayer.OnFinishedListener() {
+                  @Override
+                  public void onFinished (RadioPlayer player) {
+                    book.ensureDelay(RadioParameters.BOOK_HOUR_DELAY);
+                  }
+                }
+              );
+            }
+          }
+
+          if (announceMinutes) {
+            minutePlayer = new MinutePlayer();
           }
 
           RadioProgram program = new RadioProgram();
