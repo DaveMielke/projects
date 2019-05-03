@@ -100,7 +100,7 @@ public abstract class BaseComponent {
   }
 
   protected static String toTimeString (long time) {
-    return toTimeString(time, TimeConstants.ISO_FORMAT);
+    return toTimeString(time, TimeConstants.DISPLAY_FORMAT);
   }
 
   protected static String toTimeString () {

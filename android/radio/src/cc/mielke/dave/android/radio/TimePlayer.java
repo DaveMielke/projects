@@ -11,7 +11,7 @@ public abstract class TimePlayer extends SpeechPlayer {
     super();
   }
 
-  private final String makeTimeString (long time) {
+  public static String makeTimeString (long time) {
     boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
     String format = use24HourFormat? "H": "h";
     SimpleDateFormat formatter = new SimpleDateFormat(format);

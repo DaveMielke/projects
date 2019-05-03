@@ -125,10 +125,7 @@ public class RadioProgram extends RadioComponent {
       {
         String till = toTimeString(next);
         updateNotification(getContext().getString(R.string.state_waitingTill, till));
-
-        if (RadioParameters.LOG_PLAYER_SCHEDULING) {
-          Log.d(LOG_TAG, ("nothing to play - waiting till " + till));
-        }
+        Log.i(LOG_TAG, ("nothing to play - waiting till " + till));
       }
 
       postAt(next, retryCallback);
