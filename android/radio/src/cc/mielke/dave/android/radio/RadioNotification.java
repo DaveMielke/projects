@@ -12,7 +12,7 @@ public class RadioNotification extends BaseNotification {
 
   @Override
   protected int getSmallIcon () {
-    return R.drawable.radio;
+    return R.drawable.status_bar_icon;
   }
 
   @Override

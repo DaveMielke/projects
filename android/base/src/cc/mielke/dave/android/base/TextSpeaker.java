@@ -88,12 +88,12 @@ public class TextSpeaker {
     return false;
   }
 
-  private final boolean useNewParadigm = ApiTests.haveLollipop;
+  private final boolean USE_BUNDLED_PARAMETERS = ApiTests.haveLollipop;
   private Bundle newParameters = null;
   private HashMap<String, String> oldParameters = null;
 
   private final boolean setParameter (String key, String value) {
-    if (useNewParadigm) {
+    if (USE_BUNDLED_PARAMETERS) {
       newParameters.putString(key, value);
     } else {
       oldParameters.put(key, value);
@@ -103,7 +103,7 @@ public class TextSpeaker {
   }
 
   private final boolean setParameter (String key, int value) {
-    if (useNewParadigm) {
+    if (USE_BUNDLED_PARAMETERS) {
       newParameters.putInt(key, value);
       return true;
     } else {
@@ -112,7 +112,7 @@ public class TextSpeaker {
   }
 
   private final boolean setParameter (String key, float value) {
-    if (useNewParadigm) {
+    if (USE_BUNDLED_PARAMETERS) {
       newParameters.putFloat(key, value);
       return true;
     } else {
@@ -186,7 +186,7 @@ public class TextSpeaker {
       String identifier = Integer.toString(++utteranceIdentifier);
       int status;
 
-      if (useNewParadigm) {
+      if (USE_BUNDLED_PARAMETERS) {
         status = ttsObject.speak(text, queueMode, newParameters, identifier);
       } else {
         setParameter(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, identifier);
@@ -326,7 +326,7 @@ public class TextSpeaker {
     ttsRetryDelay = retryDelay;
     ttsHandler = new Handler();
 
-    if (useNewParadigm) {
+    if (USE_BUNDLED_PARAMETERS) {
       newParameters = new Bundle();
     } else {
       oldParameters = new HashMap<String, String>();

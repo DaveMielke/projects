@@ -54,10 +54,10 @@ public abstract class BaseComponent {
     getHandler().post(callback);
   }
 
-  private final static boolean CAN_SCHEDULE_ACCURATELY = ApiTests.haveNougat;
+  private final static boolean HAVE_AlarmManager_OnAlarmListener = ApiTests.haveNougat;
 
   protected static void postAt (final long when, final Runnable callback) {
-    if (CAN_SCHEDULE_ACCURATELY) {
+    if (HAVE_AlarmManager_OnAlarmListener) {
       AlarmManager am = getAlarmManager();
 
       AlarmManager.OnAlarmListener listener =
@@ -77,7 +77,7 @@ public abstract class BaseComponent {
   }
 
   protected static void postIn (final long delay, final Runnable callback) {
-    if (CAN_SCHEDULE_ACCURATELY) {
+    if (HAVE_AlarmManager_OnAlarmListener) {
       postAt((getCurrentTime() + delay), callback);
     } else {
       getHandler().postDelayed(callback, delay);
