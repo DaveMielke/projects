@@ -4,6 +4,8 @@ import cc.mielke.dave.android.base.TextSpeaker;
 
 import android.util.Log;
 
+import android.media.AudioAttributes;
+
 public abstract class SpeechPlayer extends RadioPlayer {
   private final static String LOG_TAG = SpeechPlayer.class.getName();
 
@@ -37,14 +39,22 @@ public abstract class SpeechPlayer extends RadioPlayer {
       protected boolean getLogEvents () {
         return RadioParameters.LOG_SPEECH_PLAYER;
       }
+    };
+
+  private final TextSpeaker.Watcher speechWatcher =
+    new TextSpeaker.Watcher() {
+      @Override
+      public void onSetAudioAttributes (AudioAttributes attributes) {
+        setAudioAttributes(attributes);
+      }
 
       @Override
-      protected void onSpeakingStarted (String identifier, CharSequence text) {
+      public void onSpeakingStarted (String identifier, CharSequence text) {
         speechViewer.showText(text);
       }
 
       @Override
-      protected void onSpeakingFinished (String identifier) {
+      public void onSpeakingFinished (String identifier) {
         onSpeechPlayerFinished();
       }
     };
@@ -52,7 +62,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
   protected final boolean play (CharSequence text) {
     synchronized (SPEECH_LOCK) {
       logPlaying("speech", text);
-      if (!textSpeaker.speakText(text)) return false;
+      if (!textSpeaker.speakText(text, true, speechWatcher)) return false;
 
       onPlayStart();
       return true;

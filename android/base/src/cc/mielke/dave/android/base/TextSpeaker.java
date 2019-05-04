@@ -7,8 +7,9 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
-import android.os.Bundle;
+import java.util.Map;
 import java.util.HashMap;
+import android.os.Bundle;
 
 import android.media.AudioManager;
 import android.media.AudioAttributes;
@@ -20,13 +21,57 @@ public class TextSpeaker {
     return false;
   }
 
-  protected void onSetAudioAttributes (AudioAttributes attributes) {
+  public static interface Watcher {
+    public void onSetAudioAttributes (AudioAttributes attributes);
+    public void onSpeakingStarted (String identifier, CharSequence text);
+    public void onSpeakingFinished (String identifier);
   }
 
-  protected void onSpeakingStarted (String identifier, CharSequence text) {
+  private final Map<String, Watcher> watchers = new HashMap<>();
+
+  private final void addWatcher (String identifier, Watcher watcher) {
+    synchronized (watchers) {
+      watchers.put(identifier, watcher);
+    }
   }
 
-  protected void onSpeakingFinished (String identifier) {
+  private final Watcher getWatcher (String identifier) {
+    synchronized (watchers) {
+      return watchers.get(identifier);
+    }
+  }
+
+  private final void onSetAudioAttributes (String identifier, AudioAttributes attributes) {
+    Watcher watcher = getWatcher(identifier);
+    if (watcher != null) watcher.onSetAudioAttributes(attributes);
+  }
+
+  private final void onSpeakingStarted (String identifier, CharSequence text) {
+    Watcher watcher = getWatcher(identifier);
+    if (watcher != null) watcher.onSpeakingStarted(identifier, text);
+  }
+
+  private final void onSpeakingFinished (String identifier) {
+    Watcher watcher = getWatcher(identifier);
+
+    if (watcher != null) {
+      watcher.onSpeakingFinished(identifier);
+      watchers.remove(identifier);
+    }
+  }
+
+  private final static AudioAttributes audioAttributes;
+
+  static {
+    if (ApiTests.HAVE_AudioAttributes) {
+      AudioAttributes.Builder builder = new AudioAttributes.Builder();
+      builder.setUsage(AudioAttributes.USAGE_MEDIA);
+      builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
+      builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
+      audioAttributes = builder.build();
+    } else {
+      audioAttributes = null;
+    }
   }
 
   private final Context ttsContext;
@@ -183,11 +228,14 @@ public class TextSpeaker {
   private int maximumInputLength = 0;
   private int utteranceIdentifier = 0;
 
-  public final boolean speakText (CharSequence text, boolean flush) {
+  public final boolean speakText (CharSequence text, boolean flush, Watcher watcher) {
     if (isEngineStarted()) {
       int queueMode = flush? TextToSpeech.QUEUE_FLUSH: TextToSpeech.QUEUE_ADD;
       String identifier = Integer.toString(++utteranceIdentifier);
       int status;
+
+      if (watcher != null) addWatcher(identifier, watcher);
+      onSetAudioAttributes(identifier, audioAttributes);
 
       if (USE_BUNDLED_PARAMETERS) {
         status = ttsObject.speak(text, queueMode, newParameters, identifier);
@@ -207,8 +255,18 @@ public class TextSpeaker {
     return false;
   }
 
+  public final boolean speakText (CharSequence text, boolean flush) {
+    return speakText(text, flush, null);
+  }
+
+  private final static boolean DEFAULT_SPEAK_TEXT_FLUSH = true;
+
   public final boolean speakText (CharSequence text) {
-    return speakText(text, true);
+    return speakText(text, DEFAULT_SPEAK_TEXT_FLUSH);
+  }
+
+  public final boolean speakText (CharSequence text, Watcher watcher) {
+    return speakText(text, DEFAULT_SPEAK_TEXT_FLUSH, watcher);
   }
 
   public boolean stopSpeaking () {
@@ -267,21 +325,10 @@ public class TextSpeaker {
               maximumInputLength = getMaximumInputLength();
               ttsReady = true;
 
-              {
-                int stream = AudioManager.STREAM_MUSIC;
-
-                if (ApiTests.HAVE_AudioAttributes) {
-                  AudioAttributes.Builder builder = new AudioAttributes.Builder();
-                  builder.setUsage(AudioAttributes.USAGE_MEDIA);
-                  builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
-                  builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
-
-                  AudioAttributes attributes = builder.build();
-                  onSetAudioAttributes(attributes);
-                  ttsObject.setAudioAttributes(attributes);
-                } else {
-                  setStream(stream);
-                }
+              if (ApiTests.HAVE_AudioAttributes) {
+                ttsObject.setAudioAttributes(audioAttributes);
+              } else {
+                setStream(AudioManager.STREAM_MUSIC);
               }
 
               setVolume(VOLUME_MAXIMUM);
