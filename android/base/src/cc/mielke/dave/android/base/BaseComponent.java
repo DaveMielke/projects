@@ -25,6 +25,7 @@ import android.content.res.Resources;
 import android.os.Handler;
 
 import android.app.AlarmManager;
+import android.media.AudioManager;
 
 public abstract class BaseComponent {
   private final static String LOG_TAG = BaseComponent.class.getName();
@@ -49,6 +50,26 @@ public abstract class BaseComponent {
     return (AlarmManager)getContext().getSystemService(Context.ALARM_SERVICE);
   }
 
+  protected static AudioManager getAudioManager () {
+    return (AudioManager)getContext().getSystemService(Context.AUDIO_SERVICE);
+  }
+
+  protected static long getCurrentTime () {
+    return System.currentTimeMillis();
+  }
+
+  protected static String toTimeString (long time, String format) {
+    return new SimpleDateFormat(format).format(time);
+  }
+
+  protected static String toTimeString (long time) {
+    return toTimeString(time, TimeConstants.DISPLAY_FORMAT);
+  }
+
+  protected static String toTimeString () {
+    return toTimeString(getCurrentTime());
+  }
+
   protected static Handler getHandler () {
     return BaseApplication.getHandler();
   }
@@ -57,10 +78,8 @@ public abstract class BaseComponent {
     getHandler().post(callback);
   }
 
-  private final static boolean HAVE_AlarmManager_OnAlarmListener = ApiTests.haveNougat;
-
   protected static void postAt (final long when, final Runnable callback) {
-    if (HAVE_AlarmManager_OnAlarmListener) {
+    if (ApiTests.HAVE_OnAlarmListener) {
       AlarmManager am = getAlarmManager();
 
       AlarmManager.OnAlarmListener listener =
@@ -80,7 +99,7 @@ public abstract class BaseComponent {
   }
 
   protected static void postIn (final long delay, final Runnable callback) {
-    if (HAVE_AlarmManager_OnAlarmListener) {
+    if (ApiTests.HAVE_OnAlarmListener) {
       postAt((getCurrentTime() + delay), callback);
     } else {
       getHandler().postDelayed(callback, delay);
@@ -89,22 +108,6 @@ public abstract class BaseComponent {
 
   protected static File getExternalStorageDirectory () {
     return BaseApplication.getExternalStorageDirectory();
-  }
-
-  protected static long getCurrentTime () {
-    return System.currentTimeMillis();
-  }
-
-  protected static String toTimeString (long time, String format) {
-    return new SimpleDateFormat(format).format(time);
-  }
-
-  protected static String toTimeString (long time) {
-    return toTimeString(time, TimeConstants.DISPLAY_FORMAT);
-  }
-
-  protected static String toTimeString () {
-    return toTimeString(getCurrentTime());
   }
 
   protected static void sort (String[] strings) {

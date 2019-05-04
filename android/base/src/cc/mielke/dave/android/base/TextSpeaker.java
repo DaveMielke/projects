@@ -267,7 +267,7 @@ public class TextSpeaker {
               {
                 int stream = AudioManager.STREAM_MUSIC;
 
-                if (ApiTests.haveLollipop) {
+                if (ApiTests.HAVE_AudioAttributes) {
                   AudioAttributes.Builder builder = new AudioAttributes.Builder();
                   builder.setLegacyStreamType(stream);
                   builder.setUsage(AudioAttributes.USAGE_MEDIA);

@@ -45,4 +45,10 @@ public abstract class ApiTests {
 
   public final static boolean havePie =
     haveLevel(Build.VERSION_CODES.P);
+
+  public final static boolean HAVE_OnAlarmListener = haveNougat;
+
+  public final static boolean HAVE_AudioAttributes = haveLollipop;
+
+  public final static boolean HAVE_AudioFocusRequest = haveOreo;
 }

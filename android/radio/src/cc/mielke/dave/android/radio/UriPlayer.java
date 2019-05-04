@@ -305,7 +305,7 @@ public abstract class UriPlayer extends RadioPlayer {
     logPlaying("URI", uri.toString());
 
     synchronized (PLAYER_LOCK) {
-      if (ApiTests.haveLollipop) {
+      if (ApiTests.HAVE_AudioAttributes) {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
         builder.setContentType(audioContentType);
