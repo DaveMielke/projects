@@ -104,6 +104,33 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
+  protected static void abandonAudioFocus () {
+    if (RadioParameters.LOG_AUDIO_FOCUS) {
+      Log.d(LOG_TAG, "abandoning audio focus");
+    }
+
+    synchronized (AUDIO_LOCK) {
+      if (haveAudioFocus) {
+        int result;
+
+        if (ApiTests.HAVE_AudioFocusRequest) {
+          result = audioManager.abandonAudioFocusRequest(audioFocusRequest);
+          audioFocusRequest = null;
+        } else {
+          result = audioManager.abandonAudioFocus(audioFocusChangeListener);
+        }
+
+        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+          Log.w(LOG_TAG, ("unexpected abandon audio focus result: " + result));
+        }
+
+        haveAudioFocus = false;
+      } else if (RadioParameters.LOG_AUDIO_FOCUS) {
+        Log.d(LOG_TAG, "audio focus not held");
+      }
+    }
+  }
+
   private final static AudioManager.OnAudioFocusChangeListener audioFocusChangeListener =
     new AudioManager.OnAudioFocusChangeListener() {
       @Override
@@ -124,10 +151,8 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus permanently lost");
               }
 
-              if (performAction(Action.SUSPEND)) {
-                abandonAudioFocus();
-              }
-
+              performAction(Action.SUSPEND);
+              abandonAudioFocus();
               break;
             }
 
@@ -190,6 +215,7 @@ public abstract class RadioPlayer extends RadioComponent {
         audioFocusRequest = new AudioFocusRequest
           .Builder(how)
           .setAudioAttributes(audioAttributes)
+          .setOnAudioFocusChangeListener(audioFocusChangeListener)
           .build();
 
         result = audioManager.requestAudioFocus(audioFocusRequest);
@@ -208,35 +234,6 @@ public abstract class RadioPlayer extends RadioComponent {
 
       Log.w(LOG_TAG, ("audio focus not granted: " + result));
       return false;
-    }
-  }
-
-  protected static void abandonAudioFocus () {
-    if (RadioParameters.LOG_AUDIO_FOCUS) {
-      Log.d(LOG_TAG, "abandoning audio focus");
-    }
-
-    synchronized (AUDIO_LOCK) {
-      if (haveAudioFocus) {
-        int result;
-
-        if (ApiTests.HAVE_AudioFocusRequest) {
-          result = audioManager.abandonAudioFocusRequest(audioFocusRequest);
-          audioFocusRequest = null;
-        } else {
-          result = audioManager.abandonAudioFocus(audioFocusChangeListener);
-        }
-
-        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-          Log.w(LOG_TAG, ("unexpected abandon audio focus result: " + result));
-        }
-
-        haveAudioFocus = false;
-      } else if (RadioParameters.LOG_AUDIO_FOCUS) {
-        Log.d(LOG_TAG, "audio focus not held");
-      }
-
-      if (ApiTests.HAVE_AudioAttributes) audioAttributes = null;
     }
   }
 
@@ -364,6 +361,7 @@ public abstract class RadioPlayer extends RadioComponent {
 
   protected static void onRadioPlayerFinished (RadioPlayer player) {
     abandonAudioFocus();
+    if (ApiTests.HAVE_AudioAttributes) setAudioAttributes(null);
 
     if (player == null) {
       player = getRadioPlayer();
