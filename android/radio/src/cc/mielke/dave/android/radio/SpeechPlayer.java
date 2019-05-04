@@ -24,7 +24,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
   private static void onSpeechPlayerFinished (SpeechPlayer player) {
     synchronized (SPEECH_LOCK) {
-      abandonAudioFocus();
       speechViewer.showText(null);
       onRadioPlayerFinished(player);
     }
@@ -49,7 +48,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
       @Override
       protected void onStartSpeaking (String identifier, CharSequence text) {
         speechViewer.showText(text);
-        requestAudioFocus(true);
       }
 
       @Override
@@ -62,7 +60,15 @@ public abstract class SpeechPlayer extends RadioPlayer {
     synchronized (SPEECH_LOCK) {
       logPlaying("speech", text);
       onPlayStart();
-      return textSpeaker.speakText(text, true);
+
+      if (requestAudioFocus(true)) {
+        if (textSpeaker.speakText(text, true)) {
+          return true;
+        }
+      }
+
+      onSpeechPlayerFinished(this);
+      return false;
     }
   }
 

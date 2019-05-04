@@ -164,8 +164,6 @@ public abstract class UriPlayer extends RadioPlayer {
 
   private static void onUriPlayerFinished (UriPlayer player) {
     synchronized (PLAYER_LOCK) {
-      abandonAudioFocus();
-
       stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
       startPositionMonitor(PositionMonitorStopReason.PAUSE);
 
@@ -275,9 +273,12 @@ public abstract class UriPlayer extends RadioPlayer {
           Log.d(LOG_TAG, "starting media player");
         }
 
-        requestAudioFocus(false);
-        mediaPlayer.start();
-        startPositionMonitor(PositionMonitorStopReason.INACTIVE);
+        if (requestAudioFocus(false)) {
+          mediaPlayer.start();
+          startPositionMonitor(PositionMonitorStopReason.INACTIVE);
+        } else {
+          onUriPlayerFinished();
+        }
       }
     };
 

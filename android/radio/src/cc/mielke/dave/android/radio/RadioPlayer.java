@@ -84,22 +84,26 @@ public abstract class RadioPlayer extends RadioComponent {
   private final static Object AUDIO_FOCUS_LOCK = new Object();
   private static AudioFocusRequest audioFocusRequest = null;
 
-  protected static void requestAudioFocus (boolean brief) {
+  protected static boolean requestAudioFocus (boolean brief) {
     synchronized (AUDIO_FOCUS_LOCK) {
-      int type = brief? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: AudioManager.AUDIOFOCUS_GAIN;
+      int how = brief? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: AudioManager.AUDIOFOCUS_GAIN;
       int stream = AudioManager.STREAM_MUSIC;
       int result;
 
       if (ApiTests.HAVE_AudioFocusRequest) {
         audioFocusRequest = new AudioFocusRequest
-          .Builder(type)
+          .Builder(how)
           .setAudioAttributes(audioAttributes)
           .build();
 
         result = audioManager.requestAudioFocus(audioFocusRequest);
       } else {
-        result = audioManager.requestAudioFocus(audioFocusChangeListener, stream, type);
+        result = audioManager.requestAudioFocus(audioFocusChangeListener, stream, how);
       }
+
+      if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) return true;
+      Log.w(LOG_TAG, "audio focus not granted");
+      return false;
     }
   }
 
@@ -107,7 +111,7 @@ public abstract class RadioPlayer extends RadioComponent {
     requestAudioFocus(false);
   }
 
-  protected static void abandonAudioFocus () {
+  private static void abandonAudioFocus () {
     synchronized (AUDIO_FOCUS_LOCK) {
       int result;
 
@@ -243,6 +247,8 @@ public abstract class RadioPlayer extends RadioComponent {
   }
 
   protected static void onRadioPlayerFinished (RadioPlayer player) {
+    abandonAudioFocus();
+
     if (player == null) {
       player = getRadioPlayer();
     }

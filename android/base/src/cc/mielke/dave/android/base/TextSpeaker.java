@@ -205,6 +205,7 @@ public class TextSpeaker {
       int status;
 
       onSetAudioAttributes(audioAttributes);
+      onStartSpeaking(identifier, text);
 
       if (USE_BUNDLED_PARAMETERS) {
         status = ttsObject.speak(text, queueMode, newParameters, identifier);
@@ -213,9 +214,7 @@ public class TextSpeaker {
         status = ttsObject.speak(text.toString(), queueMode, oldParameters);
       }
 
-      onStartSpeaking(identifier, text);
       if (status == TextToSpeech.SUCCESS) return true;
-
       Log.e(LOG_TAG, ("TTS speak failed: " + status));
       onSpeakingFinished(identifier);
     }
