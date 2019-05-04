@@ -363,7 +363,8 @@ public abstract class UriPlayer extends RadioPlayer {
     }
   }
 
-  public static void playPause () {
+  @Override
+  protected final boolean actionPlayPause () {
     synchronized (AUDIO_LOCK) {
       boolean isPlaying = false;
 
@@ -384,12 +385,8 @@ public abstract class UriPlayer extends RadioPlayer {
 
       uriViewer.setPlayPauseButton(isPlaying);
     }
-  }
 
-  public static void playNext () {
-  }
-
-  public static void playPrevious () {
+    return true;
   }
 
   public static void setVisible () {
