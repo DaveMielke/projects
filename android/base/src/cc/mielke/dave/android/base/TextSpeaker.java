@@ -204,7 +204,7 @@ public class TextSpeaker {
       String identifier = Integer.toString(++utteranceIdentifier);
       int status;
 
-      onSetAudioAttributes(audioAttributes);
+      if (ApiTests.HAVE_AudioAttributes) onSetAudioAttributes(audioAttributes);
       onStartSpeaking(identifier, text);
 
       if (USE_BUNDLED_PARAMETERS) {
