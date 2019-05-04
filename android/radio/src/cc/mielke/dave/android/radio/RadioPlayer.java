@@ -65,17 +65,37 @@ public abstract class RadioPlayer extends RadioComponent {
       public void onAudioFocusChange (int change) {
         synchronized (AUDIO_FOCUS_LOCK) {
           switch (change) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-              break;
+            case AudioManager.AUDIOFOCUS_GAIN: {
+              if (RadioParameters.LOG_AUDIO_FOCUS) {
+                Log.d(LOG_TAG, "audio focus regained");
+              }
 
-            case AudioManager.AUDIOFOCUS_LOSS:
               break;
+            }
 
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-              break;
+            case AudioManager.AUDIOFOCUS_LOSS: {
+              if (RadioParameters.LOG_AUDIO_FOCUS) {
+                Log.d(LOG_TAG, "audio focus permanently lost");
+              }
 
-            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
               break;
+            }
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT: {
+              if (RadioParameters.LOG_AUDIO_FOCUS) {
+                Log.d(LOG_TAG, "audio focus temporarily lost (may not duck)");
+              }
+
+              break;
+            }
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: {
+              if (RadioParameters.LOG_AUDIO_FOCUS) {
+                Log.d(LOG_TAG, "audio focus temporarily lost (may duck)");
+              }
+
+              break;
+            }
 
             default:
               Log.w(LOG_TAG, ("unexpected audio focus change: " + change));
@@ -85,7 +105,16 @@ public abstract class RadioPlayer extends RadioComponent {
       }
     };
 
-  protected static boolean requestAudioFocus (boolean brief) {
+  protected static boolean requestAudioFocus (boolean temporary) {
+    if (RadioParameters.LOG_AUDIO_FOCUS) {
+      Log.d(LOG_TAG,
+        String.format(
+          "requesting %s audio focus",
+          (temporary? "temporary": "persistent")
+        )
+      );
+    }
+
     synchronized (AUDIO_FOCUS_LOCK) {
       if (haveAudioFocus) {
         throw new IllegalStateException("already have audio focus");
@@ -97,7 +126,7 @@ public abstract class RadioPlayer extends RadioComponent {
         }
       }
 
-      int how = brief? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: AudioManager.AUDIOFOCUS_GAIN;
+      int how = temporary? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: AudioManager.AUDIOFOCUS_GAIN;
       int stream = AudioManager.STREAM_MUSIC;
       int result;
 
@@ -117,6 +146,10 @@ public abstract class RadioPlayer extends RadioComponent {
       }
 
       if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+        if (RadioParameters.LOG_AUDIO_FOCUS) {
+          Log.d(LOG_TAG, "audio focus granted");
+        }
+
         haveAudioFocus = true;
         return true;
       }
@@ -131,6 +164,10 @@ public abstract class RadioPlayer extends RadioComponent {
   }
 
   private static void abandonAudioFocus () {
+    if (RadioParameters.LOG_AUDIO_FOCUS) {
+      Log.d(LOG_TAG, "abandoning audio focus");
+    }
+
     synchronized (AUDIO_FOCUS_LOCK) {
       if (haveAudioFocus) {
         int result;
@@ -142,7 +179,13 @@ public abstract class RadioPlayer extends RadioComponent {
           result = audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
 
+        if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+          Log.w(LOG_TAG, ("unexpected abandon audio focus result: " + result));
+        }
+
         haveAudioFocus = false;
+      } else if (RadioParameters.LOG_AUDIO_FOCUS) {
+        Log.d(LOG_TAG, "audio focus not held");
       }
 
       if (ApiTests.HAVE_AudioAttributes) audioAttributes = null;
