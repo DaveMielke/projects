@@ -171,6 +171,10 @@ public abstract class UriPlayer extends RadioPlayer {
     onUriPlayerFinished(null);
   }
 
+  private static boolean requestAudioFocus () {
+    return requestAudioFocus(false);
+  }
+
   private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
     new MediaPlayer.OnCompletionListener() {
       @Override
@@ -266,7 +270,7 @@ public abstract class UriPlayer extends RadioPlayer {
           Log.d(LOG_TAG, "starting media player");
         }
 
-        if (requestAudioFocus(false)) {
+        if (requestAudioFocus()) {
           mediaPlayer.start();
           startPositionMonitor(PositionMonitorStopReason.INACTIVE);
         } else {
@@ -361,18 +365,21 @@ public abstract class UriPlayer extends RadioPlayer {
 
   public static void playPause () {
     synchronized (AUDIO_LOCK) {
-      boolean isPlaying;
+      boolean isPlaying = false;
 
-      if (mediaPlayer == null) {
-        isPlaying = false;
-      } else if (mediaPlayer.isPlaying()) {
-        mediaPlayer.pause();
+      if (mediaPlayer != null) {
+        if (mediaPlayer.isPlaying()) {
+          mediaPlayer.pause();
+        } else if (requestAudioFocus()) {
+          mediaPlayer.start();
+          startPositionMonitor(PositionMonitorStopReason.PAUSE);
+          isPlaying = true;
+        }
+      }
+
+      if (!isPlaying) {
+        abandonAudioFocus();
         stopPositionMonitor(PositionMonitorStopReason.PAUSE);
-        isPlaying = false;
-      } else {
-        mediaPlayer.start();
-        startPositionMonitor(PositionMonitorStopReason.PAUSE);
-        isPlaying = true;
       }
 
       uriViewer.setPlayPauseButton(isPlaying);

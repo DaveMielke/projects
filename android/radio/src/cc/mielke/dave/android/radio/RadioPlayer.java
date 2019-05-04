@@ -161,11 +161,7 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
-  protected static void requestAudioFocus () {
-    requestAudioFocus(false);
-  }
-
-  private static void abandonAudioFocus () {
+  protected static void abandonAudioFocus () {
     if (RadioParameters.LOG_AUDIO_FOCUS) {
       Log.d(LOG_TAG, "abandoning audio focus");
     }

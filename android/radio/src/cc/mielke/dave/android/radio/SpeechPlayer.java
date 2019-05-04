@@ -32,6 +32,10 @@ public abstract class SpeechPlayer extends RadioPlayer {
     onSpeechPlayerFinished(null);
   }
 
+  private static boolean requestAudioFocus () {
+    return requestAudioFocus(true);
+  }
+
   private final static TextSpeaker textSpeaker =
     new TextSpeaker(getContext(), RadioParameters.TTS_RETRY_DELAY) {
       @Override
@@ -60,7 +64,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
       logPlaying("speech", text);
       onPlayStart();
 
-      if (requestAudioFocus(true)) {
+      if (requestAudioFocus()) {
         if (textSpeaker.speakText(text, true)) {
           return true;
         }
