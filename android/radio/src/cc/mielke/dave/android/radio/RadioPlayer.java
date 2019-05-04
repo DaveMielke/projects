@@ -52,18 +52,21 @@ public abstract class RadioPlayer extends RadioComponent {
   protected final static AudioManager audioManager = getAudioManager();
 
   public static enum Action {
-    PLAY_PAUSE, PLAY, PAUSE, NEXT, PREVIOUS;
+    PLAY_PAUSE,
+    SUSPEND, RESUME,
+    NEXT, PREVIOUS,
+    ; // end of enumeration
   };
 
   protected boolean actionPlayPause () {
     return false;
   }
 
-  protected boolean actionPlay () {
+  protected boolean actionSuspend () {
     return false;
   }
 
-  protected boolean actionPause () {
+  protected boolean actionResume () {
     return false;
   }
 
@@ -82,8 +85,8 @@ public abstract class RadioPlayer extends RadioComponent {
 
       switch (action) {
         case PLAY_PAUSE: return player.actionPlayPause();
-        case PLAY: return player.actionPlay();
-        case PAUSE: return player.actionPause();
+        case SUSPEND: return player.actionSuspend();
+        case RESUME: return player.actionResume();
         case NEXT: return player.actionNext();
         case PREVIOUS: return player.actionPrevious();
         default: return false;
@@ -112,7 +115,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus regained");
               }
 
-              performAction(Action.PLAY);
+              performAction(Action.RESUME);
               break;
             }
 
@@ -121,7 +124,10 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus permanently lost");
               }
 
-              performAction(Action.PAUSE);
+              if (performAction(Action.SUSPEND)) {
+                abandonAudioFocus();
+              }
+
               break;
             }
 
@@ -130,7 +136,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus temporarily lost (may not duck)");
               }
 
-              performAction(Action.PAUSE);
+              performAction(Action.SUSPEND);
               break;
             }
 
@@ -139,7 +145,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus temporarily lost (may duck)");
               }
 
-              performAction(Action.PAUSE);
+              performAction(Action.SUSPEND);
               break;
             }
 

@@ -363,30 +363,62 @@ public abstract class UriPlayer extends RadioPlayer {
     }
   }
 
+  private final void suspendPlayer () {
+    mediaPlayer.pause();
+    stopPositionMonitor(PositionMonitorStopReason.PAUSE);
+    uriViewer.setPlayPauseButton(false);
+  }
+
+  private final void resumePlayer () {
+    mediaPlayer.start();
+    startPositionMonitor(PositionMonitorStopReason.PAUSE);
+    uriViewer.setPlayPauseButton(true);
+  }
+
   @Override
   protected final boolean actionPlayPause () {
     synchronized (AUDIO_LOCK) {
-      boolean isPlaying = false;
+      boolean resume = false;
 
       if (mediaPlayer != null) {
-        if (mediaPlayer.isPlaying()) {
-          mediaPlayer.pause();
-        } else if (requestAudioFocus()) {
-          mediaPlayer.start();
-          startPositionMonitor(PositionMonitorStopReason.PAUSE);
-          isPlaying = true;
+        if (!mediaPlayer.isPlaying()) {
+          if (requestAudioFocus()) {
+            resume = true;
+          }
         }
       }
 
-      if (!isPlaying) {
+      if (resume) {
+        resumePlayer();
+      } else {
+        suspendPlayer();
         abandonAudioFocus();
-        stopPositionMonitor(PositionMonitorStopReason.PAUSE);
       }
 
-      uriViewer.setPlayPauseButton(isPlaying);
+      return true;
     }
+  }
 
-    return true;
+  @Override
+  protected final boolean actionSuspend () {
+    synchronized (AUDIO_LOCK) {
+      if (mediaPlayer == null) return false;
+      if (!mediaPlayer.isPlaying()) return false;
+
+      suspendPlayer();
+      return true;
+    }
+  }
+
+  @Override
+  protected final boolean actionResume () {
+    synchronized (AUDIO_LOCK) {
+      if (mediaPlayer == null) return false;
+      if (mediaPlayer.isPlaying()) return false;
+
+      resumePlayer();
+      return true;
+    }
   }
 
   public static void setVisible () {
