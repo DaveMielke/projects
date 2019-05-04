@@ -7,9 +7,8 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
-import java.util.Map;
-import java.util.HashMap;
 import android.os.Bundle;
+import java.util.HashMap;
 
 import android.media.AudioManager;
 import android.media.AudioAttributes;
@@ -110,37 +109,38 @@ public class TextSpeaker {
   private Bundle newParameters = null;
   private HashMap<String, String> oldParameters = null;
 
-  private final boolean setParameter (String key, String value) {
+  private final void setOldParameter (String key, String value) {
+    oldParameters.put(key, value);
+  }
+
+  private final void setParameter (String key, String value) {
     if (USE_BUNDLED_PARAMETERS) {
       newParameters.putString(key, value);
     } else {
-      oldParameters.put(key, value);
+      setOldParameter(key, value);
     }
-
-    return true;
   }
 
-  private final boolean setParameter (String key, int value) {
+  private final void setParameter (String key, int value) {
     if (USE_BUNDLED_PARAMETERS) {
       newParameters.putInt(key, value);
-      return true;
     } else {
-      return setParameter(key, Integer.toString(value));
+      setOldParameter(key, Integer.toString(value));
     }
   }
 
-  private final boolean setParameter (String key, float value) {
+  private final void setParameter (String key, float value) {
     if (USE_BUNDLED_PARAMETERS) {
       newParameters.putFloat(key, value);
-      return true;
     } else {
-      return setParameter(key, Float.toString(value));
+      setOldParameter(key, Float.toString(value));
     }
   }
 
   private final boolean setStream (int value) {
     synchronized (this) {
-      return setParameter(TextToSpeech.Engine.KEY_PARAM_STREAM, value);
+      setParameter(TextToSpeech.Engine.KEY_PARAM_STREAM, value);
+      return true;
     }
   }
 
@@ -151,11 +151,23 @@ public class TextSpeaker {
   public final static float VOLUME_MINIMUM = 0f;
   public final static float VOLUME_MAXIMUM = 1f;
 
+  public final static float VOLUME_DEFAULT = VOLUME_MAXIMUM;
+  private float currentVolume = VOLUME_DEFAULT;
+
+  public final float getVolume () {
+    synchronized (this) {
+      return currentVolume;
+    }
+  }
+
   public final boolean setVolume (float value) {
     synchronized (this) {
       if (value < VOLUME_MINIMUM) return false;
       if (value > VOLUME_MAXIMUM) return false;
-      return setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
+
+      setParameter(TextToSpeech.Engine.KEY_PARAM_VOLUME, value);
+      currentVolume = value;
+      return true;
     }
   }
 
@@ -163,35 +175,73 @@ public class TextSpeaker {
   public final static float BALANCE_RIGHT = 1f;
   public final static float BALANCE_LEFT = -BALANCE_RIGHT;
 
+  public final static float BALANCE_DEFAULT = BALANCE_CENTER;
+  private float currentBalance = BALANCE_DEFAULT;
+
+  public final float getBalance () {
+    synchronized (this) {
+      return currentBalance;
+    }
+  }
+
   public final boolean setBalance (float value) {
     synchronized (this) {
       if (value < BALANCE_LEFT) return false;
       if (value > BALANCE_RIGHT) return false;
-      return setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
+
+      setParameter(TextToSpeech.Engine.KEY_PARAM_PAN, value);
+      currentBalance = value;
+      return true;
     }
   }
 
   public final static float RATE_MAXIMUM = 10f;
   public final static float RATE_MINIMUM = 1f / RATE_MAXIMUM;
 
+  public final static float RATE_DEFAULT = 1f;
+  private float currentRate = RATE_DEFAULT;
+
+  public final float getRate () {
+    synchronized (this) {
+      return currentRate;
+    }
+  }
+
   public final boolean setRate (float value) {
     synchronized (this) {
       if (value < RATE_MINIMUM) return false;
       if (value > RATE_MAXIMUM) return false;
+
       if (!isEngineStarted()) return false;
-      return ttsObject.setSpeechRate(value) == TextToSpeech.SUCCESS;
+      if (ttsObject.setSpeechRate(value) != TextToSpeech.SUCCESS) return false;
+
+      currentRate = value;
+      return true;
     }
   }
 
   public final static float PITCH_MAXIMUM = 10f;
   public final static float PITCH_MINIMUM = 1f / PITCH_MAXIMUM;
 
+  public final static float PITCH_DEFAULT = 1f;
+  private float currentPitch = PITCH_DEFAULT;
+
+  public final float getPitch () {
+    synchronized (this) {
+      return currentPitch;
+    }
+  }
+
   public final boolean setPitch (float value) {
     synchronized (this) {
       if (value < PITCH_MINIMUM) return false;
       if (value > PITCH_MAXIMUM) return false;
+
       if (!isEngineStarted()) return false;
-      return ttsObject.setPitch(value) == TextToSpeech.SUCCESS;
+      if (ttsObject.setPitch(value) != TextToSpeech.SUCCESS) return false;
+
+      currentPitch = value;
+      return true;
     }
   }
 
