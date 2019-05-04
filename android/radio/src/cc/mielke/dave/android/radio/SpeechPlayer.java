@@ -13,17 +13,16 @@ public abstract class SpeechPlayer extends RadioPlayer {
     super();
   }
 
-  private final static Object SPEECH_LOCK = new Object();
   private static SpeechViewer speechViewer = null;
 
   public static void setViewer (SpeechViewer viewer) {
-    synchronized (SPEECH_LOCK) {
+    synchronized (AUDIO_LOCK) {
       speechViewer = viewer;
     }
   }
 
   private static void onSpeechPlayerFinished (SpeechPlayer player) {
-    synchronized (SPEECH_LOCK) {
+    synchronized (AUDIO_LOCK) {
       speechViewer.showText(null);
       onRadioPlayerFinished(player);
     }
@@ -57,7 +56,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
     };
 
   protected final boolean play (CharSequence text) {
-    synchronized (SPEECH_LOCK) {
+    synchronized (AUDIO_LOCK) {
       logPlaying("speech", text);
       onPlayStart();
 
@@ -79,7 +78,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
         Log.d(LOG_TAG, "stopping");
       }
 
-      synchronized (SPEECH_LOCK) {
+      synchronized (AUDIO_LOCK) {
         textSpeaker.stopSpeaking();
       //onSpeechPlayerFinished(this);
       }

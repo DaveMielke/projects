@@ -48,22 +48,24 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
+  protected final static Object AUDIO_LOCK = new Object();
   protected final static AudioManager audioManager = getAudioManager();
+
   private static AudioAttributes audioAttributes = null;
-
-  protected static void setAudioAttributes (AudioAttributes attributes) {
-    audioAttributes = attributes;
-  }
-
-  private final static Object AUDIO_FOCUS_LOCK = new Object();
   private static AudioFocusRequest audioFocusRequest = null;
   private static boolean haveAudioFocus = false;
+
+  protected static void setAudioAttributes (AudioAttributes attributes) {
+    synchronized (AUDIO_LOCK) {
+      audioAttributes = attributes;
+    }
+  }
 
   private final static AudioManager.OnAudioFocusChangeListener audioFocusChangeListener =
     new AudioManager.OnAudioFocusChangeListener() {
       @Override
       public void onAudioFocusChange (int change) {
-        synchronized (AUDIO_FOCUS_LOCK) {
+        synchronized (AUDIO_LOCK) {
           switch (change) {
             case AudioManager.AUDIOFOCUS_GAIN: {
               if (RadioParameters.LOG_AUDIO_FOCUS) {
@@ -115,7 +117,7 @@ public abstract class RadioPlayer extends RadioComponent {
       );
     }
 
-    synchronized (AUDIO_FOCUS_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (haveAudioFocus) {
         throw new IllegalStateException("already have audio focus");
       }
@@ -168,7 +170,7 @@ public abstract class RadioPlayer extends RadioComponent {
       Log.d(LOG_TAG, "abandoning audio focus");
     }
 
-    synchronized (AUDIO_FOCUS_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (haveAudioFocus) {
         int result;
 

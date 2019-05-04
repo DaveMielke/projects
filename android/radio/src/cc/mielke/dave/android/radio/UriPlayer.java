@@ -18,7 +18,6 @@ public abstract class UriPlayer extends RadioPlayer {
     super();
   }
 
-  private final static Object PLAYER_LOCK = new Object();
   private static MediaPlayer mediaPlayer = null;
   private static UriViewer uriViewer = null;
 
@@ -73,7 +72,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private static void startPositionMonitor (PositionMonitorStopReason reason) {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (reason.end()) {
         positionMonitorThread =
           new Thread("position-mnitor") {
@@ -90,7 +89,7 @@ public abstract class UriPlayer extends RadioPlayer {
                   new Runnable() {
                     @Override
                     public void run () {
-                      synchronized (PLAYER_LOCK) {
+                      synchronized (AUDIO_LOCK) {
                         uriViewer.setPosition(mediaPlayer.getCurrentPosition());
                       }
                     }
@@ -118,7 +117,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private static void stopPositionMonitor (PositionMonitorStopReason reason) {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (reason.begin()) {
         positionMonitorThread.interrupt();
         positionMonitorThread = null;
@@ -146,14 +145,8 @@ public abstract class UriPlayer extends RadioPlayer {
       }
     };
 
-  public static UriViewer getViewer () {
-    synchronized (PLAYER_LOCK) {
-      return uriViewer;
-    }
-  }
-
   public static void setViewer (UriViewer viewer) {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (viewer != null) {
         viewer.setOnSeekBarChangeListener(positionChangedListener);
       }
@@ -163,7 +156,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private static void onUriPlayerFinished (UriPlayer player) {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
       startPositionMonitor(PositionMonitorStopReason.PAUSE);
 
@@ -263,7 +256,7 @@ public abstract class UriPlayer extends RadioPlayer {
           Log.d(LOG_TAG, "media layer prepared");
         }
 
-        synchronized (PLAYER_LOCK) {
+        synchronized (AUDIO_LOCK) {
           uriViewer.setDuration(mediaPlayer.getDuration());
           uriViewer.setPosition(0);
           uriViewer.setPlayPauseButton(true);
@@ -283,7 +276,7 @@ public abstract class UriPlayer extends RadioPlayer {
     };
 
   private static void ensureMediaPlayer () {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (mediaPlayer == null) {
         mediaPlayer = new MediaPlayer();
 
@@ -308,7 +301,7 @@ public abstract class UriPlayer extends RadioPlayer {
     ensureMediaPlayer();
     logPlaying("URI", uri.toString());
 
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       if (ApiTests.HAVE_AudioAttributes) {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
@@ -354,7 +347,7 @@ public abstract class UriPlayer extends RadioPlayer {
         Log.d(LOG_TAG, "stopping");
       }
 
-      synchronized (PLAYER_LOCK) {
+      synchronized (AUDIO_LOCK) {
         if (mediaPlayer != null) {
           mediaPlayer.stop();
           mediaPlayer.reset();
@@ -367,7 +360,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   public static void playPause () {
-    synchronized (PLAYER_LOCK) {
+    synchronized (AUDIO_LOCK) {
       boolean isPlaying;
 
       if (mediaPlayer == null) {
