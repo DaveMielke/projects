@@ -21,43 +21,13 @@ public class TextSpeaker {
     return false;
   }
 
-  public static interface Watcher {
-    public void onSetAudioAttributes (AudioAttributes attributes);
-    public void onSpeakingStarted (String identifier, CharSequence text);
-    public void onSpeakingFinished (String identifier);
+  protected void onSetAudioAttributes (AudioAttributes attributes) {
   }
 
-  private final Map<String, Watcher> watchers = new HashMap<>();
-
-  private final void addWatcher (String identifier, Watcher watcher) {
-    synchronized (watchers) {
-      watchers.put(identifier, watcher);
-    }
+  protected void onStartSpeaking (String identifier, CharSequence text) {
   }
 
-  private final Watcher getWatcher (String identifier) {
-    synchronized (watchers) {
-      return watchers.get(identifier);
-    }
-  }
-
-  private final void onSetAudioAttributes (String identifier, AudioAttributes attributes) {
-    Watcher watcher = getWatcher(identifier);
-    if (watcher != null) watcher.onSetAudioAttributes(attributes);
-  }
-
-  private final void onSpeakingStarted (String identifier, CharSequence text) {
-    Watcher watcher = getWatcher(identifier);
-    if (watcher != null) watcher.onSpeakingStarted(identifier, text);
-  }
-
-  private final void onSpeakingFinished (String identifier) {
-    Watcher watcher = getWatcher(identifier);
-
-    if (watcher != null) {
-      watcher.onSpeakingFinished(identifier);
-      watchers.remove(identifier);
-    }
+  protected void onSpeakingFinished (String identifier) {
   }
 
   private final static AudioAttributes audioAttributes;
@@ -228,14 +198,13 @@ public class TextSpeaker {
   private int maximumInputLength = 0;
   private int utteranceIdentifier = 0;
 
-  public final boolean speakText (CharSequence text, boolean flush, Watcher watcher) {
+  public final boolean speakText (CharSequence text, boolean flush) {
     if (isEngineStarted()) {
       int queueMode = flush? TextToSpeech.QUEUE_FLUSH: TextToSpeech.QUEUE_ADD;
       String identifier = Integer.toString(++utteranceIdentifier);
       int status;
 
-      if (watcher != null) addWatcher(identifier, watcher);
-      onSetAudioAttributes(identifier, audioAttributes);
+      onSetAudioAttributes(audioAttributes);
 
       if (USE_BUNDLED_PARAMETERS) {
         status = ttsObject.speak(text, queueMode, newParameters, identifier);
@@ -244,29 +213,18 @@ public class TextSpeaker {
         status = ttsObject.speak(text.toString(), queueMode, oldParameters);
       }
 
-      if (status == TextToSpeech.SUCCESS) {
-        onSpeakingStarted(identifier, text);
-        return true;
-      } else {
-        Log.e(LOG_TAG, ("TTS speak failed: " + status));
-      }
+      onStartSpeaking(identifier, text);
+      if (status == TextToSpeech.SUCCESS) return true;
+
+      Log.e(LOG_TAG, ("TTS speak failed: " + status));
+      onSpeakingFinished(identifier);
     }
 
     return false;
   }
 
-  public final boolean speakText (CharSequence text, boolean flush) {
-    return speakText(text, flush, null);
-  }
-
-  private final static boolean DEFAULT_SPEAK_TEXT_FLUSH = true;
-
   public final boolean speakText (CharSequence text) {
-    return speakText(text, DEFAULT_SPEAK_TEXT_FLUSH);
-  }
-
-  public final boolean speakText (CharSequence text, Watcher watcher) {
-    return speakText(text, DEFAULT_SPEAK_TEXT_FLUSH, watcher);
+    return speakText(text, true);
   }
 
   public boolean stopSpeaking () {

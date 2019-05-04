@@ -24,6 +24,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
   private static void onSpeechPlayerFinished (SpeechPlayer player) {
     synchronized (SPEECH_LOCK) {
+      abandonAudioFocus();
       speechViewer.showText(null);
       onRadioPlayerFinished(player);
     }
@@ -39,22 +40,20 @@ public abstract class SpeechPlayer extends RadioPlayer {
       protected boolean getLogEvents () {
         return RadioParameters.LOG_SPEECH_PLAYER;
       }
-    };
 
-  private final TextSpeaker.Watcher speechWatcher =
-    new TextSpeaker.Watcher() {
       @Override
-      public void onSetAudioAttributes (AudioAttributes attributes) {
+      protected void onSetAudioAttributes (AudioAttributes attributes) {
         setAudioAttributes(attributes);
       }
 
       @Override
-      public void onSpeakingStarted (String identifier, CharSequence text) {
+      protected void onStartSpeaking (String identifier, CharSequence text) {
         speechViewer.showText(text);
+        requestAudioFocus(true);
       }
 
       @Override
-      public void onSpeakingFinished (String identifier) {
+      protected void onSpeakingFinished (String identifier) {
         onSpeechPlayerFinished();
       }
     };
@@ -62,10 +61,8 @@ public abstract class SpeechPlayer extends RadioPlayer {
   protected final boolean play (CharSequence text) {
     synchronized (SPEECH_LOCK) {
       logPlaying("speech", text);
-      if (!textSpeaker.speakText(text, true, speechWatcher)) return false;
-
       onPlayStart();
-      return true;
+      return textSpeaker.speakText(text, true);
     }
   }
 
