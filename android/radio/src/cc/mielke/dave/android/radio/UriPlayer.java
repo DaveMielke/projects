@@ -309,7 +309,10 @@ public abstract class UriPlayer extends RadioPlayer {
         AudioAttributes.Builder builder = new AudioAttributes.Builder();
         builder.setUsage(AudioAttributes.USAGE_MEDIA);
         builder.setContentType(audioContentType);
-        mediaPlayer.setAudioAttributes(builder.build());
+
+        AudioAttributes attributes = builder.build();
+        setAudioAttributes(attributes);
+        mediaPlayer.setAudioAttributes(attributes);
       }
 
       try {

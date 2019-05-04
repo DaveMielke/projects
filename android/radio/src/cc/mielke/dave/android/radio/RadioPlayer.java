@@ -5,7 +5,13 @@ import java.util.LinkedHashSet;
 
 import java.util.concurrent.TimeUnit;
 
+import cc.mielke.dave.android.base.ApiTests;
+
 import android.util.Log;
+
+import android.media.AudioManager;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 
 public abstract class RadioPlayer extends RadioComponent {
   private final static String LOG_TAG = RadioPlayer.class.getName();
@@ -39,6 +45,77 @@ public abstract class RadioPlayer extends RadioComponent {
 
       radioProgram = program;
       return this;
+    }
+  }
+
+  protected final static AudioManager audioManager = getAudioManager();
+  private AudioAttributes audioAttributes = null;
+
+  protected final void setAudioAttributes (AudioAttributes attributes) {
+    audioAttributes = attributes;
+  }
+
+  private final AudioManager.OnAudioFocusChangeListener focusListener =
+    new AudioManager.OnAudioFocusChangeListener() {
+      @Override
+      public void onAudioFocusChange (int change) {
+        switch (change) {
+          case AudioManager.AUDIOFOCUS_GAIN:
+            break;
+
+          case AudioManager.AUDIOFOCUS_LOSS:
+            break;
+
+          case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+            break;
+
+          case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+            break;
+
+          default:
+            Log.w(LOG_TAG, ("unexpected audio focus change: " + change));
+            break;
+        }
+      }
+    };
+
+  private final static Object AUDIO_FOCUS_LOCK = new Object();
+  private AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = null;
+  private AudioFocusRequest audioFocusRequest = null;
+
+  protected final void requestAudioFocus (boolean brief) {
+    synchronized (AUDIO_FOCUS_LOCK) {
+      int type = brief? AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: AudioManager.AUDIOFOCUS_GAIN;
+      int stream = AudioManager.STREAM_MUSIC;
+      int result;
+
+      if (ApiTests.HAVE_AudioFocusRequest) {
+        audioFocusRequest = new AudioFocusRequest
+          .Builder(type)
+          .setAudioAttributes(audioAttributes)
+          .build();
+
+        result = audioManager.requestAudioFocus(audioFocusRequest);
+      } else {
+        result = audioManager.requestAudioFocus(audioFocusChangeListener, stream, type);
+      }
+    }
+  }
+
+  protected final void requestAudioFocus () {
+    requestAudioFocus(false);
+  }
+
+  protected final void abandonAudioFocus () {
+    synchronized (AUDIO_FOCUS_LOCK) {
+      int result;
+
+      if (ApiTests.HAVE_AudioFocusRequest) {
+        result = audioManager.abandonAudioFocusRequest(audioFocusRequest);
+        audioFocusRequest = null;
+      } else {
+        result = audioManager.abandonAudioFocus(audioFocusChangeListener);
+      }
     }
   }
 

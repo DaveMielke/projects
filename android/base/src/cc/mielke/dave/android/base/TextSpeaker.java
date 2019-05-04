@@ -20,6 +20,9 @@ public class TextSpeaker {
     return false;
   }
 
+  protected void onSetAudioAttributes (AudioAttributes attributes) {
+  }
+
   protected void onSpeakingStarted (String identifier, CharSequence text) {
   }
 
@@ -269,11 +272,13 @@ public class TextSpeaker {
 
                 if (ApiTests.HAVE_AudioAttributes) {
                   AudioAttributes.Builder builder = new AudioAttributes.Builder();
-                  builder.setLegacyStreamType(stream);
                   builder.setUsage(AudioAttributes.USAGE_MEDIA);
                   builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
                   builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
-                  ttsObject.setAudioAttributes(builder.build());
+
+                  AudioAttributes attributes = builder.build();
+                  onSetAudioAttributes(attributes);
+                  ttsObject.setAudioAttributes(attributes);
                 } else {
                   setStream(stream);
                 }
