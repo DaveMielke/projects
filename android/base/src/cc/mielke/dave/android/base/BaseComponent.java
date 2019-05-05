@@ -91,7 +91,7 @@ public abstract class BaseComponent {
   }
 
   protected static void postAt (final long when, final Runnable callback) {
-    if (ApiTests.HAVE_OnAlarmListener) {
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
       AlarmManager am = getAlarmManager();
 
       AlarmManager.OnAlarmListener listener =
@@ -111,7 +111,7 @@ public abstract class BaseComponent {
   }
 
   protected static void postIn (final long delay, final Runnable callback) {
-    if (ApiTests.HAVE_OnAlarmListener) {
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
       postAt((getCurrentTime() + delay), callback);
     } else {
       getHandler().postDelayed(callback, delay);
