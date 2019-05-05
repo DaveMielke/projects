@@ -12,7 +12,7 @@ public class MinutePlayer extends TimePlayer {
     long now = getCurrentTime();
 
     {
-      long next = ((now + MINUTE.ONE) / MINUTE.ONE) * MINUTE.ONE;
+      long next = MINUTE.START(now + MINUTE.ONE);
       setEarliestTime(next);
     }
 

@@ -1,7 +1,6 @@
 package cc.mielke.dave.android.radio;
 
 import static cc.mielke.dave.android.base.TimeConstants.*;
-import java.util.concurrent.TimeUnit;
 
 import java.text.SimpleDateFormat;
 
@@ -22,11 +21,11 @@ public abstract class TimePlayer extends SpeechPlayer {
     text.append(' ');
 
     {
-      long minutes = TimeUnit.MILLISECONDS.toMinutes(time % HOUR.ONE);
+      long minute = MINUTE.WHICH(time) % MINUTES_PER_HOUR;
 
-      if (minutes > 0) {
-        if (minutes < 10) text.append("o ");
-        text.append(minutes);
+      if (minute > 0) {
+        if (minute < 10) text.append("o ");
+        text.append(minute);
       } else if (use24HourFormat) {
         text.append("o'clock");
       }

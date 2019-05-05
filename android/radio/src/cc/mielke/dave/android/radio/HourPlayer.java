@@ -13,7 +13,7 @@ public class HourPlayer extends TimePlayer {
   public final boolean play () {
     long now = getCurrentTime();
     long time = now + MINUTE.HALF;
-    long hour = (time / HOUR.ONE) * HOUR.ONE;
+    long hour = HOUR.START(time);
 
     {
       long next = hour + HOUR.ONE - MINUTE.HALF;

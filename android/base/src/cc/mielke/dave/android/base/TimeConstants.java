@@ -19,6 +19,14 @@ public enum TimeConstants {
     HALF = ONE / 2;
   }
 
+  public final long WHICH (long time) {
+    return time / ONE;
+  }
+
+  public final long START (long time) {
+    return WHICH(time) * ONE;
+  }
+
   public final static long SECONDS_PER_MINUTE = MINUTE.ONE / SECOND.ONE;
   public final static long MINUTES_PER_HOUR = HOUR.ONE / MINUTE.ONE;
 }
