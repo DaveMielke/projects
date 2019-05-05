@@ -19,15 +19,15 @@ public class MainActivity extends BaseActivity {
   }
 
   public final void uriPlayPause (View view) {
-    RadioPlayer.performAction(RadioPlayer.Action.PLAY_PAUSE);
+    RadioPlayer.Action.PLAY_PAUSE.perform();
   }
 
   public final void uriNext (View view) {
-    RadioPlayer.performAction(RadioPlayer.Action.NEXT);
+    RadioPlayer.Action.NEXT.perform();
   }
 
   public final void uriPrevious (View view) {
-    RadioPlayer.performAction(RadioPlayer.Action.PREVIOUS);
+    RadioPlayer.Action.PREVIOUS.perform();
   }
 
   @Override

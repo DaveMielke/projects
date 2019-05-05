@@ -51,13 +51,6 @@ public abstract class RadioPlayer extends RadioComponent {
   protected final static Object AUDIO_LOCK = new Object();
   protected final static AudioManager audioManager = getAudioManager();
 
-  public static enum Action {
-    PLAY_PAUSE,
-    SUSPEND, RESUME,
-    NEXT, PREVIOUS,
-    ; // end of enumeration
-  };
-
   protected boolean actionPlayPause () {
     return false;
   }
@@ -78,21 +71,72 @@ public abstract class RadioPlayer extends RadioComponent {
     return false;
   }
 
-  public static boolean performAction (Action action) {
-    synchronized (AUDIO_LOCK) {
-      RadioPlayer player = getRadioPlayer();
-      if (player == null) return false;
+  public static enum Action {
+    PLAY_PAUSE(
+      new Performer() {
+        @Override
+        public boolean perform (RadioPlayer player) {
+          return player.actionPlayPause();
+        }
+      }
+    ),
 
-      switch (action) {
-        case PLAY_PAUSE: return player.actionPlayPause();
-        case SUSPEND: return player.actionSuspend();
-        case RESUME: return player.actionResume();
-        case NEXT: return player.actionNext();
-        case PREVIOUS: return player.actionPrevious();
-        default: return false;
+    SUSPEND(
+      new Performer() {
+        @Override
+        public boolean perform (RadioPlayer player) {
+          return player.actionSuspend();
+        }
+      }
+    ),
+
+    RESUME(
+      new Performer() {
+        @Override
+        public boolean perform (RadioPlayer player) {
+          return player.actionResume();
+        }
+      }
+    ),
+
+    NEXT(
+      new Performer() {
+        @Override
+        public boolean perform (RadioPlayer player) {
+          return player.actionNext();
+        }
+      }
+    ),
+
+    PREVIOUS(
+      new Performer() {
+        @Override
+        public boolean perform (RadioPlayer player) {
+          return player.actionPrevious();
+        }
+      }
+    ),
+
+    ; // end of enumeration
+
+    private static interface Performer {
+      public boolean perform (RadioPlayer player);
+    }
+
+    private final Performer actionPerformer;
+
+    Action (Performer performer) {
+      actionPerformer = performer;
+    }
+
+    public final boolean perform () {
+      synchronized (AUDIO_LOCK) {
+        RadioPlayer player = getRadioPlayer();
+        if (player == null) return false;
+        return actionPerformer.perform(player);
       }
     }
-  }
+  };
 
   private static AudioAttributes audioAttributes = null;
   private static AudioFocusRequest audioFocusRequest = null;
@@ -142,7 +186,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus regained");
               }
 
-              performAction(Action.RESUME);
+              Action.RESUME.perform();
               break;
             }
 
@@ -151,7 +195,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus permanently lost");
               }
 
-              performAction(Action.SUSPEND);
+              Action.SUSPEND.perform();
               abandonAudioFocus();
               break;
             }
@@ -161,7 +205,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus temporarily lost (may not duck)");
               }
 
-              performAction(Action.SUSPEND);
+              Action.SUSPEND.perform();
               break;
             }
 
@@ -170,7 +214,7 @@ public abstract class RadioPlayer extends RadioComponent {
                 Log.d(LOG_TAG, "audio focus temporarily lost (may duck)");
               }
 
-              performAction(Action.SUSPEND);
+              Action.SUSPEND.perform();
               break;
             }
 
