@@ -65,17 +65,20 @@ public class RadioProgram extends RadioComponent {
     }
   }
 
-  protected final RadioProgram addPlayers (RadioPlayer... players) {
+  protected final boolean addPlayers (RadioPlayer... players) {
+    boolean hasPlayers = false;
+
     synchronized (this) {
       for (RadioPlayer player : players) {
         if (player == null) continue;
+        hasPlayers = true;
 
         player.setProgram(this);
         allPlayers.add(player);
       }
     }
 
-    return this;
+    return hasPlayers;
   }
 
   private final Runnable retryCallback =

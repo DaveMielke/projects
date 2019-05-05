@@ -83,14 +83,18 @@ public class RadioPrograms extends RadioComponent {
           RadioProgram program = new RadioProgram();
           program.setName(name);
 
-          program.addPlayers(
+          boolean hasPlayers = program.addPlayers(
             hourPlayer,
             minutePlayer,
             bookPlayer,
             musicPlayer
           );
 
-          programs.put(name, program);
+          if (hasPlayers) {
+            programs.put(name, program);
+          } else {
+            Log.w(LOG_TAG, ("no players: " + name));
+          }
         }
       }
     }
