@@ -1,6 +1,7 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.TextSpeaker;
+import cc.mielke.dave.android.base.ApiTests;
 
 import android.util.Log;
 
@@ -44,11 +45,6 @@ public abstract class SpeechPlayer extends RadioPlayer {
       }
 
       @Override
-      protected void onSetAudioAttributes (AudioAttributes attributes) {
-        setAudioAttributes(attributes);
-      }
-
-      @Override
       protected void onStartSpeaking (String identifier, CharSequence text) {
         speechViewer.showText(text);
       }
@@ -63,6 +59,10 @@ public abstract class SpeechPlayer extends RadioPlayer {
     synchronized (AUDIO_LOCK) {
       logPlaying("speech", text);
       onPlayStart();
+
+      if (ApiTests.HAVE_AudioAttributes) {
+        setAudioAttributes(textSpeaker.getAudioAttributes());
+      }
 
       if (requestAudioFocus()) {
         if (textSpeaker.speakText(text, true)) {

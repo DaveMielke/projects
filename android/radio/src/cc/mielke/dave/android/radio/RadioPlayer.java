@@ -212,8 +212,7 @@ public abstract class RadioPlayer extends RadioComponent {
           throw new IllegalStateException("already have audio focus request");
         }
 
-        audioFocusRequest = new AudioFocusRequest
-          .Builder(how)
+        audioFocusRequest = new AudioFocusRequest.Builder(how)
           .setAudioAttributes(audioAttributes)
           .setOnAudioFocusChangeListener(audioFocusChangeListener)
           .build();

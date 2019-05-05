@@ -306,16 +306,6 @@ public abstract class UriPlayer extends RadioPlayer {
     logPlaying("URI", uri.toString());
 
     synchronized (AUDIO_LOCK) {
-      if (ApiTests.HAVE_AudioAttributes) {
-        AudioAttributes.Builder builder = new AudioAttributes.Builder();
-        builder.setUsage(AudioAttributes.USAGE_MEDIA);
-        builder.setContentType(audioContentType);
-
-        AudioAttributes attributes = builder.build();
-        setAudioAttributes(attributes);
-        mediaPlayer.setAudioAttributes(attributes);
-      }
-
       try {
         if (RadioParameters.LOG_URI_PLAYER) {
           Log.d(LOG_TAG, ("setting media player data source: " + uri.toString()));
@@ -331,6 +321,16 @@ public abstract class UriPlayer extends RadioPlayer {
         );
 
         return false;
+      }
+
+      if (ApiTests.HAVE_AudioAttributes) {
+        AudioAttributes attributes = new AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_MEDIA)
+          .setContentType(audioContentType)
+          .build();
+
+        setAudioAttributes(attributes);
+        mediaPlayer.setAudioAttributes(attributes);
       }
 
       if (RadioParameters.LOG_URI_PLAYER) {

@@ -20,9 +20,6 @@ public class TextSpeaker {
     return false;
   }
 
-  protected void onSetAudioAttributes (AudioAttributes attributes) {
-  }
-
   protected void onStartSpeaking (String identifier, CharSequence text) {
   }
 
@@ -33,14 +30,18 @@ public class TextSpeaker {
 
   static {
     if (ApiTests.HAVE_AudioAttributes) {
-      AudioAttributes.Builder builder = new AudioAttributes.Builder();
-      builder.setUsage(AudioAttributes.USAGE_MEDIA);
-      builder.setContentType(AudioAttributes.CONTENT_TYPE_SPEECH);
-      builder.setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED);
-      audioAttributes = builder.build();
+      audioAttributes = new AudioAttributes.Builder()
+        .setUsage(AudioAttributes.USAGE_MEDIA)
+        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+        .setFlags(AudioAttributes.FLAG_AUDIBILITY_ENFORCED)
+        .build();
     } else {
       audioAttributes = null;
     }
+  }
+
+  public static AudioAttributes getAudioAttributes () {
+    return audioAttributes;
   }
 
   private final Context ttsContext;
@@ -254,7 +255,6 @@ public class TextSpeaker {
       String identifier = Integer.toString(++utteranceIdentifier);
       int status;
 
-      if (ApiTests.HAVE_AudioAttributes) onSetAudioAttributes(audioAttributes);
       onStartSpeaking(identifier, text);
 
       if (USE_BUNDLED_PARAMETERS) {
