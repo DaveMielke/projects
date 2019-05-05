@@ -2,19 +2,23 @@ package cc.mielke.dave.android.base;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class TimeConstants {
-  private TimeConstants () {
+public enum TimeConstants {
+  SECOND(TimeUnit.SECONDS),
+  MINUTE(TimeUnit.MINUTES),
+  HOUR(TimeUnit.HOURS),
+  DAY(TimeUnit.DAYS),
+  ; // end of enumeration
+
+  public final TimeUnit UNIT;
+  public final long ONE;
+  public final long HALF;
+
+  TimeConstants (TimeUnit unit) {
+    UNIT = unit;
+    ONE = UNIT.toMillis(1);
+    HALF = ONE / 2;
   }
 
-  public final static long ONE_HOUR = TimeUnit.HOURS.toMillis(1);
-  public final static long HALF_HOUR = ONE_HOUR / 2;
-
-  public final static long ONE_MINUTE = TimeUnit.MINUTES.toMillis(1);
-  public final static long HALF_MINUTE = ONE_MINUTE / 2;
-
-  public final static long ONE_SECOND = TimeUnit.SECONDS.toMillis(1);
-  public final static long HALF_SECOND = ONE_SECOND / 2;
-
-  public final static long SECONDS_PER_MINUTE = ONE_MINUTE / ONE_SECOND;
-  public final static long MINUTES_PER_HOUR = ONE_HOUR / ONE_MINUTE;
+  public final static long SECONDS_PER_MINUTE = MINUTE.ONE / SECOND.ONE;
+  public final static long MINUTES_PER_HOUR = HOUR.ONE / MINUTE.ONE;
 }

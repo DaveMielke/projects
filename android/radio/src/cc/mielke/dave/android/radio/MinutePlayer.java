@@ -12,7 +12,7 @@ public class MinutePlayer extends TimePlayer {
     long now = getCurrentTime();
 
     {
-      long next = ((now + ONE_MINUTE) / ONE_MINUTE) * ONE_MINUTE;
+      long next = ((now + MINUTE.ONE) / MINUTE.ONE) * MINUTE.ONE;
       setEarliestTime(next);
     }
 

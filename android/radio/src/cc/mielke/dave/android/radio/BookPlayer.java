@@ -1,7 +1,5 @@
 package cc.mielke.dave.android.radio;
 
-import java.util.concurrent.TimeUnit;
-
 import java.util.ArrayList;
 import java.io.File;
 

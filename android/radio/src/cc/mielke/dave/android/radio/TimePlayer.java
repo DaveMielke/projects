@@ -22,7 +22,7 @@ public abstract class TimePlayer extends SpeechPlayer {
     text.append(' ');
 
     {
-      long minutes = TimeUnit.MILLISECONDS.toMinutes(time % ONE_HOUR);
+      long minutes = TimeUnit.MILLISECONDS.toMinutes(time % HOUR.ONE);
 
       if (minutes > 0) {
         if (minutes < 10) text.append("o ");

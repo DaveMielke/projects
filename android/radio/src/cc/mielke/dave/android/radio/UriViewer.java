@@ -125,7 +125,7 @@ public class UriViewer extends ActivityComponent {
   private final String toTime (long milliseconds) {
     StringBuilder time = new StringBuilder();
 
-    long seconds = (milliseconds + (HALF_SECOND - 1)) / ONE_SECOND;
+    long seconds = (milliseconds + (SECOND.HALF - 1)) / SECOND.ONE;
     long minutes = seconds / SECONDS_PER_MINUTE;
     seconds %= SECONDS_PER_MINUTE;
 

@@ -12,18 +12,18 @@ public class HourPlayer extends TimePlayer {
   @Override
   public final boolean play () {
     long now = getCurrentTime();
-    long time = now + HALF_MINUTE;
-    long hour = (time / ONE_HOUR) * ONE_HOUR;
+    long time = now + MINUTE.HALF;
+    long hour = (time / HOUR.ONE) * HOUR.ONE;
 
     {
-      long next = hour + ONE_HOUR - HALF_MINUTE;
+      long next = hour + HOUR.ONE - MINUTE.HALF;
       setEarliestTime(next);
     }
 
     {
       boolean announce =
         (previousHour == null)?
-        (Math.abs(now - hour) <= HALF_MINUTE):
+        (Math.abs(now - hour) <= MINUTE.HALF):
         (hour != previousHour);
 
       previousHour = hour;
