@@ -75,8 +75,9 @@ public abstract class CollectionPlayer extends FilePlayer {
   }
 
   private static class FileEntry {
-    private final File file;
-    private final int audioContentType;
+    public final File file;
+    public final int audioContentType;
+    public final long time = getCurrentTime();
 
     public FileEntry (File file, int audioContentType) {
       this.file = file;
