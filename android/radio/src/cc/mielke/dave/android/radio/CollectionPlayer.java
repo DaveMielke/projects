@@ -142,4 +142,10 @@ public abstract class CollectionPlayer extends FilePlayer {
     if (next == null) return false;
     return play(next.file, next.audioContentType);
   }
+
+  @Override
+  protected final boolean actionNext () {
+    stop();
+    return true;
+  }
 }
