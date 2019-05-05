@@ -62,8 +62,12 @@ public abstract class BaseComponent {
     return TimeHelper.is24HourMode(getContext());
   }
 
+  protected static String getTimeFormat (boolean withDate) {
+    return TimeHelper.getTimeFormat(getContext(), withDate);
+  }
+
   protected static String getTimeFormat () {
-    return TimeHelper.getTimeFormat(getContext());
+    return getTimeFormat(false);
   }
 
   protected static String toTimeString (long time, String format) {
