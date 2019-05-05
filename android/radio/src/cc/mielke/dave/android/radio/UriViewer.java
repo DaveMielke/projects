@@ -112,6 +112,8 @@ public class UriViewer extends ActivityComponent {
 
     playPauseButton.setContentDescription(getString(label));
     playPauseButton.setBackgroundResource(image);
+
+    RadioService.setPlayPauseAction(isPlaying);
   }
 
   private SeekBar seekBar = null;

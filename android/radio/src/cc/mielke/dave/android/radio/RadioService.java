@@ -62,8 +62,21 @@ public class RadioService extends Service {
       if (radioNotification != null) {
         radioNotification.setTitle(title);
         radioNotification.setText(text);
-        radioNotification.show();
+        radioNotification.showNotification();
       }
     }
+  }
+
+  public static boolean setPlayPauseAction (boolean isPlaying) {
+    synchronized (SERVICE_LOCK) {
+      if (radioNotification != null) {
+        if (radioNotification.setPlayPauseAction(isPlaying)) {
+          radioNotification.showNotification();
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }

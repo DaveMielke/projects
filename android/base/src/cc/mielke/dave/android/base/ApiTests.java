@@ -103,4 +103,6 @@ public abstract class ApiTests {
   public final static boolean HAVE_AudioFocusRequest = haveOreo;
 
   public final static boolean HAVE_Notification_Action = haveKitkatWatch;
+
+  public final static boolean HAVE_Notification_Builder_setActions = haveNougat;
 }

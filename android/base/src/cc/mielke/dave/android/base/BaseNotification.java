@@ -1,5 +1,7 @@
 package cc.mielke.dave.android.base;
 
+import java.util.ArrayList;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.NotificationChannel;
@@ -16,6 +18,10 @@ import android.graphics.BitmapFactory;
 public abstract class BaseNotification extends BaseComponent {
   private final static String LOG_TAG = BaseNotification.class.getName();
 
+  private final static Object IDENTIFIER_LOCK = new Object();
+  private static int uniqueIdentifier = 0;
+  protected final int notificationIdentifier;
+
   private final Service notificationService;
   private final NotificationManager notificationManager;
   private final Notification.Builder notificationBuilder;
@@ -24,20 +30,20 @@ public abstract class BaseNotification extends BaseComponent {
     return notificationService;
   }
 
-  protected int getLargeIcon () {
-    return getService().getApplicationInfo().icon;
-  }
-
-  protected int getSmallIcon () {
-    return getLargeIcon();
-  }
-
   protected String getChannelIdentifier () {
     return BaseApplication.getName();
   }
 
   protected String getChannelName () {
     return getChannelIdentifier();
+  }
+
+  protected int getLargeIcon () {
+    return getService().getApplicationInfo().icon;
+  }
+
+  protected int getSmallIcon () {
+    return getLargeIcon();
   }
 
   protected int getImportance () {
@@ -125,42 +131,13 @@ public abstract class BaseNotification extends BaseComponent {
     return builder;
   }
 
-  protected final void addAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
-    PendingIntent intent = newPendingIntent(activityClass);
-
-    if (ApiTests.HAVE_Notification_Action) {
-      Notification.Action action = new Notification.Action.Builder(icon, label, intent)
-        .build();
-
-      notificationBuilder.addAction(action);
-    } else {
-      notificationBuilder.addAction(icon, label, intent);
-    }
-  }
-
-  private final static Object IDENTIFIER_LOCK = new Object();
-  private static int uniqueIdentifier = 0;
-  protected final int notificationIdentifier;
-
-  protected BaseNotification (Service service) {
-    super();
-
-    synchronized (IDENTIFIER_LOCK) {
-      notificationIdentifier = ++uniqueIdentifier;
-    }
-
-    notificationService = service;
-    notificationManager = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationBuilder = makeNotificationBuilder(service);
-  }
-
-  private final Notification build () {
+  private final Notification buildNotification () {
     return notificationBuilder.build();
   }
 
-  public final void show (boolean foreground) {
+  public final void showNotification (boolean foreground) {
     synchronized (this) {
-      Notification notification = build();
+      Notification notification = buildNotification();
 
       if (foreground) {
         getService().startForeground(notificationIdentifier, notification);
@@ -170,8 +147,8 @@ public abstract class BaseNotification extends BaseComponent {
     }
   }
 
-  public final void show () {
-    show(false);
+  public final void showNotification () {
+    showNotification(false);
   }
 
   public final void setTitle (CharSequence text) {
@@ -195,6 +172,73 @@ public abstract class BaseNotification extends BaseComponent {
 
     synchronized (this) {
       notificationBuilder.setSubText(text);
+    }
+  }
+
+  private final static int actionLimit = 3;
+  private int actionCount = 0;
+  private ArrayList<Notification.Action> actionList = null;
+
+  protected final Notification.Action getAction (int index) {
+    synchronized (this) {
+      return actionList.get(index);
+    }
+  }
+
+  protected final boolean setAction (int index, Notification.Action action) {
+    if (ApiTests.HAVE_Notification_Builder_setActions) {
+      synchronized (this) {
+        actionList.set(index, action);
+        notificationBuilder.setActions(actionList.toArray(new Notification.Action[actionList.size()]));
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  protected final Notification.Action newAction (int icon, CharSequence label, PendingIntent intent) {
+    return new Notification.Action.Builder(icon, label, intent)
+             .build();
+  }
+
+  protected final Notification.Action newAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
+    return newAction(icon, label, newPendingIntent(activityClass));
+  }
+
+  protected final int addAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
+    PendingIntent intent = newPendingIntent(activityClass);
+
+    synchronized (this) {
+      if (actionCount == actionLimit) {
+        throw new IllegalStateException("too many actions");
+      }
+
+      if (ApiTests.HAVE_Notification_Action) {
+        Notification.Action action = newAction(icon, label, intent);
+        notificationBuilder.addAction(action);
+        actionList.add(action);
+      } else {
+        notificationBuilder.addAction(icon, label, intent);
+      }
+
+      return actionCount++;
+    }
+  }
+
+  protected BaseNotification (Service service) {
+    super();
+
+    synchronized (IDENTIFIER_LOCK) {
+      notificationIdentifier = ++uniqueIdentifier;
+    }
+
+    notificationService = service;
+    notificationManager = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationBuilder = makeNotificationBuilder(service);
+
+    if (ApiTests.HAVE_Notification_Action) {
+      actionList = new ArrayList<>();
     }
   }
 }
