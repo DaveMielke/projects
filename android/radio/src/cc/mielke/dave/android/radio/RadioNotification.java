@@ -9,9 +9,21 @@ public class RadioNotification extends BaseNotification {
     super(service);
 
     addAction(
+      android.R.drawable.ic_media_previous,
+      getString(R.string.action_uriPrevious),
+      PreviousActivity.class
+    );
+
+    addAction(
       android.R.drawable.ic_media_play,
       getString(R.string.action_uriPlay),
       PlayPauseActivity.class
+    );
+
+    addAction(
+      android.R.drawable.ic_media_next,
+      getString(R.string.action_uriNext),
+      NextActivity.class
     );
 
     setTitle(getService().getString(R.string.state_noProgram));
