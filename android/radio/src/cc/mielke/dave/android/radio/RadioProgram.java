@@ -135,6 +135,10 @@ public class RadioProgram extends RadioComponent {
         next = Math.min(next, player.getEarliestTime());
       }
 
+      if (next == Long.MAX_VALUE) {
+        next = now + RadioParameters.PROGRAM_DEFAULT_DELAY;
+      }
+
       {
         String till = toTimeString(next);
         Log.i(LOG_TAG, ("nothing to play - waiting till " + till));
