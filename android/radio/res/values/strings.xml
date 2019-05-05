@@ -16,5 +16,5 @@
   <string name="action_uriPause">Pause</string>
 
   <string name="state_noProgram">off</string>
-  <string name="state_waitingTill">waiting till %s</string>
+  <string name="state_waiting">waiting</string>
 </resources>

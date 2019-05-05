@@ -138,7 +138,7 @@ public class RadioProgram extends RadioComponent {
       {
         String till = toTimeString(next);
         Log.i(LOG_TAG, ("nothing to play - waiting till " + till));
-        updateNotification(getContext().getString(R.string.state_waitingTill, till));
+        updateNotification(getString(R.string.state_waiting), till);
       }
 
       postAt(next, retryCallback);
