@@ -10,6 +10,51 @@ public abstract class ApiTests {
     return Build.VERSION.SDK_INT >= level;
   }
 
+  public final static boolean haveBase =
+    haveLevel(Build.VERSION_CODES.BASE);
+
+  public final static boolean haveBase11 =
+    haveLevel(Build.VERSION_CODES.BASE_1_1);
+
+  public final static boolean haveCupcake =
+    haveLevel(Build.VERSION_CODES.CUPCAKE);
+
+  public final static boolean haveDonut =
+    haveLevel(Build.VERSION_CODES.DONUT);
+
+  public final static boolean haveEclair =
+    haveLevel(Build.VERSION_CODES.ECLAIR);
+
+  public final static boolean haveEclair01 =
+    haveLevel(Build.VERSION_CODES.ECLAIR_0_1);
+
+  public final static boolean haveEclairMR1 =
+    haveLevel(Build.VERSION_CODES.ECLAIR_MR1);
+
+  public final static boolean haveFroyo =
+    haveLevel(Build.VERSION_CODES.FROYO);
+
+  public final static boolean haveGingerbread =
+    haveLevel(Build.VERSION_CODES.GINGERBREAD);
+
+  public final static boolean haveGingerbreadMR1 =
+    haveLevel(Build.VERSION_CODES.GINGERBREAD_MR1);
+
+  public final static boolean haveHoneycomb =
+    haveLevel(Build.VERSION_CODES.HONEYCOMB);
+
+  public final static boolean haveHoneycombMR1 =
+    haveLevel(Build.VERSION_CODES.HONEYCOMB_MR1);
+
+  public final static boolean haveHoneycombMR2 =
+    haveLevel(Build.VERSION_CODES.HONEYCOMB_MR2);
+
+  public final static boolean haveIceCreamSandwich =
+    haveLevel(Build.VERSION_CODES.ICE_CREAM_SANDWICH);
+
+  public final static boolean haveIceCreamSandwichMR1 =
+    haveLevel(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1);
+
   public final static boolean haveJellyBean =
     haveLevel(Build.VERSION_CODES.JELLY_BEAN);
 
@@ -21,6 +66,9 @@ public abstract class ApiTests {
 
   public final static boolean haveKitkat =
     haveLevel(Build.VERSION_CODES.KITKAT);
+
+  public final static boolean haveKitkatWatch =
+    haveLevel(Build.VERSION_CODES.KITKAT_WATCH);
 
   public final static boolean haveLollipop =
     haveLevel(Build.VERSION_CODES.LOLLIPOP);
