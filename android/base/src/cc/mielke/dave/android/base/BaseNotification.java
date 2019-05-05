@@ -125,6 +125,19 @@ public abstract class BaseNotification extends BaseComponent {
     return builder;
   }
 
+  protected final void addAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
+    PendingIntent intent = newPendingIntent(activityClass);
+
+    if (ApiTests.HAVE_Notification_Action) {
+      Notification.Action action = new Notification.Action.Builder(icon, label, intent)
+        .build();
+
+      notificationBuilder.addAction(action);
+    } else {
+      notificationBuilder.addAction(icon, label, intent);
+    }
+  }
+
   private final static Object IDENTIFIER_LOCK = new Object();
   private static int uniqueIdentifier = 0;
   protected final int notificationIdentifier;

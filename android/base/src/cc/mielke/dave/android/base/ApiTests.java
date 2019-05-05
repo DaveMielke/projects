@@ -101,4 +101,6 @@ public abstract class ApiTests {
   public final static boolean HAVE_AudioAttributes = haveLollipop;
 
   public final static boolean HAVE_AudioFocusRequest = haveOreo;
+
+  public final static boolean HAVE_Notification_Action = haveKitkatWatch;
 }
