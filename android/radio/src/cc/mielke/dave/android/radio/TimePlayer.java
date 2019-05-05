@@ -4,7 +4,6 @@ import static cc.mielke.dave.android.base.TimeConstants.*;
 import java.util.concurrent.TimeUnit;
 
 import java.text.SimpleDateFormat;
-import android.text.format.DateFormat;
 
 public abstract class TimePlayer extends SpeechPlayer {
   public TimePlayer () {
@@ -12,7 +11,7 @@ public abstract class TimePlayer extends SpeechPlayer {
   }
 
   public static String makeTimeString (long time) {
-    boolean use24HourFormat = DateFormat.is24HourFormat(getContext());
+    boolean use24HourFormat = is24HourMode();
     String format = use24HourFormat? "H": "h";
     SimpleDateFormat formatter = new SimpleDateFormat(format);
 

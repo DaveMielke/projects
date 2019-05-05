@@ -58,12 +58,20 @@ public abstract class BaseComponent {
     return System.currentTimeMillis();
   }
 
+  protected static boolean is24HourMode () {
+    return TimeConstants.is24HourMode(getContext());
+  }
+
+  protected static String getTimeFormat () {
+    return TimeConstants.getTimeFormat(getContext());
+  }
+
   protected static String toTimeString (long time, String format) {
     return new SimpleDateFormat(format).format(time);
   }
 
   protected static String toTimeString (long time) {
-    return toTimeString(time, TimeConstants.DISPLAY_FORMAT);
+    return toTimeString(time, getTimeFormat());
   }
 
   protected static String toTimeString () {
