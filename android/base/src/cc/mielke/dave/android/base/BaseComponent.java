@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.Properties;
 
 import java.text.SimpleDateFormat;
-import cc.mielke.dave.android.base.TimeConstants;
+import cc.mielke.dave.android.base.TimeHelper;
 
 import java.io.File;
 import java.io.InputStream;
@@ -59,11 +59,11 @@ public abstract class BaseComponent {
   }
 
   protected static boolean is24HourMode () {
-    return TimeConstants.is24HourMode(getContext());
+    return TimeHelper.is24HourMode(getContext());
   }
 
   protected static String getTimeFormat () {
-    return TimeConstants.getTimeFormat(getContext());
+    return TimeHelper.getTimeFormat(getContext());
   }
 
   protected static String toTimeString (long time, String format) {
