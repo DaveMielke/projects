@@ -145,7 +145,26 @@ public abstract class CollectionPlayer extends FilePlayer {
 
   @Override
   protected final boolean actionNext () {
-    stop();
-    return true;
+    synchronized (AUDIO_LOCK) {
+      stop();
+      return true;
+    }
+  }
+
+  @Override
+  protected final boolean actionPrevious () {
+    synchronized (AUDIO_LOCK) {
+      if (currentFile < 1) return false;
+      currentFile -= 1;
+
+      if (currentFile > 0) {
+        if (getPosition() < RadioParameters.FILE_PREVIOUS_THRESHOLD) {
+          currentFile -= 1;
+        }
+      }
+
+      stop();
+      return true;
+    }
   }
 }

@@ -363,6 +363,13 @@ public abstract class UriPlayer extends RadioPlayer {
     }
   }
 
+  protected final int getPosition () {
+    synchronized (AUDIO_LOCK) {
+      if (mediaPlayer == null) return 0;
+      return mediaPlayer.getCurrentPosition();
+    }
+  }
+
   private final void suspendPlayer () {
     mediaPlayer.pause();
     stopPositionMonitor(PositionMonitorStopReason.PAUSE);
