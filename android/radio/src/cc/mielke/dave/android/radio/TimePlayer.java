@@ -10,8 +10,8 @@ public abstract class TimePlayer extends SpeechPlayer {
   }
 
   public static String makeTimeString (long time) {
-    boolean use24HourFormat = is24HourMode();
-    String format = use24HourFormat? "H": "h";
+    boolean use12HourFormat = is12HourMode();
+    String format = use12HourFormat? "h": "H";
     SimpleDateFormat formatter = new SimpleDateFormat(format);
 
     StringBuilder text = new StringBuilder();
@@ -26,12 +26,12 @@ public abstract class TimePlayer extends SpeechPlayer {
       if (minute > 0) {
         if (minute < 10) text.append("o ");
         text.append(minute);
-      } else if (use24HourFormat) {
+      } else if (!use12HourFormat) {
         text.append("o'clock");
       }
     }
 
-    if (!use24HourFormat) {
+    if (use12HourFormat) {
       formatter.applyPattern("a");
       text.append(' ');
       text.append(formatter.format(time));

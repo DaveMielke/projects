@@ -58,12 +58,12 @@ public abstract class BaseComponent {
     return System.currentTimeMillis();
   }
 
-  protected static boolean is24HourMode () {
-    return TimeHelper.is24HourMode(getContext());
+  protected static boolean is12HourMode () {
+    return TimeHelper.is12HourMode(getContext());
   }
 
   protected static String getTimeFormat (boolean withDate) {
-    return TimeHelper.getTimeFormat(getContext(), withDate);
+    return TimeHelper.getTimeFormat(getContext(), withDate, false);
   }
 
   protected static String getTimeFormat () {
