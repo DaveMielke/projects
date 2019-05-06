@@ -47,9 +47,9 @@ public class UriViewer extends RadioComponent {
             if (onChangeListener != null) {
               onChangeListener.onMetadataChange(visible, title, artist);
             }
-          }
 
-          updateNotification(title, artist);
+            updateNotification(title, artist);
+          }
         }
       }
     );

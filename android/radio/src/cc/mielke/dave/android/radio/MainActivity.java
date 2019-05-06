@@ -106,6 +106,18 @@ public class MainActivity extends BaseActivity {
       }
     };
 
+  private View speechView = null;
+  private TextView speechText = null;
+
+  private final SpeechViewer.OnChangeListener speechChangeListener =
+    new SpeechViewer.OnChangeListener() {
+      @Override
+      public void onTextChange (boolean visible, CharSequence text) {
+        setVisible(speechView, visible);
+        speechText.setText(text);
+      }
+    };
+
   private ProgramSelector programSelector = null;
 
   public final void selectProgram (View view) {
@@ -139,7 +151,9 @@ public class MainActivity extends BaseActivity {
     uriSeekBar.setKeyProgressIncrement(10000);
     UriPlayer.getViewer().setOnChangeListener(uriChangeListener);
 
-    SpeechPlayer.setViewer(new SpeechViewer(this));
+    speechView = findViewById(R.id.view_speech);
+    speechText = findViewById(R.id.speech_text);
+    SpeechPlayer.getViewer().setOnChangeListener(speechChangeListener);
 
     programSelector = new ProgramSelector(this);
 
@@ -148,13 +162,13 @@ public class MainActivity extends BaseActivity {
 
   @Override
   protected void onNewIntent (Intent intent) {
-    Log.d(LOG_TAG, "new intent");
   }
 
   @Override
   public void onDestroy () {
     try {
       UriPlayer.getViewer().setOnChangeListener(null);
+      SpeechPlayer.getViewer().setOnChangeListener(null);
     } finally {
       super.onDestroy();
     }

@@ -1,11 +1,17 @@
 package cc.mielke.dave.android.radio;
 
-import android.view.View;
-import android.widget.TextView;
+public class SpeechViewer extends RadioComponent {
+  public static interface OnChangeListener {
+    public void onTextChange (boolean visible, CharSequence text);
+  }
 
-public class SpeechViewer extends ActivityComponent {
-  private View speechView = null;
-  private TextView speechText = null;
+  private OnChangeListener onChangeListener = null;
+
+  public final void setOnChangeListener (OnChangeListener listener) {
+    synchronized (this) {
+      onChangeListener = listener;
+    }
+  }
 
   public final void showText (CharSequence text) {
     final boolean visible;
@@ -17,24 +23,25 @@ public class SpeechViewer extends ActivityComponent {
       visible = true;
     }
 
-    final CharSequence message = text;
+    synchronized (this) {
+      if (onChangeListener != null) {
+        final CharSequence message = text;
 
-    getHandler().post(
-      new Runnable() {
-        @Override
-        public void run () {
-          updateNotification(message);
-          setVisible(speechView, visible);
-          speechText.setText(message);
-        }
+        getHandler().post(
+          new Runnable() {
+            @Override
+            public void run () {
+              onChangeListener.onTextChange(visible, message);
+            }
+          }
+        );
       }
-    );
+
+      updateNotification(text);
+    }
   }
 
-  public SpeechViewer (MainActivity activity) {
-    super(activity);
-
-    speechView = mainActivity.findViewById(R.id.view_speech);
-    speechText = mainActivity.findViewById(R.id.speech_text);
+  public SpeechViewer () {
+    super();
   }
 }

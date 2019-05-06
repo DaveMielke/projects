@@ -14,12 +14,10 @@ public abstract class SpeechPlayer extends RadioPlayer {
     super();
   }
 
-  private static SpeechViewer speechViewer = null;
+  private static SpeechViewer speechViewer = new SpeechViewer();
 
-  public static void setViewer (SpeechViewer viewer) {
-    synchronized (AUDIO_LOCK) {
-      speechViewer = viewer;
-    }
+  public static SpeechViewer getViewer () {
+    return speechViewer;
   }
 
   private static void onSpeechPlayerFinished (SpeechPlayer player) {
