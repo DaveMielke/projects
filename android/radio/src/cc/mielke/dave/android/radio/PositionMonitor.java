@@ -69,6 +69,7 @@ public abstract class PositionMonitor extends RadioComponent {
                 Log.d(LOG_TAG, "position monitor started");
               }
 
+              final UriViewer uriViewer = UriPlayer.getViewer();
               boolean stop = false;
 
               while (true) {
@@ -77,7 +78,7 @@ public abstract class PositionMonitor extends RadioComponent {
                     @Override
                     public void run () {
                       synchronized (AUDIO_LOCK) {
-                        UriPlayer.getViewer().setPosition(UriPlayer.getPosition());
+                        uriViewer.setPosition(UriPlayer.getPosition());
                       }
                     }
                   }
