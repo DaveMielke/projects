@@ -86,7 +86,7 @@ public class MainActivity extends BaseActivity {
       }
     };
 
-  private final SeekBar.OnSeekBarChangeListener uriPositionChangeListener =
+  private final SeekBar.OnSeekBarChangeListener uriSeekBarChangeListener =
     new SeekBar.OnSeekBarChangeListener() {
       @Override
       public void onProgressChanged (SeekBar seekBar, int position, boolean fromUser) {
@@ -148,11 +148,14 @@ public class MainActivity extends BaseActivity {
     uriSeekBar = findViewById(R.id.uri_seek_bar);
     uriSeekCurrent = findViewById(R.id.uri_seek_current);
     uriSeekRemaining = findViewById(R.id.uri_seek_remaining);
-    uriSeekBar.setKeyProgressIncrement(10000);
-    UriPlayer.getViewer().setOnChangeListener(uriChangeListener);
+
+    uriSeekBar.setKeyProgressIncrement(RadioParameters.USER_SEEK_INCREMENT);
+    uriSeekBar.setOnSeekBarChangeListener(uriSeekBarChangeListener);
 
     speechView = findViewById(R.id.view_speech);
     speechText = findViewById(R.id.speech_text);
+
+    UriPlayer.getViewer().setOnChangeListener(uriChangeListener);
     SpeechPlayer.getViewer().setOnChangeListener(speechChangeListener);
 
     programSelector = new ProgramSelector(this);

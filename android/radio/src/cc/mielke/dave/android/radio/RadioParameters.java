@@ -23,6 +23,7 @@ public abstract class RadioParameters {
   public final static long BOOK_HOUR_DELAY = TimeUnit.MINUTES.toMillis(3);
 
   public final static long POSITION_MONITOR_INTERVAL = TimeUnit.SECONDS.toMillis(1);
+  public final static long USER_SEEK_INCREMENT = TimeUnit.SECONDS.toMillis(10);
   public final static long FILE_PREVIOUS_THRESHOLD = TimeUnit.SECONDS.toMillis(5);
 
   public final static long TTS_RETRY_DELAY = TimeUnit.SECONDS.toMillis(30);
