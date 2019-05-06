@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+  <TableLayout
+    android:id="@+id/view_uri"
+    android:visibility="gone"
+    >
+
+    <include layout="@layout/uri_metadata" />
+    <include layout="@layout/uri_buttons" />
+    <include layout="@layout/uri_seek" />
+  </TableLayout>
+</merge>

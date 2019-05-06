@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+  <TableLayout>
+    <TableRow>
+      <Space android:layout_weight="1" />
+
+      <Button
+        android:onClick="uriPrevious"
+        android:background="@android:drawable/ic_media_previous"
+        android:contentDescription="@string/action_uriPrevious"
+       />
+
+      <Space android:layout_weight="1" />
+
+      <Button
+        android:id="@+id/button_uriPlayPause"
+        android:onClick="uriPlayPause"
+        android:background="@android:drawable/ic_media_play"
+        android:contentDescription="@string/action_uriPlay"
+       />
+
+      <Space android:layout_weight="1" />
+
+      <Button
+        android:onClick="uriNext"
+        android:background="@android:drawable/ic_media_next"
+        android:contentDescription="@string/action_uriNext"
+       />
+
+      <Space android:layout_weight="1" />
+    </TableRow>
+  </TableLayout>
+</merge>

@@ -24,77 +24,7 @@
     android:layout_alignParentBottom="true"
     >
 
-    <TableLayout
-      android:id="@+id/view_uri"
-      android:visibility="gone"
-      >
-
-      <TextView
-        android:id="@+id/uri_metadata_title"
-        android:gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textStyle="bold"
-       />
-
-      <TextView
-        android:id="@+id/uri_metadata_artist"
-        android:gravity="center_horizontal"
-       />
-
-      <TableLayout>
-        <TableRow>
-          <Space android:layout_weight="1" />
-
-          <Button
-            android:onClick="uriPrevious"
-            android:background="@android:drawable/ic_media_previous"
-            android:contentDescription="@string/action_uriPrevious"
-           />
-
-          <Space android:layout_weight="1" />
-
-          <Button
-            android:id="@+id/button_uriPlayPause"
-            android:onClick="uriPlayPause"
-            android:background="@android:drawable/ic_media_play"
-            android:contentDescription="@string/action_uriPlay"
-           />
-
-          <Space android:layout_weight="1" />
-
-          <Button
-            android:onClick="uriNext"
-            android:background="@android:drawable/ic_media_next"
-            android:contentDescription="@string/action_uriNext"
-           />
-
-          <Space android:layout_weight="1" />
-        </TableRow>
-      </TableLayout>
-
-      <TableLayout android:padding="25dp" android:stretchColumns="1">
-        <SeekBar android:id="@+id/uri_seek_bar" />
-
-        <TableRow>
-          <TextView android:id="@+id/uri_seek_current" />
-          <Space />
-          <TextView android:id="@+id/uri_seek_remaining" android:gravity="right" />
-        </TableRow>
-      </TableLayout>
-    </TableLayout>
-
-    <TableLayout
-      android:id="@+id/view_speech"
-      android:stretchColumns="1"
-      android:visibility="gone"
-      >
-
-      <TextView
-        android:id="@+id/speech_text"
-        android:gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textStyle="bold"
-       />
-    </TableLayout>
+    <include layout="@layout/uri_view" />
+    <include layout="@layout/speech_view" />
   </TableLayout>
 </RelativeLayout>

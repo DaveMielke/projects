@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+  <TableLayout android:padding="25dp" android:stretchColumns="1">
+    <SeekBar android:id="@+id/uri_seek_bar" />
+
+    <TableRow>
+      <TextView android:id="@+id/uri_seek_current" />
+      <Space />
+      <TextView android:id="@+id/uri_seek_remaining" android:gravity="right" />
+    </TableRow>
+  </TableLayout>
+</merge>
