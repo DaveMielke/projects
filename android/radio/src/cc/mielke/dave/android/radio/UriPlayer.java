@@ -17,8 +17,8 @@ public abstract class UriPlayer extends RadioPlayer {
     super();
   }
 
-  private static UriViewer uriViewer = new UriViewer();;
-  private static MediaPlayer mediaPlayer = new MediaPlayer();
+  private final static UriViewer uriViewer = new UriViewer();;
+  private final static MediaPlayer mediaPlayer = new MediaPlayer();
 
   public static UriViewer getViewer () {
     return uriViewer;

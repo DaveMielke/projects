@@ -14,7 +14,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
     super();
   }
 
-  private static SpeechViewer speechViewer = new SpeechViewer();
+  private final static SpeechViewer speechViewer = new SpeechViewer();
 
   public static SpeechViewer getViewer () {
     return speechViewer;
