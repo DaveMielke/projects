@@ -11,6 +11,57 @@ public abstract class PositionMonitor extends AudioComponent {
   private static Thread monitorThread = null;
   private static int stopDepth = 0;
 
+  private static void startMonitor () {
+    synchronized (AUDIO_LOCK) {
+      monitorThread =
+        new Thread("position-mnitor") {
+          @Override
+          public void run () {
+            if (RadioParameters.LOG_POSITION_MONITOR) {
+              Log.d(LOG_TAG, "position monitor started");
+            }
+
+            final UriViewer uriViewer = UriPlayer.getViewer();
+            boolean stop = false;
+
+            while (true) {
+              post(
+                new Runnable() {
+                  @Override
+                  public void run () {
+                    synchronized (AUDIO_LOCK) {
+                      uriViewer.setPosition(UriPlayer.getPosition());
+                    }
+                  }
+                }
+              );
+
+              if (stop) break;
+
+              try {
+                sleep(RadioParameters.POSITION_MONITOR_INTERVAL);
+              } catch (InterruptedException exception) {
+                stop = true;
+              }
+            }
+
+            if (RadioParameters.LOG_POSITION_MONITOR) {
+              Log.d(LOG_TAG, "position monitor stopped");
+            }
+          }
+        };
+
+      monitorThread.start();
+    }
+  }
+
+  private static void stopMonitor () {
+    synchronized (AUDIO_LOCK) {
+      monitorThread.interrupt();
+      monitorThread = null;
+    }
+  }
+
   public static enum StopReason {
     INACTIVE(true),
     INVISIBLE(true),
@@ -20,8 +71,8 @@ public abstract class PositionMonitor extends AudioComponent {
 
     private boolean currentState = false;
 
-    private final boolean set (boolean state, String action) {
-      if (state == currentState) return false;
+    private final boolean setState (boolean newState, String action) {
+      if (newState == currentState) return false;
 
       if (RadioParameters.LOG_POSITION_MONITOR) {
         if (action != null) {
@@ -34,7 +85,7 @@ public abstract class PositionMonitor extends AudioComponent {
         }
       }
 
-      if ((currentState = state)) {
+      if ((currentState = newState)) {
         return stopDepth++ == 0;
       }
 
@@ -45,71 +96,16 @@ public abstract class PositionMonitor extends AudioComponent {
       return --stopDepth == 0;
     }
 
-    public final boolean begin () {
-      return set(true, "stop");
-    }
-
-    public final boolean end () {
-      return set(false, "start");
-    }
-
     StopReason (boolean state) {
-      set(state, null);
+      setState(state, null);
     }
-  }
 
-  public static void start (StopReason reason) {
-    synchronized (AUDIO_LOCK) {
-      if (reason.end()) {
-        monitorThread =
-          new Thread("position-mnitor") {
-            @Override
-            public void run () {
-              if (RadioParameters.LOG_POSITION_MONITOR) {
-                Log.d(LOG_TAG, "position monitor started");
-              }
-
-              final UriViewer uriViewer = UriPlayer.getViewer();
-              boolean stop = false;
-
-              while (true) {
-                post(
-                  new Runnable() {
-                    @Override
-                    public void run () {
-                      synchronized (AUDIO_LOCK) {
-                        uriViewer.setPosition(UriPlayer.getPosition());
-                      }
-                    }
-                  }
-                );
-
-                if (stop) break;
-
-                try {
-                  sleep(RadioParameters.POSITION_MONITOR_INTERVAL);
-                } catch (InterruptedException exception) {
-                  stop = true;
-                }
-              }
-
-              if (RadioParameters.LOG_POSITION_MONITOR) {
-                Log.d(LOG_TAG, "position monitor stopped");
-              }
-            }
-          };
-
-        monitorThread.start();
-      }
+    public final void start () {
+      if (setState(false, "start")) startMonitor();
     }
-  }
 
-  public static void stop (StopReason reason) {
-    synchronized (AUDIO_LOCK) {
-      if (reason.begin()) {
-        monitorThread.interrupt();
-        monitorThread = null;
-      }
+    public final void stop () {
+      if (setState(true, "stop")) stopMonitor();
     }
   }
 }

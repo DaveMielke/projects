@@ -97,12 +97,12 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onStartTrackingTouch (SeekBar seekBar) {
-        PositionMonitor.stop(PositionMonitor.StopReason.TOUCH);
+        PositionMonitor.StopReason.TOUCH.stop();
       }
 
       @Override
       public void onStopTrackingTouch (SeekBar seekBar) {
-        PositionMonitor.start(PositionMonitor.StopReason.TOUCH);
+        PositionMonitor.StopReason.TOUCH.start();
       }
     };
 
@@ -180,13 +180,13 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onResume () {
     super.onResume();
-    PositionMonitor.start(PositionMonitor.StopReason.INVISIBLE);
+    PositionMonitor.StopReason.INVISIBLE.start();
   }
 
   @Override
   public void onPause () {
     try {
-      PositionMonitor.stop(PositionMonitor.StopReason.INVISIBLE);
+      PositionMonitor.StopReason.INVISIBLE.stop();
     } finally {
       super.onPause();
     }
