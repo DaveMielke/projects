@@ -82,8 +82,11 @@ public class SimpleProgramBuilder extends RadioComponent {
       minutePlayer = new MinutePlayer();
     }
 
+    String name = programName;
+    if (name == null) name = getString(R.string.name_anonymousProgram);
+
     RadioProgram program = new RadioProgram();
-    program.setName(programName);
+    program.setName(name);
 
     boolean hasPlayers = program.addPlayers(
       hourPlayer,
