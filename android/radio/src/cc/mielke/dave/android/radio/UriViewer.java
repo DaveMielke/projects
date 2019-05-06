@@ -1,8 +1,5 @@
 package cc.mielke.dave.android.radio;
 
-import cc.mielke.dave.android.base.ApiTests;
-import static cc.mielke.dave.android.base.TimeConstants.*;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -10,20 +7,21 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 
 import android.content.Context;
-import android.view.View;
-import android.widget.TextView;
-import android.widget.Button;
-import android.widget.SeekBar;
 
-public class UriViewer extends ActivityComponent {
-  private View uriView = null;
-  private TextView metadataTitle = null;
-  private TextView metadataArtist = null;
+public class UriViewer extends RadioComponent {
+  public static interface OnChangeListener {
+    public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
+    public void onPlayPauseChange (int label, int image);
+    public void onDurationChange (int milliseconds);
+    public void onPositionChange (int milliseconds);
+  }
 
-  private final void updateText (TextView view, String text) {
-    if (text == null) text = "";
-    view.setText(text);
-    setVisible(view, (text.length() > 0));
+  private OnChangeListener onChangeListener = null;
+
+  public final void setOnChangeListener (OnChangeListener listener) {
+    synchronized (this) {
+      onChangeListener = listener;
+    }
   }
 
   private final void updateMetadata (final String... arguments) {
@@ -45,10 +43,13 @@ public class UriViewer extends ActivityComponent {
             artist = arguments[1];
           }
 
+          synchronized (this) {
+            if (onChangeListener != null) {
+              onChangeListener.onMetadataChange(visible, title, artist);
+            }
+          }
+
           updateNotification(title, artist);
-          setVisible(uriView, visible);
-          updateText(metadataTitle, title);
-          updateText(metadataArtist, artist);
         }
       }
     );
@@ -96,82 +97,51 @@ public class UriViewer extends ActivityComponent {
       }
     };
 
-  private Button playPauseButton = null;
-
   public final void setPlayPauseButton (boolean isPlaying) {
-    int label;
-    int image;
+    synchronized (this) {
+      if (onChangeListener != null) {
+        int label;
+        int image;
 
-    if (isPlaying) {
-      label = R.string.action_uriPause;
-      image = android.R.drawable.ic_media_pause;
-    } else {
-      label = R.string.action_uriPlay;
-      image = android.R.drawable.ic_media_play;
+        if (isPlaying) {
+          label = R.string.action_uriPause;
+          image = android.R.drawable.ic_media_pause;
+        } else {
+          label = R.string.action_uriPlay;
+          image = android.R.drawable.ic_media_play;
+        }
+
+        onChangeListener.onPlayPauseChange(label, image);
+      }
     }
-
-    playPauseButton.setContentDescription(getString(label));
-    playPauseButton.setBackgroundResource(image);
 
     RadioService.setPlayPauseAction(isPlaying);
   }
 
-  private SeekBar seekBar = null;
-  private TextView seekCurrent = null;
-  private TextView seekRemaining = null;
-
   public final void setDuration (int milliseconds) {
-    seekBar.setMax(milliseconds);
-  }
-
-  private final String toTime (long milliseconds) {
-    StringBuilder time = new StringBuilder();
-
-    long seconds = (milliseconds + (SECOND.HALF - 1)) / SECOND.ONE;
-    long minutes = seconds / SECONDS_PER_MINUTE;
-    seconds %= SECONDS_PER_MINUTE;
-
-    long hours = minutes / MINUTES_PER_HOUR;
-    minutes %= MINUTES_PER_HOUR;
-
-    if (hours > 0) {
-      time.append(String.format("%d:%02d", hours, minutes));
-    } else {
-      time.append(String.format("%d", minutes));
+    synchronized (this) {
+      if (onChangeListener != null) {
+        onChangeListener.onDurationChange(milliseconds);
+      }
     }
-
-    time.append(String.format(":%02d", seconds));
-    return time.toString();
   }
 
   public final void setPosition (int milliseconds) {
-    if (ApiTests.haveNougat) {
-      seekBar.setProgress(milliseconds, true);
-    } else {
-      seekBar.setProgress(milliseconds);
+    synchronized (this) {
+      if (onChangeListener != null) {
+        onChangeListener.onPositionChange(milliseconds);
+      }
     }
-
-    seekCurrent.setText(toTime(milliseconds));
-    seekRemaining.setText("-" + toTime(seekBar.getMax() - milliseconds));
   }
 
+/*
   public final void setOnSeekBarChangeListener (SeekBar.OnSeekBarChangeListener listener) {
     seekBar.setOnSeekBarChangeListener(listener);
   }
+*/
 
-  public UriViewer (MainActivity activity) {
-    super(activity);
-    uriView = mainActivity.findViewById(R.id.view_uri);
-
-    metadataTitle = mainActivity.findViewById(R.id.uri_metadata_title);
-    metadataArtist = mainActivity.findViewById(R.id.uri_metadata_artist);
-
-    playPauseButton = mainActivity.findViewById(R.id.button_uriPlayPause);
-
-    seekBar = mainActivity.findViewById(R.id.uri_seek_bar);
-    seekCurrent = mainActivity.findViewById(R.id.uri_seek_current);
-    seekRemaining = mainActivity.findViewById(R.id.uri_seek_remaining);
-    seekBar.setKeyProgressIncrement(10000);
+  public UriViewer () {
+    super();
 
     dequeueThread = new Thread(uriDequeuer);
     dequeueThread.start();

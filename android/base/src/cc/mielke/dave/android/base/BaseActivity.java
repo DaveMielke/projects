@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 
+import android.view.View;
+
 public abstract class BaseActivity extends Activity {
   public final AlertDialog.Builder newAlertDialogBuilder (int name) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -65,5 +67,9 @@ public abstract class BaseActivity extends Activity {
       .setNegativeButton(android.R.string.no, null)
       .setItems(items, listener)
       .show();
+  }
+
+  public final void setVisible (View view, boolean yes) {
+    view.setVisibility(yes? View.VISIBLE: View.GONE);
   }
 }

@@ -9,7 +9,6 @@ import android.util.Log;
 import android.media.MediaPlayer;
 import android.media.AudioAttributes;
 import android.net.Uri;
-import android.widget.SeekBar;
 
 public abstract class UriPlayer extends RadioPlayer {
   private final static String LOG_TAG = UriPlayer.class.getName();
@@ -18,8 +17,12 @@ public abstract class UriPlayer extends RadioPlayer {
     super();
   }
 
-  private static MediaPlayer mediaPlayer = null;
-  private static UriViewer uriViewer = null;
+  private static UriViewer uriViewer = new UriViewer();;
+  private static MediaPlayer mediaPlayer = new MediaPlayer();
+
+  public static UriViewer getViewer () {
+    return uriViewer;
+  }
 
   private static Thread positionMonitorThread = null;
   private static int positionMonitorStopDepth = 0;
@@ -122,36 +125,6 @@ public abstract class UriPlayer extends RadioPlayer {
         positionMonitorThread.interrupt();
         positionMonitorThread = null;
       }
-    }
-  }
-
-  private final static SeekBar.OnSeekBarChangeListener positionChangedListener =
-    new SeekBar.OnSeekBarChangeListener() {
-      @Override
-      public void onProgressChanged (SeekBar seekBar, int position, boolean fromUser) {
-        if (fromUser) {
-          mediaPlayer.seekTo(position);
-        }
-      }
-
-      @Override
-      public void onStartTrackingTouch (SeekBar seekBar) {
-        stopPositionMonitor(PositionMonitorStopReason.TOUCH);
-      }
-
-      @Override
-      public void onStopTrackingTouch (SeekBar seekBar) {
-        startPositionMonitor(PositionMonitorStopReason.TOUCH);
-      }
-    };
-
-  public static void setViewer (UriViewer viewer) {
-    synchronized (AUDIO_LOCK) {
-      if (viewer != null) {
-        viewer.setOnSeekBarChangeListener(positionChangedListener);
-      }
-
-      uriViewer = viewer;
     }
   }
 
@@ -279,30 +252,25 @@ public abstract class UriPlayer extends RadioPlayer {
       }
     };
 
-  private static void ensureMediaPlayer () {
-    synchronized (AUDIO_LOCK) {
-      if (mediaPlayer == null) {
-        mediaPlayer = new MediaPlayer();
+  static {
+    mediaPlayer.setOnInfoListener(mediaPlayerInfoListener);
+    mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
+    mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
+    mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
+  }
 
-        mediaPlayer.setOnInfoListener(mediaPlayerInfoListener);
-        mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
-
-        mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
-        mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
-      }
-
-      if (RadioParameters.LOG_URI_PLAYER) {
-        Log.d(LOG_TAG, "resetting media player");
-      }
-
-      mediaPlayer.reset();
-    }
+  public static void setPosition (int milliseconds) {
+    mediaPlayer.seekTo(milliseconds);
   }
 
   protected final boolean play (Uri uri, int audioContentType) {
     if (uri == null) return false;
 
-    ensureMediaPlayer();
+    if (RadioParameters.LOG_URI_PLAYER) {
+      Log.d(LOG_TAG, "resetting media player");
+    }
+
+    mediaPlayer.reset();
     logPlaying("URI", uri.toString());
 
     synchronized (AUDIO_LOCK) {
@@ -428,11 +396,23 @@ public abstract class UriPlayer extends RadioPlayer {
     }
   }
 
-  public static void setVisible () {
-    startPositionMonitor(PositionMonitorStopReason.INVISIBLE);
+  public static void setIsVisible (boolean yes) {
+    PositionMonitorStopReason reason = PositionMonitorStopReason.INVISIBLE;
+
+    if (yes) {
+      startPositionMonitor(reason);
+    } else {
+      stopPositionMonitor(reason);
+    }
   }
 
-  public static void setInvisible () {
-    stopPositionMonitor(PositionMonitorStopReason.INVISIBLE);
+  public static void setUserSeeking (boolean yes) {
+    PositionMonitorStopReason reason = PositionMonitorStopReason.TOUCH;
+
+    if (yes) {
+      stopPositionMonitor(reason);
+    } else {
+      startPositionMonitor(reason);
+    }
   }
 }
