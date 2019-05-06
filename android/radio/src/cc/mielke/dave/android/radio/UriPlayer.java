@@ -24,114 +24,10 @@ public abstract class UriPlayer extends RadioPlayer {
     return uriViewer;
   }
 
-  private static Thread positionMonitorThread = null;
-  private static int positionMonitorStopDepth = 0;
-
-  private static enum PositionMonitorStopReason {
-    INACTIVE(true),
-    INVISIBLE(true),
-    PAUSE(false),
-    TOUCH(false),
-    ; // end of enumeration
-
-    private boolean currentState = false;
-
-    private final boolean set (boolean state, String action) {
-      if (state == currentState) return false;
-
-      if (RadioParameters.LOG_POSITION_MONITOR) {
-        if (action != null) {
-          Log.d(LOG_TAG,
-            String.format(
-              "%s position monitor: %s: %d",
-              action, name(), positionMonitorStopDepth
-            )
-          );
-        }
-      }
-
-      if ((currentState = state)) {
-        return positionMonitorStopDepth++ == 0;
-      }
-
-      if (positionMonitorStopDepth <= 0) {
-        throw new IllegalStateException("stop depth underflow");
-      }
-
-      return --positionMonitorStopDepth == 0;
-    }
-
-    public final boolean begin () {
-      return set(true, "stop");
-    }
-
-    public final boolean end () {
-      return set(false, "start");
-    }
-
-    PositionMonitorStopReason (boolean state) {
-      set(state, null);
-    }
-  }
-
-  private static void startPositionMonitor (PositionMonitorStopReason reason) {
-    synchronized (AUDIO_LOCK) {
-      if (reason.end()) {
-        positionMonitorThread =
-          new Thread("position-mnitor") {
-            @Override
-            public void run () {
-              if (RadioParameters.LOG_POSITION_MONITOR) {
-                Log.d(LOG_TAG, "position monitor started");
-              }
-
-              boolean stop = false;
-
-              while (true) {
-                post(
-                  new Runnable() {
-                    @Override
-                    public void run () {
-                      synchronized (AUDIO_LOCK) {
-                        uriViewer.setPosition(mediaPlayer.getCurrentPosition());
-                      }
-                    }
-                  }
-                );
-
-                if (stop) break;
-
-                try {
-                  sleep(RadioParameters.POSITION_MONITOR_INTERVAL);
-                } catch (InterruptedException exception) {
-                  stop = true;
-                }
-              }
-
-              if (RadioParameters.LOG_POSITION_MONITOR) {
-                Log.d(LOG_TAG, "position monitor stopped");
-              }
-            }
-          };
-
-        positionMonitorThread.start();
-      }
-    }
-  }
-
-  private static void stopPositionMonitor (PositionMonitorStopReason reason) {
-    synchronized (AUDIO_LOCK) {
-      if (reason.begin()) {
-        positionMonitorThread.interrupt();
-        positionMonitorThread = null;
-      }
-    }
-  }
-
   private static void onUriPlayerFinished (UriPlayer player) {
     synchronized (AUDIO_LOCK) {
-      stopPositionMonitor(PositionMonitorStopReason.INACTIVE);
-      startPositionMonitor(PositionMonitorStopReason.PAUSE);
+      PositionMonitor.stop(PositionMonitor.StopReason.INACTIVE);
+      PositionMonitor.start(PositionMonitor.StopReason.PAUSE);
 
       uriViewer.setPlayPauseButton(false);
       uriViewer.enqueueUri(null);
@@ -245,7 +141,7 @@ public abstract class UriPlayer extends RadioPlayer {
 
         if (requestAudioFocus()) {
           mediaPlayer.start();
-          startPositionMonitor(PositionMonitorStopReason.INACTIVE);
+          PositionMonitor.start(PositionMonitor.StopReason.INACTIVE);
         } else {
           onUriPlayerFinished();
         }
@@ -259,8 +155,16 @@ public abstract class UriPlayer extends RadioPlayer {
     mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
   }
 
+  public static int getPosition () {
+    synchronized (AUDIO_LOCK) {
+      return mediaPlayer.getCurrentPosition();
+    }
+  }
+
   public static void setPosition (int milliseconds) {
-    mediaPlayer.seekTo(milliseconds);
+    synchronized (AUDIO_LOCK) {
+      mediaPlayer.seekTo(milliseconds);
+    }
   }
 
   protected final boolean play (Uri uri, int audioContentType) {
@@ -320,33 +224,24 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       synchronized (AUDIO_LOCK) {
-        if (mediaPlayer != null) {
-          mediaPlayer.stop();
-          mediaPlayer.reset();
-          onUriPlayerFinished(this);
-        }
+        mediaPlayer.stop();
+        mediaPlayer.reset();
+        onUriPlayerFinished(this);
       }
     } finally {
       super.stop();
     }
   }
 
-  protected final int getPosition () {
-    synchronized (AUDIO_LOCK) {
-      if (mediaPlayer == null) return 0;
-      return mediaPlayer.getCurrentPosition();
-    }
-  }
-
   private final void suspendPlayer () {
     mediaPlayer.pause();
-    stopPositionMonitor(PositionMonitorStopReason.PAUSE);
+    PositionMonitor.stop(PositionMonitor.StopReason.PAUSE);
     uriViewer.setPlayPauseButton(false);
   }
 
   private final void resumePlayer () {
     mediaPlayer.start();
-    startPositionMonitor(PositionMonitorStopReason.PAUSE);
+    PositionMonitor.start(PositionMonitor.StopReason.PAUSE);
     uriViewer.setPlayPauseButton(true);
   }
 
@@ -355,11 +250,9 @@ public abstract class UriPlayer extends RadioPlayer {
     synchronized (AUDIO_LOCK) {
       boolean resume = false;
 
-      if (mediaPlayer != null) {
-        if (!mediaPlayer.isPlaying()) {
-          if (requestAudioFocus()) {
-            resume = true;
-          }
+      if (!mediaPlayer.isPlaying()) {
+        if (requestAudioFocus()) {
+          resume = true;
         }
       }
 
@@ -377,9 +270,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionSuspend () {
     synchronized (AUDIO_LOCK) {
-      if (mediaPlayer == null) return false;
       if (!mediaPlayer.isPlaying()) return false;
-
       suspendPlayer();
       return true;
     }
@@ -388,31 +279,9 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionResume () {
     synchronized (AUDIO_LOCK) {
-      if (mediaPlayer == null) return false;
       if (mediaPlayer.isPlaying()) return false;
-
       resumePlayer();
       return true;
-    }
-  }
-
-  public static void setIsVisible (boolean yes) {
-    PositionMonitorStopReason reason = PositionMonitorStopReason.INVISIBLE;
-
-    if (yes) {
-      startPositionMonitor(reason);
-    } else {
-      stopPositionMonitor(reason);
-    }
-  }
-
-  public static void setUserSeeking (boolean yes) {
-    PositionMonitorStopReason reason = PositionMonitorStopReason.TOUCH;
-
-    if (yes) {
-      stopPositionMonitor(reason);
-    } else {
-      startPositionMonitor(reason);
     }
   }
 }

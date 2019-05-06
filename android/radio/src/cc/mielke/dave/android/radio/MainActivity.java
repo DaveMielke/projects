@@ -97,12 +97,12 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onStartTrackingTouch (SeekBar seekBar) {
-        UriPlayer.setUserSeeking(true);
+        PositionMonitor.stop(PositionMonitor.StopReason.TOUCH);
       }
 
       @Override
       public void onStopTrackingTouch (SeekBar seekBar) {
-        UriPlayer.setUserSeeking(false);
+        PositionMonitor.start(PositionMonitor.StopReason.TOUCH);
       }
     };
 
@@ -149,7 +149,7 @@ public class MainActivity extends BaseActivity {
     uriSeekCurrent = findViewById(R.id.uri_seek_current);
     uriSeekRemaining = findViewById(R.id.uri_seek_remaining);
 
-    uriSeekBar.setKeyProgressIncrement(RadioParameters.USER_SEEK_INCREMENT);
+    uriSeekBar.setKeyProgressIncrement((int)RadioParameters.USER_SEEK_INCREMENT);
     uriSeekBar.setOnSeekBarChangeListener(uriSeekBarChangeListener);
 
     speechView = findViewById(R.id.view_speech);
@@ -180,13 +180,13 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onResume () {
     super.onResume();
-    UriPlayer.setIsVisible(true);
+    PositionMonitor.start(PositionMonitor.StopReason.INVISIBLE);
   }
 
   @Override
   public void onPause () {
     try {
-      UriPlayer.setIsVisible(false);
+      PositionMonitor.stop(PositionMonitor.StopReason.INVISIBLE);
     } finally {
       super.onPause();
     }

@@ -48,7 +48,6 @@ public abstract class RadioPlayer extends RadioComponent {
     }
   }
 
-  protected final static Object AUDIO_LOCK = new Object();
   protected final static AudioManager audioManager = getAudioManager();
 
   protected boolean actionPlayPause () {
