@@ -32,69 +32,15 @@ public class RadioPrograms extends RadioComponent {
           String name = properties.getProperty("name", null);
           if (name == null) name = file.getName();
 
-          String musicCollection = properties.getProperty("music", null);
-          RadioPlayer musicPlayer = null;
+          RadioProgram program = new SimpleProgramBuilder()
+            .setProgramName(name)
+            .setMusicCollection(properties.getProperty("music", null))
+            .setBookCollection(properties.getProperty("book", null))
+            .setAnnounceHours(properties.getProperty("hours", null) != null)
+            .setAnnounceMinutes(properties.getProperty("minutes", null) != null)
+            .build();
 
-          String bookCollection = properties.getProperty("book", null);
-          RadioPlayer bookPlayer = null;
-
-          boolean announceHours = properties.getProperty("hours", null) != null;
-          RadioPlayer hourPlayer = null;
-
-          boolean announceMinutes = properties.getProperty("minutes", null) != null;
-          RadioPlayer minutePlayer = null;
-
-          if (musicCollection != null) {
-            musicPlayer = new MusicPlayer().setCollection(musicCollection);
-          }
-
-          if (bookCollection != null) {
-            bookPlayer = new BookPlayer().setCollection(bookCollection);
-
-            if (musicPlayer != null) {
-              bookPlayer.setBaseDelay(RadioParameters.BOOK_BASE_DELAY);
-              bookPlayer.setRelativeDelay(RadioParameters.BOOK_RELATIVE_DELAY);
-              bookPlayer.setMaximumDelay(RadioParameters.BOOK_MAXIMUM_DELAY);
-              bookPlayer.ensureDelay(RadioParameters.BOOK_INITIAL_DELAY);
-            }
-          }
-
-          if (announceHours) {
-            hourPlayer = new HourPlayer();
-
-            if ((bookPlayer != null) && (musicPlayer != null)) {
-              final RadioPlayer book = bookPlayer;
-
-              hourPlayer.addOnFinishedListener(
-                new RadioPlayer.OnFinishedListener() {
-                  @Override
-                  public void onFinished (RadioPlayer player) {
-                    book.ensureDelay(RadioParameters.BOOK_HOUR_DELAY);
-                  }
-                }
-              );
-            }
-          }
-
-          if (announceMinutes) {
-            minutePlayer = new MinutePlayer();
-          }
-
-          RadioProgram program = new RadioProgram();
-          program.setName(name);
-
-          boolean hasPlayers = program.addPlayers(
-            hourPlayer,
-            minutePlayer,
-            bookPlayer,
-            musicPlayer
-          );
-
-          if (hasPlayers) {
-            programs.put(name, program);
-          } else {
-            Log.w(LOG_TAG, ("no players: " + name));
-          }
+          if (program != null) programs.put(name, program);
         }
       }
     }
