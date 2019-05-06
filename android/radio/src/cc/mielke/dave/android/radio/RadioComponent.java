@@ -55,6 +55,4 @@ public abstract class RadioComponent extends BaseComponent {
     int index = (int)Math.round(Math.floor((double)list.size() * Math.random()));
     return list.remove(index);
   }
-
-  protected final static Object AUDIO_LOCK = new Object();
 }

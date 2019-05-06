@@ -2,7 +2,7 @@ package cc.mielke.dave.android.radio;
 
 import android.util.Log;
 
-public abstract class PositionMonitor extends RadioComponent {
+public abstract class PositionMonitor extends AudioComponent {
   private final static String LOG_TAG = PositionMonitor.class.getName();
 
   private PositionMonitor () {
