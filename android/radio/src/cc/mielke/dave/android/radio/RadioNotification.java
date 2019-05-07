@@ -1,8 +1,6 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.BaseNotification;
-import cc.mielke.dave.android.base.ApiTests;
-
 import android.app.Notification;
 import android.app.Service;
 
@@ -13,6 +11,8 @@ public class RadioNotification extends BaseNotification {
 
   public RadioNotification (Service service) {
     super(service);
+
+    setActivity(MainActivity.class);
 
     addAction(
       android.R.drawable.ic_media_previous,
@@ -32,7 +32,7 @@ public class RadioNotification extends BaseNotification {
       NextActivity.class
     );
 
-    if (ApiTests.HAVE_Notification_Action) {
+    if (USE_ACTION_OBJECTS) {
       actionPlay = getAction(indexPlayPause);
 
       actionPause = newAction(
@@ -47,7 +47,7 @@ public class RadioNotification extends BaseNotification {
   }
 
   public final boolean setPlayPauseAction (boolean isPlaying) {
-    if (ApiTests.HAVE_Notification_Action) {
+    if (USE_ACTION_OBJECTS) {
       Notification.Action action = isPlaying? actionPause: actionPlay;
       return setAction(indexPlayPause, action);
     }

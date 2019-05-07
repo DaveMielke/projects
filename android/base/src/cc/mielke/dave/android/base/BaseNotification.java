@@ -18,6 +18,9 @@ import android.graphics.BitmapFactory;
 public abstract class BaseNotification extends BaseComponent {
   private final static String LOG_TAG = BaseNotification.class.getName();
 
+  protected final static boolean USE_ACTION_OBJECTS = ApiTests.HAVE_Notification_Action;
+  protected final static boolean CAN_CHANGE_ACTIONS = ApiTests.HAVE_Notification_Builder_setActions;
+
   private final static Object IDENTIFIER_LOCK = new Object();
   private static int uniqueIdentifier = 0;
   protected final int notificationIdentifier;
@@ -58,22 +61,21 @@ public abstract class BaseNotification extends BaseComponent {
     return Notification.VISIBILITY_PRIVATE;
   }
 
-  protected Class<? extends Activity> getActivityClass () {
-    return null;
-  }
-
-  protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass) {
+  protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass, int flags) {
     Context context = getContext();
     Intent intent = new Intent(context, activityClass);
-
-    intent.addFlags(
-      Intent.FLAG_ACTIVITY_CLEAR_TASK |
-      Intent.FLAG_ACTIVITY_NEW_TASK
-    );
-
+    intent.addFlags(flags);
     return PendingIntent.getActivity(
       context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
     );
+  }
+
+  protected final PendingIntent newActivityIntent (Class<? extends Activity> activityClass) {
+    return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+  }
+
+  protected final PendingIntent newActionIntent (Class<? extends Activity> activityClass) {
+    return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
   }
 
   private final Notification.Builder makeNotificationBuilder (Context context) {
@@ -108,15 +110,6 @@ public abstract class BaseNotification extends BaseComponent {
     {
       int icon = getSmallIcon();
       if (icon != 0) builder.setSmallIcon(icon);
-    }
-
-    {
-      Class<? extends Activity> activityClass = getActivityClass();
-      if (activityClass != null) {
-        builder.setContentIntent(newPendingIntent(activityClass))
-               .setAutoCancel(true)
-               ;
-      }
     }
 
     if (ApiTests.haveJellyBeanMR1) {
@@ -175,6 +168,12 @@ public abstract class BaseNotification extends BaseComponent {
     }
   }
 
+  protected final void setActivity (Class<? extends Activity> activityClass) {
+    notificationBuilder.setContentIntent(newActivityIntent(activityClass))
+                       .setAutoCancel(true)
+                       ;
+  }
+
   private final static int actionLimit = 3;
   private int actionCount = 0;
   private ArrayList<Notification.Action> actionList = null;
@@ -185,11 +184,17 @@ public abstract class BaseNotification extends BaseComponent {
     }
   }
 
+  protected final Notification.Action[] getActions () {
+    synchronized (this) {
+      return actionList.toArray(new Notification.Action[actionList.size()]);
+    }
+  }
+
   protected final boolean setAction (int index, Notification.Action action) {
-    if (ApiTests.HAVE_Notification_Builder_setActions) {
+    if (CAN_CHANGE_ACTIONS) {
       synchronized (this) {
         actionList.set(index, action);
-        notificationBuilder.setActions(actionList.toArray(new Notification.Action[actionList.size()]));
+        notificationBuilder.setActions(getActions());
         return true;
       }
     }
@@ -203,18 +208,18 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   protected final Notification.Action newAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
-    return newAction(icon, label, newPendingIntent(activityClass));
+    return newAction(icon, label, newActionIntent(activityClass));
   }
 
   protected final int addAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
-    PendingIntent intent = newPendingIntent(activityClass);
+    PendingIntent intent = newActionIntent(activityClass);
 
     synchronized (this) {
       if (actionCount == actionLimit) {
         throw new IllegalStateException("too many actions");
       }
 
-      if (ApiTests.HAVE_Notification_Action) {
+      if (USE_ACTION_OBJECTS) {
         Notification.Action action = newAction(icon, label, intent);
         notificationBuilder.addAction(action);
         actionList.add(action);
@@ -237,7 +242,7 @@ public abstract class BaseNotification extends BaseComponent {
     notificationManager = (NotificationManager)service.getSystemService(Context.NOTIFICATION_SERVICE);
     notificationBuilder = makeNotificationBuilder(service);
 
-    if (ApiTests.HAVE_Notification_Action) {
+    if (USE_ACTION_OBJECTS) {
       actionList = new ArrayList<>();
     }
   }
