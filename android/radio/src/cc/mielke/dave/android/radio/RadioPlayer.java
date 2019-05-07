@@ -163,12 +163,16 @@ public abstract class RadioPlayer extends AudioComponent {
 
   private static AudioAttributes audioAttributes = null;
   private static AudioFocusRequest audioFocusRequest = null;
-  private static boolean haveAudioFocus = false;
+  private static boolean audioFocusActive = false;
 
   protected static void setAudioAttributes (AudioAttributes attributes) {
     synchronized (AUDIO_LOCK) {
       audioAttributes = attributes;
     }
+  }
+
+  protected static boolean isAudioFocusActive () {
+    return audioFocusActive;
   }
 
   protected static void abandonAudioFocus () {
@@ -177,7 +181,7 @@ public abstract class RadioPlayer extends AudioComponent {
     }
 
     synchronized (AUDIO_LOCK) {
-      if (haveAudioFocus) {
+      if (audioFocusActive) {
         int result;
 
         if (ApiTests.HAVE_AudioFocusRequest) {
@@ -191,7 +195,7 @@ public abstract class RadioPlayer extends AudioComponent {
           Log.w(LOG_TAG, ("unexpected abandon audio focus result: " + result));
         }
 
-        haveAudioFocus = false;
+        audioFocusActive = false;
       } else if (RadioParameters.LOG_AUDIO_FOCUS) {
         Log.d(LOG_TAG, "audio focus not held");
       }
@@ -259,8 +263,8 @@ public abstract class RadioPlayer extends AudioComponent {
     }
 
     synchronized (AUDIO_LOCK) {
-      if (haveAudioFocus) {
-        throw new IllegalStateException("already have audio focus");
+      if (audioFocusActive) {
+        throw new IllegalStateException("audio focus already active");
       }
 
       if (ApiTests.HAVE_AudioAttributes) {
@@ -293,7 +297,7 @@ public abstract class RadioPlayer extends AudioComponent {
           Log.d(LOG_TAG, "audio focus granted");
         }
 
-        haveAudioFocus = true;
+        audioFocusActive = true;
         return true;
       }
 

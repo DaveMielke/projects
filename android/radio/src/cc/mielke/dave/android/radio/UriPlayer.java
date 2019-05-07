@@ -259,8 +259,10 @@ public abstract class UriPlayer extends RadioPlayer {
       boolean resume = false;
 
       if (!mediaPlayer.isPlaying()) {
-        if (requestAudioFocus()) {
-          resume = true;
+        if (!isAudioFocusActive()) {
+          if (requestAudioFocus()) {
+            resume = true;
+          }
         }
       }
 
@@ -278,6 +280,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionPlay () {
     synchronized (AUDIO_LOCK) {
       if (mediaPlayer.isPlaying()) return false;
+      if (isAudioFocusActive()) return false;
       if (!requestAudioFocus()) return false;
       resumePlayer(true);
       return true;
@@ -288,6 +291,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionPause () {
     synchronized (AUDIO_LOCK) {
       if (!mediaPlayer.isPlaying()) return false;
+      if (!isAudioFocusActive()) return false;
       suspendPlayer(true);
       return true;
     }
@@ -297,6 +301,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionSuspend () {
     synchronized (AUDIO_LOCK) {
       if (!mediaPlayer.isPlaying()) return false;
+      if (!isAudioFocusActive()) return false;
       suspendPlayer(false);
       return true;
     }
@@ -306,6 +311,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionResume () {
     synchronized (AUDIO_LOCK) {
       if (mediaPlayer.isPlaying()) return false;
+      if (!isAudioFocusActive()) return false;
       resumePlayer(false);
       return true;
     }
