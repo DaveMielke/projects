@@ -3,12 +3,16 @@ package cc.mielke.dave.android.radio;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import android.util.Log;
+
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 
 import android.content.Context;
 
 public class UriViewer extends RadioComponent {
+  private final static String LOG_TAG = UriViewer.class.getName();
+
   public static interface OnChangeListener {
     public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
     public void onPlayPauseChange (Boolean isPlaying);
