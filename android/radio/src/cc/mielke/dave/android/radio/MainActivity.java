@@ -17,6 +17,12 @@ import android.widget.SeekBar;
 public class MainActivity extends BaseActivity {
   private final static String LOG_TAG = MainActivity.class.getName();
 
+  private final void updateText (TextView view, CharSequence text) {
+    if (text == null) text = "";
+    view.setText(text);
+    setVisible(view, (text.length() > 0));
+  }
+
   private View uriView = null;
   private TextView uriMetadataTitle = null;
   private TextView uriMetadataArtist = null;
@@ -27,12 +33,6 @@ public class MainActivity extends BaseActivity {
 
   private final UriViewer.OnChangeListener uriChangeListener =
     new UriViewer.OnChangeListener() {
-      private final void updateText (TextView view, CharSequence text) {
-        if (text == null) text = "";
-        view.setText(text);
-        setVisible(view, (text.length() > 0));
-      }
-
       @Override
       public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist) {
         setVisible(uriView, visible);
@@ -114,7 +114,7 @@ public class MainActivity extends BaseActivity {
       @Override
       public void onTextChange (boolean visible, CharSequence text) {
         setVisible(speechView, visible);
-        speechText.setText(text);
+        updateText(speechText, text);
       }
     };
 

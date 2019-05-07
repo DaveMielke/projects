@@ -17,13 +17,13 @@ public class UriViewer extends RadioComponent {
   }
 
   private OnChangeListener onChangeListener = null;
-  private boolean uriVisible = false;
-  private CharSequence metadataTitle = null;
-  private CharSequence metadataArtist = null;
-  private int playPauseLabel = R.string.action_uriPlay;
-  private int playPauseImage = android.R.drawable.ic_media_play;
-  private int seekDuration = 0;
-  private int seekPosition = 0;
+  private boolean uriVisible;
+  private CharSequence metadataTitle;
+  private CharSequence metadataArtist;
+  private int playPauseLabel;
+  private int playPauseImage;
+  private int seekDuration;
+  private int seekPosition;
 
   private final void onMetadataChange () {
     onChangeListener.onMetadataChange(uriVisible, metadataTitle, metadataArtist);
@@ -151,14 +151,13 @@ public class UriViewer extends RadioComponent {
     }
   }
 
-/*
-  public final void setOnSeekBarChangeListener (SeekBar.OnSeekBarChangeListener listener) {
-    seekBar.setOnSeekBarChangeListener(listener);
-  }
-*/
-
   public UriViewer () {
     super();
+
+    updateMetadata();
+    setPlayPauseButton(false);
+    setDuration(0);
+    setPosition(0);
 
     dequeueThread = new Thread(uriDequeuer);
     dequeueThread.start();

@@ -7,7 +7,7 @@ public class SpeechViewer extends RadioComponent {
 
   private OnChangeListener onChangeListener = null;
   private boolean speechVisible = false;
-  private CharSequence speechText = null;
+  private CharSequence speechText;
 
   private final void onTextChange () {
     onChangeListener.onTextChange(speechVisible, speechText);
@@ -50,5 +50,6 @@ public class SpeechViewer extends RadioComponent {
 
   public SpeechViewer () {
     super();
+    showText(null);
   }
 }
