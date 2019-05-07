@@ -6,38 +6,45 @@ public class SpeechViewer extends RadioComponent {
   }
 
   private OnChangeListener onChangeListener = null;
+  private boolean speechVisible = false;
+  private CharSequence speechText = null;
+
+  private final void onTextChange () {
+    onChangeListener.onTextChange(speechVisible, speechText);
+  }
 
   public final void setOnChangeListener (OnChangeListener listener) {
     synchronized (this) {
       onChangeListener = listener;
+
+      if (onChangeListener != null) {
+        onTextChange();
+      }
     }
   }
 
   public final void showText (CharSequence text) {
-    final boolean visible;
-
-    if (text == null) {
-      visible = false;
-      text = "";
-    } else {
-      visible = true;
-    }
-
     synchronized (this) {
-      if (onChangeListener != null) {
-        final CharSequence message = text;
+      if (text == null) {
+        speechVisible = false;
+        speechText = "";
+      } else {
+        speechVisible = true;
+        speechText = text;
+      }
 
+      if (onChangeListener != null) {
         getHandler().post(
           new Runnable() {
             @Override
             public void run () {
-              onChangeListener.onTextChange(visible, message);
+              onTextChange();
             }
           }
         );
       }
 
-      updateNotification(text);
+      updateNotification(speechText);
     }
   }
 

@@ -17,38 +17,63 @@ public class UriViewer extends RadioComponent {
   }
 
   private OnChangeListener onChangeListener = null;
+  private boolean uriVisible = false;
+  private CharSequence metadataTitle = null;
+  private CharSequence metadataArtist = null;
+  private int playPauseLabel = R.string.action_uriPlay;
+  private int playPauseImage = android.R.drawable.ic_media_play;
+  private int seekDuration = 0;
+  private int seekPosition = 0;
+
+  private final void onMetadataChange () {
+    onChangeListener.onMetadataChange(uriVisible, metadataTitle, metadataArtist);
+  }
+
+  private final void onPlayPauseChange () {
+    onChangeListener.onPlayPauseChange(playPauseLabel, playPauseImage);
+  }
+
+  private final void onDurationChange () {
+    onChangeListener.onDurationChange(seekDuration);
+  }
+
+  private final void onPositionChange () {
+    onChangeListener.onPositionChange(seekPosition);
+  }
 
   public final void setOnChangeListener (OnChangeListener listener) {
     synchronized (this) {
       onChangeListener = listener;
+
+      if (onChangeListener != null) {
+        onMetadataChange();
+        onPlayPauseChange();
+        onDurationChange();
+        onPositionChange();
+      }
     }
   }
 
-  private final void updateMetadata (final String... arguments) {
+  private final void updateMetadata (String... arguments) {
+    synchronized (this) {
+      if (arguments.length == 0) {
+        uriVisible = false;
+        metadataTitle = null;
+        metadataArtist = null;
+      } else {
+        uriVisible = true;
+        metadataTitle = arguments[0];
+        metadataArtist = arguments[1];
+      }
+    }
+
     getHandler().post(
       new Runnable() {
         @Override
         public void run () {
-          boolean visible;
-          String title;
-          String artist;
-
-          if (arguments.length == 0) {
-            visible = false;
-            title = null;
-            artist = null;
-          } else {
-            visible = true;
-            title = arguments[0];
-            artist = arguments[1];
-          }
-
           synchronized (this) {
-            if (onChangeListener != null) {
-              onChangeListener.onMetadataChange(visible, title, artist);
-            }
-
-            updateNotification(title, artist);
+            if (onChangeListener != null) onMetadataChange();
+            updateNotification(metadataTitle, metadataArtist);
           }
         }
       }
@@ -99,38 +124,30 @@ public class UriViewer extends RadioComponent {
 
   public final void setPlayPauseButton (boolean isPlaying) {
     synchronized (this) {
-      if (onChangeListener != null) {
-        int label;
-        int image;
-
-        if (isPlaying) {
-          label = R.string.action_uriPause;
-          image = android.R.drawable.ic_media_pause;
-        } else {
-          label = R.string.action_uriPlay;
-          image = android.R.drawable.ic_media_play;
-        }
-
-        onChangeListener.onPlayPauseChange(label, image);
+      if (isPlaying) {
+        playPauseLabel = R.string.action_uriPause;
+        playPauseImage = android.R.drawable.ic_media_pause;
+      } else {
+        playPauseLabel = R.string.action_uriPlay;
+        playPauseImage = android.R.drawable.ic_media_play;
       }
-    }
 
-    RadioService.setPlayPauseAction(isPlaying);
+      if (onChangeListener != null) onPlayPauseChange();
+      RadioService.setPlayPauseAction(isPlaying);
+    }
   }
 
   public final void setDuration (int milliseconds) {
     synchronized (this) {
-      if (onChangeListener != null) {
-        onChangeListener.onDurationChange(milliseconds);
-      }
+      seekDuration = milliseconds;
+      if (onChangeListener != null) onDurationChange();
     }
   }
 
   public final void setPosition (int milliseconds) {
     synchronized (this) {
-      if (onChangeListener != null) {
-        onChangeListener.onPositionChange(milliseconds);
-      }
+      seekPosition = milliseconds;
+      if (onChangeListener != null) onPositionChange();
     }
   }
 
