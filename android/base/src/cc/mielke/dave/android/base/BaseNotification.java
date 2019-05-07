@@ -12,8 +12,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.app.PendingIntent;
 
-import android.app.Activity;
 import android.app.Service;
+import android.app.Activity;
 
 import android.graphics.BitmapFactory;
 
@@ -63,20 +63,27 @@ public abstract class BaseNotification extends BaseComponent {
     return Notification.VISIBILITY_PRIVATE;
   }
 
+  private final static Object PENDING_INTENT_IDENTIFIER_LOCK = new Object();
+  private static int pendingIntentIdentifier = 0;
+
+  protected static int newPendingIntentIdentifier () {
+    synchronized (PENDING_INTENT_IDENTIFIER_LOCK) {
+      return ++pendingIntentIdentifier;
+    }
+  }
+
   protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass, int flags) {
     Context context = getContext();
     Intent intent = new Intent(context, activityClass);
     intent.addFlags(flags);
-    return PendingIntent.getActivity(
-      context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT
-    );
+    return PendingIntent.getActivity(context, newPendingIntentIdentifier(), intent, 0);
   }
 
   protected final PendingIntent newActivityIntent (Class<? extends Activity> activityClass) {
     return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
   }
 
-  protected final PendingIntent newActionIntent (Class<? extends Activity> activityClass) {
+  protected final PendingIntent newTaskIntent (Class<? extends Activity> activityClass) {
     return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
   }
 
@@ -212,17 +219,10 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   protected final Notification.Action newAction (int icon, CharSequence label, PendingIntent intent) {
-    return new Notification.Action.Builder(icon, label, intent)
-             .build();
+    return new Notification.Action.Builder(icon, label, intent).build();
   }
 
-  protected final Notification.Action newAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
-    return newAction(icon, label, newActionIntent(activityClass));
-  }
-
-  protected final int addAction (int icon, CharSequence label, Class<? extends Activity> activityClass) {
-    PendingIntent intent = newActionIntent(activityClass);
-
+  protected final int addAction (int icon, CharSequence label, PendingIntent intent) {
     synchronized (this) {
       if (actionCount == actionLimit) {
         throw new IllegalStateException("too many actions");

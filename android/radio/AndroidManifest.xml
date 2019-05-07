@@ -31,25 +31,8 @@
       </intent-filter>
     </activity>
 
-    <activity
-      android:name="PlayPauseActivity"
-      android:launchMode="singleTask"
-      android:taskAffinity=""
-      android:excludeFromRecents="true"
-     />
-
-    <activity
-      android:name="NextActivity"
-      android:launchMode="singleTask"
-      android:taskAffinity=""
-      android:excludeFromRecents="true"
-     />
-
-    <activity
-      android:name="PreviousActivity"
-      android:launchMode="singleTask"
-      android:taskAffinity=""
-      android:excludeFromRecents="true"
+    <receiver
+      android:name="ActionReceiver"
      />
 
     <service
