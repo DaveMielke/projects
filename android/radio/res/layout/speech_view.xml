@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-  <TableLayout
-    android:id="@+id/view_speech"
-    android:stretchColumns="1"
-    android:visibility="gone"
-    >
-
+  <TableLayout android:id="@+id/view_speech">
     <TextView
       android:id="@+id/speech_text"
       android:gravity="center_horizontal"

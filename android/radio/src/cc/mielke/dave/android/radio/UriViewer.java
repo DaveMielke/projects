@@ -11,26 +11,25 @@ import android.content.Context;
 public class UriViewer extends RadioComponent {
   public static interface OnChangeListener {
     public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
-    public void onPlayPauseChange (int label, int image);
+    public void onPlayPauseChange (Boolean isPlaying);
     public void onDurationChange (int milliseconds);
     public void onPositionChange (int milliseconds);
   }
 
   private OnChangeListener onChangeListener = null;
-  private boolean uriVisible;
+  private boolean metadataVisible;
   private CharSequence metadataTitle;
   private CharSequence metadataArtist;
-  private int playPauseLabel;
-  private int playPauseImage;
+  private Boolean playPause;
   private int seekDuration;
   private int seekPosition;
 
   private final void onMetadataChange () {
-    onChangeListener.onMetadataChange(uriVisible, metadataTitle, metadataArtist);
+    onChangeListener.onMetadataChange(metadataVisible, metadataTitle, metadataArtist);
   }
 
   private final void onPlayPauseChange () {
-    onChangeListener.onPlayPauseChange(playPauseLabel, playPauseImage);
+    onChangeListener.onPlayPauseChange(playPause);
   }
 
   private final void onDurationChange () {
@@ -57,11 +56,11 @@ public class UriViewer extends RadioComponent {
   private final void updateMetadata (String... arguments) {
     synchronized (this) {
       if (arguments.length == 0) {
-        uriVisible = false;
+        metadataVisible = false;
         metadataTitle = null;
         metadataArtist = null;
       } else {
-        uriVisible = true;
+        metadataVisible = true;
         metadataTitle = arguments[0];
         metadataArtist = arguments[1];
       }
@@ -71,7 +70,7 @@ public class UriViewer extends RadioComponent {
       new Runnable() {
         @Override
         public void run () {
-          synchronized (this) {
+          synchronized (UriViewer.this) {
             if (onChangeListener != null) onMetadataChange();
             updateNotification(metadataTitle, metadataArtist);
           }
@@ -122,18 +121,11 @@ public class UriViewer extends RadioComponent {
       }
     };
 
-  public final void setPlayPauseButton (boolean isPlaying) {
+  public final void setPlayPause (Boolean isPlaying) {
     synchronized (this) {
-      if (isPlaying) {
-        playPauseLabel = R.string.action_uriPause;
-        playPauseImage = android.R.drawable.ic_media_pause;
-      } else {
-        playPauseLabel = R.string.action_uriPlay;
-        playPauseImage = android.R.drawable.ic_media_play;
-      }
-
+      playPause = isPlaying;
       if (onChangeListener != null) onPlayPauseChange();
-      RadioService.setPlayPauseAction(isPlaying);
+      RadioService.setPlayPause(isPlaying);
     }
   }
 
@@ -155,7 +147,7 @@ public class UriViewer extends RadioComponent {
     super();
 
     updateMetadata();
-    setPlayPauseButton(false);
+    setPlayPause(null);
     setDuration(0);
     setPosition(0);
 

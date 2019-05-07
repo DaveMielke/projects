@@ -10,11 +10,14 @@
   <string name="message_noProgram">program not selected</string>
   <string name="message_noPrograms">no programs have been defined</string>
 
-  <string name="action_uriNext">Next</string>
-  <string name="action_uriPrevious">Previous</string>
   <string name="action_uriPlay">Play</string>
   <string name="action_uriPause">Pause</string>
+  <string name="action_uriNext">Next</string>
+  <string name="action_uriPrevious">Previous</string>
 
   <string name="state_noProgram">off</string>
   <string name="state_waiting">waiting</string>
+
+  <string name="state_playing">playing</string>
+  <string name="state_paused">paused</string>
 </resources>

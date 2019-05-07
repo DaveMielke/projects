@@ -23,10 +23,14 @@ public class MainActivity extends BaseActivity {
     setVisible(view, (text.length() > 0));
   }
 
-  private View uriView = null;
+  private View uriMetadataView = null;
   private TextView uriMetadataTitle = null;
   private TextView uriMetadataArtist = null;
+
+  private View uriButtonsView = null;
   private Button uriPlayPauseButton = null;
+
+  private View uriSeekView = null;
   private SeekBar uriSeekBar = null;
   private TextView uriSeekCurrent = null;
   private TextView uriSeekRemaining = null;
@@ -35,22 +39,30 @@ public class MainActivity extends BaseActivity {
     new UriViewer.OnChangeListener() {
       @Override
       public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist) {
-        setVisible(uriView, visible);
+        setVisible(uriMetadataView, visible);
         updateText(uriMetadataTitle, title);
         updateText(uriMetadataArtist, artist);
       }
 
       @Override
-      public void onPlayPauseChange (int label, int image) {
+      public void onPlayPauseChange (Boolean isPlaying) {
+        boolean visible = isPlaying != null;
+        if (!visible) isPlaying = false;
+
+        int label;
+        int image;
+
+        if (isPlaying) {
+          label = R.string.action_uriPause;
+          image = android.R.drawable.ic_media_pause;
+        } else {
+          label = R.string.action_uriPlay;
+          image = android.R.drawable.ic_media_play;
+        }
+
+        setVisible(uriButtonsView, visible);
         uriPlayPauseButton.setContentDescription(getString(label));
         uriPlayPauseButton.setBackgroundResource(image);
-      }
-
-      private int currentDuration = 0;
-
-      @Override
-      public void onDurationChange (int milliseconds) {
-        uriSeekBar.setMax(milliseconds);
       }
 
       private final String toTime (long milliseconds) {
@@ -84,6 +96,14 @@ public class MainActivity extends BaseActivity {
         uriSeekCurrent.setText(toTime(milliseconds));
         uriSeekRemaining.setText("-" + toTime(uriSeekBar.getMax() - milliseconds));
       }
+
+      @Override
+      public void onDurationChange (int milliseconds) {
+        boolean visible = milliseconds > 0;
+        setVisible(uriSeekView, visible);
+        uriSeekBar.setMax(milliseconds);
+        if (!visible) uriSeekBar.setProgress(0);
+      }
     };
 
   private final SeekBar.OnSeekBarChangeListener uriSeekBarChangeListener =
@@ -112,7 +132,8 @@ public class MainActivity extends BaseActivity {
   private final SpeechViewer.OnChangeListener speechChangeListener =
     new SpeechViewer.OnChangeListener() {
       @Override
-      public void onTextChange (boolean visible, CharSequence text) {
+      public void onTextChange (CharSequence text) {
+        boolean visible = text != null;
         setVisible(speechView, visible);
         updateText(speechText, text);
       }
@@ -141,10 +162,14 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    uriView = findViewById(R.id.view_uri);
+    uriMetadataView = findViewById(R.id.uri_metadata_view);
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);
     uriMetadataArtist = findViewById(R.id.uri_metadata_artist);
-    uriPlayPauseButton = findViewById(R.id.button_uriPlayPause);
+
+    uriButtonsView = findViewById(R.id.uri_buttons_view);
+    uriPlayPauseButton = findViewById(R.id.uri_button_PlayPause);
+
+    uriSeekView = findViewById(R.id.uri_seek_view);
     uriSeekBar = findViewById(R.id.uri_seek_bar);
     uriSeekCurrent = findViewById(R.id.uri_seek_current);
     uriSeekRemaining = findViewById(R.id.uri_seek_remaining);

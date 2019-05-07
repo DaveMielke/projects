@@ -46,13 +46,23 @@ public class RadioNotification extends BaseNotification {
     showNotification(true);
   }
 
-  public final boolean setPlayPauseAction (boolean isPlaying) {
-    if (USE_ACTION_OBJECTS) {
+  public final void setPlayPause (Boolean isPlaying) {
+    if (CAN_CHANGE_ACTIONS) {
+      if (isPlaying == null) isPlaying = false;
       Notification.Action action = isPlaying? actionPause: actionPlay;
-      return setAction(indexPlayPause, action);
-    }
+      setAction(indexPlayPause, action);
+    } else {
+      String text;
 
-    return false;
+      if (isPlaying == null) {
+        text = "";
+      } else {
+        int state = isPlaying? R.string.state_playing: R.string.state_paused;
+        text = getString(state);
+      }
+
+      setSubText(text);
+    }
   }
 
   @Override

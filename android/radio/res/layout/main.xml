@@ -24,7 +24,10 @@
     android:layout_alignParentBottom="true"
     >
 
-    <include layout="@layout/uri_view" />
+    <include layout="@layout/uri_metadata" />
+    <include layout="@layout/uri_buttons" />
+    <include layout="@layout/uri_seek" />
+
     <include layout="@layout/speech_view" />
   </TableLayout>
 </RelativeLayout>

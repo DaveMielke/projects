@@ -67,16 +67,12 @@ public class RadioService extends Service {
     }
   }
 
-  public static boolean setPlayPauseAction (boolean isPlaying) {
+  public static void setPlayPause (Boolean isPlaying) {
     synchronized (SERVICE_LOCK) {
       if (radioNotification != null) {
-        if (radioNotification.setPlayPauseAction(isPlaying)) {
-          radioNotification.showNotification();
-          return true;
-        }
+        radioNotification.setPlayPause(isPlaying);
+        radioNotification.showNotification();
       }
     }
-
-    return false;
   }
 }

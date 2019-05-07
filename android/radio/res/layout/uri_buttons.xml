@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-  <TableLayout>
+  <TableLayout android:id="@+id/uri_buttons_view">
     <TableRow>
       <Space android:layout_weight="1" />
 
@@ -14,7 +14,7 @@
       <Space android:layout_weight="1" />
 
       <Button
-        android:id="@+id/button_uriPlayPause"
+        android:id="@+id/uri_button_PlayPause"
         android:onClick="uriPlayPause"
         android:background="@android:drawable/ic_media_play"
         android:contentDescription="@string/action_uriPlay"

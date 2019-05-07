@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-  <TextView
-    android:id="@+id/uri_metadata_title"
-    android:gravity="center_horizontal"
-    android:textAppearance="?android:attr/textAppearanceLarge"
-    android:textStyle="bold"
-   />
+  <TableLayout android:id="@+id/uri_metadata_view">
+    <TextView
+      android:id="@+id/uri_metadata_title"
+      android:gravity="center_horizontal"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:textStyle="bold"
+     />
 
-  <TextView
-    android:id="@+id/uri_metadata_artist"
-    android:gravity="center_horizontal"
-   />
+    <TextView
+      android:id="@+id/uri_metadata_artist"
+      android:gravity="center_horizontal"
+     />
+  </TableLayout>
 </merge>

@@ -29,8 +29,9 @@ public abstract class UriPlayer extends RadioPlayer {
       PositionMonitor.StopReason.INACTIVE.stop();
       PositionMonitor.StopReason.PAUSE.start();
 
-      uriViewer.setPlayPauseButton(false);
       uriViewer.enqueueUri(null);
+      uriViewer.setPlayPause(null);
+      uriViewer.setDuration(0);
 
       onRadioPlayerFinished(player);
     }
@@ -130,9 +131,9 @@ public abstract class UriPlayer extends RadioPlayer {
         }
 
         synchronized (AUDIO_LOCK) {
+          uriViewer.setPlayPause(true);
           uriViewer.setDuration(mediaPlayer.getDuration());
           uriViewer.setPosition(0);
-          uriViewer.setPlayPauseButton(true);
         }
 
         if (RadioParameters.LOG_URI_PLAYER) {
@@ -236,13 +237,13 @@ public abstract class UriPlayer extends RadioPlayer {
   private final void suspendPlayer () {
     mediaPlayer.pause();
     PositionMonitor.StopReason.PAUSE.stop();
-    uriViewer.setPlayPauseButton(false);
+    uriViewer.setPlayPause(false);
   }
 
   private final void resumePlayer () {
     mediaPlayer.start();
     PositionMonitor.StopReason.PAUSE.start();
-    uriViewer.setPlayPauseButton(true);
+    uriViewer.setPlayPause(true);
   }
 
   @Override
