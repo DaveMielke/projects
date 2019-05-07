@@ -40,17 +40,23 @@ public class RadioNotification extends BaseNotification {
         getString(R.string.action_uriPause),
         PlayPauseActivity.class
       );
+
+      if (CAN_CHANGE_ACTIONS) {
+        removeActions();
+      }
     }
 
-    setTitle(getService().getString(R.string.state_noProgram));
     showNotification(true);
   }
 
   public final void setPlayPause (Boolean isPlaying) {
     if (CAN_CHANGE_ACTIONS) {
-      if (isPlaying == null) isPlaying = false;
-      Notification.Action action = isPlaying? actionPause: actionPlay;
-      setAction(indexPlayPause, action);
+      if (isPlaying == null) {
+        removeActions();
+      } else {
+        Notification.Action action = isPlaying? actionPause: actionPlay;
+        setAction(indexPlayPause, action);
+      }
     } else {
       String text;
 

@@ -2,6 +2,8 @@ package cc.mielke.dave.android.base;
 
 import java.util.ArrayList;
 
+import android.util.Log;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.NotificationChannel;
@@ -190,16 +192,23 @@ public abstract class BaseNotification extends BaseComponent {
     }
   }
 
-  protected final boolean setAction (int index, Notification.Action action) {
-    if (CAN_CHANGE_ACTIONS) {
-      synchronized (this) {
-        actionList.set(index, action);
-        notificationBuilder.setActions(getActions());
-        return true;
-      }
+  protected final void setActions () {
+    synchronized (this) {
+      notificationBuilder.setActions(getActions());
     }
+  }
 
-    return false;
+  protected final void removeActions () {
+    synchronized (this) {
+      notificationBuilder.setActions();
+    }
+  }
+
+  protected final void setAction (int index, Notification.Action action) {
+    synchronized (this) {
+      actionList.set(index, action);
+      setActions();
+    }
   }
 
   protected final Notification.Action newAction (int icon, CharSequence label, PendingIntent intent) {
