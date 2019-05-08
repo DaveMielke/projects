@@ -80,11 +80,18 @@ public abstract class BaseNotification extends BaseComponent {
   }
 
   protected final PendingIntent newActivityIntent (Class<? extends Activity> activityClass) {
-    return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
+    return newPendingIntent(activityClass, (
+      Intent.FLAG_ACTIVITY_CLEAR_TOP |
+      Intent.FLAG_ACTIVITY_SINGLE_TOP
+    ));
   }
 
   protected final PendingIntent newTaskIntent (Class<? extends Activity> activityClass) {
-    return newPendingIntent(activityClass, (Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+    return newPendingIntent(activityClass, (
+      Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS |
+      Intent.FLAG_ACTIVITY_CLEAR_TASK |
+      Intent.FLAG_ACTIVITY_NEW_TASK
+    ));
   }
 
   private final Notification.Builder makeNotificationBuilder (Context context) {
