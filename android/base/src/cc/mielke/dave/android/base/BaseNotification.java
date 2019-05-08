@@ -63,37 +63,6 @@ public abstract class BaseNotification extends BaseComponent {
     return Notification.VISIBILITY_PRIVATE;
   }
 
-  private final static Object PENDING_INTENT_IDENTIFIER_LOCK = new Object();
-  private static int pendingIntentIdentifier = 0;
-
-  protected static int newPendingIntentIdentifier () {
-    synchronized (PENDING_INTENT_IDENTIFIER_LOCK) {
-      return ++pendingIntentIdentifier;
-    }
-  }
-
-  protected final PendingIntent newPendingIntent (Class<? extends Activity> activityClass, int flags) {
-    Context context = getContext();
-    Intent intent = new Intent(context, activityClass);
-    intent.addFlags(flags);
-    return PendingIntent.getActivity(context, newPendingIntentIdentifier(), intent, 0);
-  }
-
-  protected final PendingIntent newActivityIntent (Class<? extends Activity> activityClass) {
-    return newPendingIntent(activityClass, (
-      Intent.FLAG_ACTIVITY_CLEAR_TOP |
-      Intent.FLAG_ACTIVITY_SINGLE_TOP
-    ));
-  }
-
-  protected final PendingIntent newTaskIntent (Class<? extends Activity> activityClass) {
-    return newPendingIntent(activityClass, (
-      Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS |
-      Intent.FLAG_ACTIVITY_CLEAR_TASK |
-      Intent.FLAG_ACTIVITY_NEW_TASK
-    ));
-  }
-
   private final Notification.Builder makeNotificationBuilder (Context context) {
     Notification.Builder builder;
 
@@ -184,8 +153,48 @@ public abstract class BaseNotification extends BaseComponent {
     }
   }
 
+  protected final Intent newIntent (Class targetClass) {
+    return new Intent(getService(), targetClass);
+  }
+
+  protected final Intent newActivityIntent (Class<? extends Activity> activityClass) {
+    return newIntent(activityClass).addFlags(
+      Intent.FLAG_ACTIVITY_CLEAR_TOP |
+      Intent.FLAG_ACTIVITY_SINGLE_TOP
+    );
+  }
+
+  protected final Intent newTaskIntent (Class<? extends Activity> activityClass) {
+    return newIntent(activityClass).addFlags(
+      Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS |
+      Intent.FLAG_ACTIVITY_CLEAR_TASK |
+      Intent.FLAG_ACTIVITY_NEW_TASK
+    );
+  }
+
+  private final static Object PENDING_INTENT_IDENTIFIER_LOCK = new Object();
+  private static int pendingIntentIdentifier = 0;
+
+  protected static int newPendingIntentIdentifier () {
+    synchronized (PENDING_INTENT_IDENTIFIER_LOCK) {
+      return ++pendingIntentIdentifier;
+    }
+  }
+
+  protected final PendingIntent newPendingActivityIntent (Intent intent) {
+    return PendingIntent.getActivity(getService(), newPendingIntentIdentifier(), intent, 0);
+  }
+
+  protected final PendingIntent newPendingServiceIntent (Intent intent) {
+    return PendingIntent.getService(getService(), newPendingIntentIdentifier(), intent, 0);
+  }
+
+  protected final PendingIntent newPendingBroadcastIntent (Intent intent) {
+    return PendingIntent.getBroadcast(getService(), newPendingIntentIdentifier(), intent, 0);
+  }
+
   protected final void setActivity (Class<? extends Activity> activityClass) {
-    notificationBuilder.setContentIntent(newActivityIntent(activityClass))
+    notificationBuilder.setContentIntent(newPendingActivityIntent(newActivityIntent(activityClass)))
                        .setAutoCancel(true)
                        ;
   }

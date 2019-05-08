@@ -10,10 +10,9 @@ import android.app.PendingIntent;
 
 public class RadioNotification extends BaseNotification {
   private final PendingIntent newPendingIntent (RadioPlayer.Action action) {
-    Context context = getContext();
-    Intent intent = new Intent(context, ActionReceiver.class);
+    Intent intent = newIntent(ActionReceiver.class);
     intent.setAction(action.name());
-    return PendingIntent.getBroadcast(context, newPendingIntentIdentifier(), intent, 0);
+    return newPendingBroadcastIntent(intent);
   }
 
   private int indexPlayPause = -1;
