@@ -31,15 +31,19 @@
       </intent-filter>
     </activity>
 
-    <receiver
-      android:name=".ActionReceiver"
-      android:exported="false"
-     />
-
     <service
       android:name=".RadioService"
       android:label="@string/player_service_label"
       android:exported="false"
      />
+
+    <receiver
+      android:name=".MediaButtonReceiver"
+      >
+
+      <intent-filter>
+        <action android:name="android.intent.action.MEDIA_BUTTON" />
+      </intent-filter>
+    </receiver>
   </application>
 </manifest>

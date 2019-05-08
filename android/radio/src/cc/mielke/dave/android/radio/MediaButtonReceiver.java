@@ -1,0 +1,51 @@
+package cc.mielke.dave.android.radio;
+
+import android.util.Log;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+
+import android.view.KeyEvent;
+
+public class MediaButtonReceiver extends BroadcastReceiver {
+  private final static String LOG_TAG = MediaButtonReceiver.class.getName();
+
+  public static void handleMediaButtonIntent (Intent intent) {
+    String action = intent.getAction();
+
+    if (action !=  null) {
+      if (action.equals(Intent.ACTION_MEDIA_BUTTON)) {
+        KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+
+        if (event != null) {
+          if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (event.getKeyCode()) {
+              case KeyEvent.KEYCODE_MEDIA_PLAY:
+              case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                RadioPlayer.Action.PLAY_PAUSE.perform();
+                break;
+
+              case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                RadioPlayer.Action.PAUSE.perform();
+                break;
+
+              case KeyEvent.KEYCODE_MEDIA_NEXT:
+                RadioPlayer.Action.NEXT.perform();
+                break;
+
+              case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                RadioPlayer.Action.PREVIOUS.perform();
+                break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @Override
+  public void onReceive (Context context, Intent intent) {
+    handleMediaButtonIntent(intent);
+  }
+}

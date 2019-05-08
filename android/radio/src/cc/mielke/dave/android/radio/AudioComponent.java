@@ -14,5 +14,5 @@ public abstract class AudioComponent extends RadioComponent {
   }
 
   protected final static Object AUDIO_LOCK = new Object();
-  protected final static AudioManager audioManager = getAudioManager();
+  public final static AudioManager audioManager = getAudioManager();
 }
