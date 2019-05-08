@@ -235,8 +235,10 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private final void suspendPlayer (boolean pause) {
-    mediaPlayer.pause();
-    PositionMonitor.StopReason.PAUSE.stop();
+    if (mediaPlayer.isPlaying()) {
+      mediaPlayer.pause();
+      PositionMonitor.StopReason.PAUSE.stop();
+    }
 
     if (pause) {
       uriViewer.setPlayPause(false);
@@ -244,34 +246,26 @@ public abstract class UriPlayer extends RadioPlayer {
     }
   }
 
-  private final void resumePlayer (boolean play) {
-    mediaPlayer.start();
-    PositionMonitor.StopReason.PAUSE.start();
+  private final boolean resumePlayer (boolean isPaused) {
+    if (isPaused) {
+      if (mediaPlayer.isPlaying()) {
+        throw new IllegalStateException("playing without audio focus");
+      }
 
-    if (play) {
+      if (!requestAudioFocus()) return false;
       uriViewer.setPlayPause(true);
     }
+
+    mediaPlayer.start();
+    PositionMonitor.StopReason.PAUSE.start();
+    return true;
   }
 
   @Override
   protected final boolean actionPlayPause () {
     synchronized (AUDIO_LOCK) {
-      boolean resume = false;
-
-      if (!mediaPlayer.isPlaying()) {
-        if (!isAudioFocusActive()) {
-          if (requestAudioFocus()) {
-            resume = true;
-          }
-        }
-      }
-
-      if (resume) {
-        resumePlayer(true);
-      } else {
-        suspendPlayer(true);
-      }
-
+      if (!isAudioFocusActive()) return resumePlayer(true);
+      suspendPlayer(true);
       return true;
     }
   }
@@ -279,18 +273,14 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionPlay () {
     synchronized (AUDIO_LOCK) {
-      if (mediaPlayer.isPlaying()) return false;
       if (isAudioFocusActive()) return false;
-      if (!requestAudioFocus()) return false;
-      resumePlayer(true);
-      return true;
+      return resumePlayer(true);
     }
   }
 
   @Override
   protected final boolean actionPause () {
     synchronized (AUDIO_LOCK) {
-      if (!mediaPlayer.isPlaying()) return false;
       if (!isAudioFocusActive()) return false;
       suspendPlayer(true);
       return true;
@@ -300,8 +290,8 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionSuspend () {
     synchronized (AUDIO_LOCK) {
-      if (!mediaPlayer.isPlaying()) return false;
       if (!isAudioFocusActive()) return false;
+      if (!mediaPlayer.isPlaying()) return false;
       suspendPlayer(false);
       return true;
     }
@@ -310,10 +300,9 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionResume () {
     synchronized (AUDIO_LOCK) {
-      if (mediaPlayer.isPlaying()) return false;
       if (!isAudioFocusActive()) return false;
-      resumePlayer(false);
-      return true;
+      if (mediaPlayer.isPlaying()) return false;
+      return resumePlayer(false);
     }
   }
 }
