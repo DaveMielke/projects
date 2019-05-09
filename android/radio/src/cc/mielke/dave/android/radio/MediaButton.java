@@ -1,16 +1,15 @@
 package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.ApiTests;
+
 import android.util.Log;
 
-import android.media.session.MediaSession;
-
-import android.app.PendingIntent;
 import android.content.Intent;
-
-import android.content.ComponentName;
-
 import android.view.KeyEvent;
+
+import android.media.session.MediaSession;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 
 public abstract class MediaButton extends AudioComponent {
   private final static String LOG_TAG = MediaButton.class.getName();

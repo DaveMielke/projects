@@ -18,17 +18,17 @@ public abstract class AudioFocus extends AudioComponent {
   private static AudioFocusRequest audioFocusRequest = null;
   private static boolean audioFocusActive = false;
 
-  protected static void setAudioAttributes (AudioAttributes attributes) {
+  public static void setAudioAttributes (AudioAttributes attributes) {
     synchronized (AUDIO_LOCK) {
       audioAttributes = attributes;
     }
   }
 
-  protected static boolean isAudioFocusActive () {
+  public static boolean isAudioFocusActive () {
     return audioFocusActive;
   }
 
-  protected static void abandonAudioFocus () {
+  public static void abandonAudioFocus () {
     if (RadioParameters.LOG_AUDIO_FOCUS) {
       Log.d(LOG_TAG, "abandoning audio focus");
     }
@@ -117,7 +117,7 @@ public abstract class AudioFocus extends AudioComponent {
       }
     };
 
-  protected static boolean requestAudioFocus (boolean temporary) {
+  public static boolean requestAudioFocus (boolean temporary) {
     if (RadioParameters.LOG_AUDIO_FOCUS) {
       Log.d(LOG_TAG,
         String.format(
