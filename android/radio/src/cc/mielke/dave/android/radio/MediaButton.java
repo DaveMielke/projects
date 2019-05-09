@@ -4,62 +4,18 @@ import cc.mielke.dave.android.base.ApiTests;
 
 import android.util.Log;
 
-import android.content.Intent;
-import android.view.KeyEvent;
-
 import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
+
 import android.app.PendingIntent;
+import android.content.Intent;
+
 import android.content.ComponentName;
 
 public abstract class MediaButton extends AudioComponent {
   private final static String LOG_TAG = MediaButton.class.getName();
 
   private MediaButton () {
-  }
-
-  public static void handleIntent (Intent intent) {
-    String action = intent.getAction();
-
-    if (action !=  null) {
-      if (action.equals(Intent.ACTION_MEDIA_BUTTON)) {
-        KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-
-        if (event != null) {
-          if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            int key = event.getKeyCode();
-
-            switch (key) {
-              case KeyEvent.KEYCODE_MEDIA_PLAY:
-              case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                RadioPlayer.Action.PLAY_PAUSE.perform();
-                break;
-
-              case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                RadioPlayer.Action.PAUSE.perform();
-                break;
-
-              case KeyEvent.KEYCODE_MEDIA_NEXT:
-                RadioPlayer.Action.NEXT.perform();
-                break;
-
-              case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                RadioPlayer.Action.PREVIOUS.perform();
-                break;
-
-              default:
-                Log.w(LOG_TAG, String.format("unhandled key: %d: %s", key, KeyEvent.keyCodeToString(key)));
-                break;
-            }
-          }
-        } else {
-          Log.w(LOG_TAG, "key event not specified");
-        }
-      } else {
-        Log.w(LOG_TAG, ("unexpected action: " + action));
-      }
-    } else {
-      Log.w(LOG_TAG, "action not specified");
-    }
   }
 
   private final static boolean USE_MEDIA_SESSION = ApiTests.haveLollipop;
@@ -79,12 +35,6 @@ public abstract class MediaButton extends AudioComponent {
 
     session.setCallback(
       new MediaSession.Callback() {
-        @Override
-        public boolean onMediaButtonEvent (Intent intent) {
-          handleIntent(intent);
-          return true;
-        }
-
         @Override
         public void onPlay () {
           RadioPlayer.Action.PLAY_PAUSE.perform();
@@ -107,8 +57,22 @@ public abstract class MediaButton extends AudioComponent {
       }
     );
 
-    session.setMediaButtonReceiver(newPendingIntent());
+    session.setPlaybackState(
+      new PlaybackState.Builder()
+        .setActions(
+          PlaybackState.ACTION_SKIP_TO_NEXT |
+          PlaybackState.ACTION_SKIP_TO_PREVIOUS |
+          PlaybackState.ACTION_PLAY |
+          PlaybackState.ACTION_PAUSE |
+          PlaybackState.ACTION_PLAY_PAUSE
+        )
+
+        .setState(PlaybackState.STATE_STOPPED, 0, 1f)
+        .build()
+    );
+
     session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
+    session.setMediaButtonReceiver(newPendingIntent());
 
     session.setActive(true);
     return session;
