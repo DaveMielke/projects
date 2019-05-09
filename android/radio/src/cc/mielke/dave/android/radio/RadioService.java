@@ -18,7 +18,6 @@ public class RadioService extends Service {
 
     synchronized (SERVICE_LOCK) {
       radioNotification = new RadioNotification(this);
-      MediaButton.claim();
     }
   }
 
@@ -26,7 +25,6 @@ public class RadioService extends Service {
   public void onDestroy () {
     try {
       synchronized (SERVICE_LOCK) {
-        MediaButton.release();
         radioNotification = null;
       }
     } finally {

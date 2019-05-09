@@ -80,11 +80,23 @@ public abstract class MediaButton extends AudioComponent {
 
   public static void claim () {
     if (USE_MEDIA_SESSION) {
+      if (mediaSession != null) {
+        throw new IllegalStateException("media session already active");
+      }
+
       mediaSession = newMediaSession();
     } else if (USE_PENDING_INTENT) {
+      if (pendingIntent != null) {
+        throw new IllegalStateException("pending intent already registered");
+      }
+
       pendingIntent = newPendingIntent();
       audioManager.registerMediaButtonEventReceiver(pendingIntent);
     } else {
+      if (receiverComponent != null) {
+        throw new IllegalStateException("receiver component already registered");
+      }
+
       receiverComponent = new ComponentName(getContext(), MediaButtonReceiver.class);
       audioManager.registerMediaButtonEventReceiver(receiverComponent);
     }
@@ -92,12 +104,24 @@ public abstract class MediaButton extends AudioComponent {
 
   public static void release () {
     if (USE_MEDIA_SESSION) {
+      if (mediaSession == null) {
+        throw new IllegalStateException("media session not active");
+      }
+
       mediaSession.release();
       mediaSession = null;
     } else if (USE_PENDING_INTENT) {
+      if (pendingIntent == null) {
+        throw new IllegalStateException("pending intent not registered");
+      }
+
       audioManager.unregisterMediaButtonEventReceiver(pendingIntent);
       pendingIntent = null;
     } else {
+      if (receiverComponent == null) {
+        throw new IllegalStateException("receiver component not registered");
+      }
+
       audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
       receiverComponent = null;
     }

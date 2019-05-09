@@ -127,6 +127,12 @@ public class UriViewer extends RadioComponent {
 
   public final void setPlayPause (Boolean isPlaying) {
     synchronized (this) {
+      if (isPlaying != null) {
+        if (playPause == null) MediaButton.claim();
+      } else {
+        if (playPause != null) MediaButton.release();
+      }
+
       playPause = isPlaying;
       if (onChangeListener != null) onPlayPauseChange();
       RadioService.setPlayPause(isPlaying);
