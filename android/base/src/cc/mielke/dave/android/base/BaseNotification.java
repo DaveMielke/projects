@@ -199,7 +199,6 @@ public abstract class BaseNotification extends BaseComponent {
                        ;
   }
 
-  private final static int actionLimit = 3;
   private int actionCount = 0;
   private ArrayList<Notification.Action> actionList = null;
 
@@ -240,10 +239,6 @@ public abstract class BaseNotification extends BaseComponent {
 
   protected final int addAction (int icon, CharSequence label, PendingIntent intent) {
     synchronized (this) {
-      if (actionCount == actionLimit) {
-        throw new IllegalStateException("too many actions");
-      }
-
       if (USE_ACTION_OBJECTS) {
         Notification.Action action = newAction(icon, label, intent);
         notificationBuilder.addAction(action);
