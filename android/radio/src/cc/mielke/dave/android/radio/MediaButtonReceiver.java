@@ -20,7 +20,9 @@ public class MediaButtonReceiver extends BroadcastReceiver {
 
         if (event != null) {
           if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (event.getKeyCode()) {
+            int key = event.getKeyCode();
+
+            switch (key) {
               case KeyEvent.KEYCODE_MEDIA_PLAY:
               case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
                 RadioPlayer.Action.PLAY_PAUSE.perform();
@@ -37,10 +39,20 @@ public class MediaButtonReceiver extends BroadcastReceiver {
               case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
                 RadioPlayer.Action.PREVIOUS.perform();
                 break;
+
+              default:
+                Log.w(LOG_TAG, String.format("unhandled key: %d: %s", key, KeyEvent.keyCodeToString(key)));
+                break;
             }
           }
+        } else {
+          Log.w(LOG_TAG, "key event not specified");
         }
+      } else {
+        Log.w(LOG_TAG, ("unexpected action: " + action));
       }
+    } else {
+      Log.w(LOG_TAG, "action not specified");
     }
   }
 
