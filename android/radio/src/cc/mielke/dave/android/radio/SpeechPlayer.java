@@ -32,7 +32,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
   }
 
   private static boolean requestAudioFocus () {
-    return requestAudioFocus(true);
+    return AudioFocus.requestAudioFocus(true);
   }
 
   private final static TextSpeaker textSpeaker =
@@ -59,7 +59,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
       onPlayStart();
 
       if (ApiTests.HAVE_AudioAttributes) {
-        setAudioAttributes(textSpeaker.getAudioAttributes());
+        AudioFocus.setAudioAttributes(textSpeaker.getAudioAttributes());
       }
 
       if (requestAudioFocus()) {

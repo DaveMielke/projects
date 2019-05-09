@@ -42,7 +42,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private static boolean requestAudioFocus () {
-    return requestAudioFocus(false);
+    return AudioFocus.requestAudioFocus(false);
   }
 
   private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
@@ -202,7 +202,7 @@ public abstract class UriPlayer extends RadioPlayer {
           .setContentType(audioContentType)
           .build();
 
-        setAudioAttributes(attributes);
+        AudioFocus.setAudioAttributes(attributes);
         mediaPlayer.setAudioAttributes(attributes);
       }
 
@@ -242,7 +242,7 @@ public abstract class UriPlayer extends RadioPlayer {
 
     if (pause) {
       uriViewer.setPlayPause(false);
-      abandonAudioFocus();
+      AudioFocus.abandonAudioFocus();
     }
   }
 
@@ -264,7 +264,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionPlayPause () {
     synchronized (AUDIO_LOCK) {
-      if (!isAudioFocusActive()) return resumePlayer(true);
+      if (!AudioFocus.isAudioFocusActive()) return resumePlayer(true);
       suspendPlayer(true);
       return true;
     }
@@ -273,7 +273,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionPlay () {
     synchronized (AUDIO_LOCK) {
-      if (isAudioFocusActive()) return false;
+      if (AudioFocus.isAudioFocusActive()) return false;
       return resumePlayer(true);
     }
   }
@@ -281,7 +281,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionPause () {
     synchronized (AUDIO_LOCK) {
-      if (!isAudioFocusActive()) return false;
+      if (!AudioFocus.isAudioFocusActive()) return false;
       suspendPlayer(true);
       return true;
     }
@@ -290,7 +290,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionSuspend () {
     synchronized (AUDIO_LOCK) {
-      if (!isAudioFocusActive()) return false;
+      if (!AudioFocus.isAudioFocusActive()) return false;
       if (!mediaPlayer.isPlaying()) return false;
       suspendPlayer(false);
       return true;
@@ -300,7 +300,7 @@ public abstract class UriPlayer extends RadioPlayer {
   @Override
   protected final boolean actionResume () {
     synchronized (AUDIO_LOCK) {
-      if (!isAudioFocusActive()) return false;
+      if (!AudioFocus.isAudioFocusActive()) return false;
       if (mediaPlayer.isPlaying()) return false;
       return resumePlayer(false);
     }
