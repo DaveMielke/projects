@@ -7,6 +7,7 @@ public class HourPlayer extends TimePlayer {
     super();
   }
 
+  private final static long THRESHOLD = SECOND.UNIT.toMillis(10);
   private Long previousHour = null;
 
   @Override
@@ -18,18 +19,14 @@ public class HourPlayer extends TimePlayer {
   @Override
   public final boolean play () {
     long now = getCurrentTime();
-    long time = now + MINUTE.HALF;
+    long time = now + THRESHOLD;
     long hour = HOUR.START(time);
-
-    {
-      long next = hour + HOUR.ONE - MINUTE.HALF;
-      setEarliestTime(next);
-    }
+    setEarliestTime(hour + HOUR.ONE - THRESHOLD);
 
     {
       boolean announce =
         (previousHour == null)?
-        (Math.abs(now - hour) <= MINUTE.HALF):
+        ((time - hour) < MINUTE.ONE):
         (hour != previousHour);
 
       previousHour = hour;

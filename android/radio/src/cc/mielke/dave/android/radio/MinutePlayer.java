@@ -10,12 +10,7 @@ public class MinutePlayer extends TimePlayer {
   @Override
   public final boolean play () {
     long now = getCurrentTime();
-
-    {
-      long next = MINUTE.START(now + MINUTE.ONE);
-      setEarliestTime(next);
-    }
-
+    setEarliestTime(MINUTE.START(now + MINUTE.ONE));
     return play(now);
   }
 }
