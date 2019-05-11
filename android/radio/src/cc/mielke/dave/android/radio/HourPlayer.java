@@ -10,6 +10,12 @@ public class HourPlayer extends TimePlayer {
   private Long previousHour = null;
 
   @Override
+  public void reset () {
+    super.reset();
+    previousHour = null;
+  }
+
+  @Override
   public final boolean play () {
     long now = getCurrentTime();
     long time = now + MINUTE.HALF;

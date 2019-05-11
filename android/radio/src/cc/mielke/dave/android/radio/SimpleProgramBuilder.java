@@ -54,10 +54,10 @@ public class SimpleProgramBuilder extends RadioComponent {
       bookPlayer = new BookPlayer().setCollection(bookCollection);
 
       if (musicPlayer != null) {
+        bookPlayer.setInitialDelay(RadioParameters.BOOK_INITIAL_DELAY);
         bookPlayer.setBaseDelay(RadioParameters.BOOK_BASE_DELAY);
         bookPlayer.setRelativeDelay(RadioParameters.BOOK_RELATIVE_DELAY);
         bookPlayer.setMaximumDelay(RadioParameters.BOOK_MAXIMUM_DELAY);
-        bookPlayer.ensureDelay(RadioParameters.BOOK_INITIAL_DELAY);
       }
     }
 

@@ -165,6 +165,11 @@ public class RadioProgram extends RadioComponent {
       if (!isActive) {
         logAction("starting");
         isActive = true;
+
+        for (RadioPlayer player : allPlayers) {
+          player.reset();
+        }
+
         play();
       }
     }

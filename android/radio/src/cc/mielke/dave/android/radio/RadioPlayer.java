@@ -167,9 +167,27 @@ public abstract class RadioPlayer extends AudioComponent {
     onFinishedListeners.add(listener);
   }
 
+  private long initialDelay = 0;
   private long baseDelay = 0;
   private double relativeDelay = 0d;
   private long maximumDelay = Long.MAX_VALUE;
+
+  public final long getInitialDelay () {
+    synchronized (this) {
+      return initialDelay;
+    }
+  }
+
+  public final RadioPlayer setInitialDelay (long milliseconds) {
+    synchronized (this) {
+      initialDelay = milliseconds;
+      return this;
+    }
+  }
+
+  public final RadioPlayer setInitialDelay (long count, TimeUnit unit) {
+    return setInitialDelay(unit.toMillis(count));
+  }
 
   public final long getBaseDelay () {
     synchronized (this) {
@@ -244,6 +262,10 @@ public abstract class RadioPlayer extends AudioComponent {
 
   public final RadioPlayer ensureDelay (long count, TimeUnit unit) {
     return ensureDelay(unit.toMillis(count));
+  }
+
+  public void reset () {
+    earliestTime = getCurrentTime() + initialDelay;
   }
 
   protected final void onPlayStart () {
