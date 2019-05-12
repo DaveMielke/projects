@@ -21,7 +21,7 @@ public abstract class PositionMonitor extends AudioComponent {
               Log.d(LOG_TAG, "position monitor started");
             }
 
-            final UriViewer uriViewer = UriPlayer.getViewer();
+            final UriWatcher uriWatcher = UriPlayer.getWatcher();
             boolean stop = false;
 
             while (true) {
@@ -30,7 +30,7 @@ public abstract class PositionMonitor extends AudioComponent {
                   @Override
                   public void run () {
                     synchronized (AUDIO_LOCK) {
-                      uriViewer.setPosition(UriPlayer.getPosition());
+                      uriWatcher.onPositionChange(UriPlayer.getPosition());
                     }
                   }
                 }

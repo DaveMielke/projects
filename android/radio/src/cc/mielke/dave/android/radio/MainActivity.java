@@ -35,8 +35,8 @@ public class MainActivity extends BaseActivity {
   private TextView uriSeekCurrent = null;
   private TextView uriSeekRemaining = null;
 
-  private final UriViewer.OnChangeListener uriChangeListener =
-    new UriViewer.OnChangeListener() {
+  private final UriWatcher.OnChangeListener uriChangeListener =
+    new UriWatcher.OnChangeListener() {
       @Override
       public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist) {
         setVisible(uriMetadataView, visible);
@@ -129,8 +129,8 @@ public class MainActivity extends BaseActivity {
   private View speechView = null;
   private TextView speechText = null;
 
-  private final SpeechViewer.OnChangeListener speechChangeListener =
-    new SpeechViewer.OnChangeListener() {
+  private final SpeechWatcher.OnChangeListener speechChangeListener =
+    new SpeechWatcher.OnChangeListener() {
       @Override
       public void onTextChange (CharSequence text) {
         boolean visible = text != null;
@@ -180,8 +180,8 @@ public class MainActivity extends BaseActivity {
     speechView = findViewById(R.id.view_speech);
     speechText = findViewById(R.id.speech_text);
 
-    UriPlayer.getViewer().setOnChangeListener(uriChangeListener);
-    SpeechPlayer.getViewer().setOnChangeListener(speechChangeListener);
+    UriPlayer.getWatcher().setOnChangeListener(uriChangeListener);
+    SpeechPlayer.getWatcher().setOnChangeListener(speechChangeListener);
 
     programSelector = new ProgramSelector(this);
 
@@ -195,8 +195,8 @@ public class MainActivity extends BaseActivity {
   @Override
   public void onDestroy () {
     try {
-      UriPlayer.getViewer().setOnChangeListener(null);
-      SpeechPlayer.getViewer().setOnChangeListener(null);
+      UriPlayer.getWatcher().setOnChangeListener(null);
+      SpeechPlayer.getWatcher().setOnChangeListener(null);
     } finally {
       super.onDestroy();
     }

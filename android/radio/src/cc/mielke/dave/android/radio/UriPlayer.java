@@ -17,11 +17,11 @@ public abstract class UriPlayer extends RadioPlayer {
     super();
   }
 
-  private final static UriViewer uriViewer = new UriViewer();;
+  private final static UriWatcher uriWatcher = new UriWatcher();;
   private final static MediaPlayer mediaPlayer = new MediaPlayer();
 
-  public static UriViewer getViewer () {
-    return uriViewer;
+  public static UriWatcher getWatcher () {
+    return uriWatcher;
   }
 
   private static void onUriPlayerFinished (UriPlayer player) {
@@ -29,9 +29,9 @@ public abstract class UriPlayer extends RadioPlayer {
       PositionMonitor.StopReason.INACTIVE.stop();
       PositionMonitor.StopReason.PAUSE.start();
 
-      uriViewer.enqueueUri(null);
-      uriViewer.setPlayPause(null);
-      uriViewer.setDuration(0);
+      uriWatcher.onUriChange(null);
+      uriWatcher.onPlayPauseChange(null);
+      uriWatcher.onDurationChange(0);
 
       onRadioPlayerFinished(player);
     }
@@ -131,9 +131,9 @@ public abstract class UriPlayer extends RadioPlayer {
         }
 
         synchronized (AUDIO_LOCK) {
-          uriViewer.setPlayPause(true);
-          uriViewer.setDuration(mediaPlayer.getDuration());
-          uriViewer.setPosition(0);
+          uriWatcher.onPlayPauseChange(true);
+          uriWatcher.onDurationChange(mediaPlayer.getDuration());
+          uriWatcher.onPositionChange(0);
         }
 
         if (RadioParameters.LOG_URI_PLAYER) {
@@ -212,7 +212,7 @@ public abstract class UriPlayer extends RadioPlayer {
 
       onPlayStart();
       mediaPlayer.prepareAsync();
-      uriViewer.enqueueUri(uri);
+      uriWatcher.onUriChange(uri);
       return true;
     }
   }
@@ -241,7 +241,7 @@ public abstract class UriPlayer extends RadioPlayer {
     }
 
     if (pause) {
-      uriViewer.setPlayPause(false);
+      uriWatcher.onPlayPauseChange(false);
       AudioFocus.abandonAudioFocus();
     }
   }
@@ -253,7 +253,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       if (!requestAudioFocus()) return false;
-      uriViewer.setPlayPause(true);
+      uriWatcher.onPlayPauseChange(true);
     }
 
     mediaPlayer.start();

@@ -10,8 +10,8 @@ import android.net.Uri;
 
 import android.content.Context;
 
-public class UriViewer extends RadioComponent {
-  private final static String LOG_TAG = UriViewer.class.getName();
+public class UriWatcher extends RadioComponent {
+  private final static String LOG_TAG = UriWatcher.class.getName();
 
   public static interface OnChangeListener {
     public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
@@ -74,7 +74,7 @@ public class UriViewer extends RadioComponent {
       new Runnable() {
         @Override
         public void run () {
-          synchronized (UriViewer.this) {
+          synchronized (UriWatcher.this) {
             if (onChangeListener != null) onMetadataChange();
             updateNotification(metadataTitle, metadataArtist);
           }
@@ -86,7 +86,7 @@ public class UriViewer extends RadioComponent {
   private final BlockingQueue<String> uriQueue = new LinkedBlockingQueue<>();
   private Thread dequeueThread = null;
 
-  public final void enqueueUri (Uri uri) {
+  public final void onUriChange (Uri uri) {
     uriQueue.offer((uri != null)? uri.toString(): "");
   }
 
@@ -125,7 +125,7 @@ public class UriViewer extends RadioComponent {
       }
     };
 
-  public final void setPlayPause (Boolean isPlaying) {
+  public final void onPlayPauseChange (Boolean isPlaying) {
     synchronized (this) {
       if (isPlaying != null) {
         if (playPause == null) MediaButton.claim();
@@ -139,27 +139,27 @@ public class UriViewer extends RadioComponent {
     }
   }
 
-  public final void setDuration (int milliseconds) {
+  public final void onDurationChange (int milliseconds) {
     synchronized (this) {
       seekDuration = milliseconds;
       if (onChangeListener != null) onDurationChange();
     }
   }
 
-  public final void setPosition (int milliseconds) {
+  public final void onPositionChange (int milliseconds) {
     synchronized (this) {
       seekPosition = milliseconds;
       if (onChangeListener != null) onPositionChange();
     }
   }
 
-  public UriViewer () {
+  public UriWatcher () {
     super();
 
     updateMetadata();
-    setPlayPause(null);
-    setDuration(0);
-    setPosition(0);
+    onPlayPauseChange(null);
+    onDurationChange(0);
+    onPositionChange(0);
 
     dequeueThread = new Thread(uriDequeuer);
     dequeueThread.start();

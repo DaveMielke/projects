@@ -1,6 +1,6 @@
 package cc.mielke.dave.android.radio;
 
-public class SpeechViewer extends RadioComponent {
+public class SpeechWatcher extends RadioComponent {
   public static interface OnChangeListener {
     public void onTextChange (CharSequence text);
   }
@@ -22,7 +22,7 @@ public class SpeechViewer extends RadioComponent {
     }
   }
 
-  public final void showText (CharSequence text) {
+  public final void onTextChange (CharSequence text) {
     synchronized (this) {
       speechText = text;
 
@@ -31,7 +31,7 @@ public class SpeechViewer extends RadioComponent {
           new Runnable() {
             @Override
             public void run () {
-              synchronized (SpeechViewer.this) {
+              synchronized (SpeechWatcher.this) {
                 onTextChange();
               }
             }
@@ -43,8 +43,8 @@ public class SpeechViewer extends RadioComponent {
     }
   }
 
-  public SpeechViewer () {
+  public SpeechWatcher () {
     super();
-    showText(null);
+    onTextChange(null);
   }
 }
