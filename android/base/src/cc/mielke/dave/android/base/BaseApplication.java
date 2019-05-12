@@ -8,30 +8,49 @@ import android.content.pm.ApplicationInfo;
 
 import android.content.Context;
 import android.os.Handler;
+import android.os.Looper;
 
 public class BaseApplication extends Application {
+  private final static Object CONTEXT_LOCK = new Object();
   private static Context applicationContext = null;
   private static Handler applicationHandler = null;
+
+  public static boolean setContext (Context context) {
+    synchronized (CONTEXT_LOCK) {
+      if (applicationContext != null) return false;
+      applicationContext = context.getApplicationContext();
+      return true;
+    }
+  }
 
   @Override
   public void onCreate () {
     super.onCreate();
-    applicationContext = this;
-    applicationHandler = new Handler();
+    setContext(this);
   }
 
   public static Context getContext () {
-    return applicationContext;
+    synchronized (CONTEXT_LOCK) {
+      return applicationContext;
+    }
   }
 
   public static Handler getHandler () {
-    return applicationHandler;
+    synchronized (CONTEXT_LOCK) {
+      if (applicationHandler == null) applicationHandler = new Handler(Looper.getMainLooper());
+      return applicationHandler;
+    }
   }
 
   public static String getName (Context context) {
     ApplicationInfo info = context.getApplicationInfo();
-    int label = info.labelRes;
-    return (label == 0)? info.nonLocalizedLabel.toString(): context.getString(label);
+
+    {
+      int label = info.labelRes;
+      if (label != 0) return context.getString(label);
+    }
+
+    return info.nonLocalizedLabel.toString();
   }
 
   public static String getName () {
@@ -44,7 +63,9 @@ public class BaseApplication extends Application {
     File directory = Environment.getExternalStorageDirectory();
     if (directory == null) return null;
 
-    directory = new File(directory, getName());
-    return directory;
+    String name = getName();
+    if (name == null) return null;
+
+    return new File(directory, name);
   }
 }
