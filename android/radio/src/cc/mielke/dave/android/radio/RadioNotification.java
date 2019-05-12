@@ -10,7 +10,7 @@ import android.app.PendingIntent;
 
 public class RadioNotification extends BaseNotification {
   private final PendingIntent newPendingIntent (RadioPlayer.Action action) {
-    Intent intent = newIntent(ActionReceiver.class);
+    Intent intent = newIntent(PlayerActionReceiver.class);
     intent.setAction(action.name());
     return newPendingBroadcastIntent(intent);
   }

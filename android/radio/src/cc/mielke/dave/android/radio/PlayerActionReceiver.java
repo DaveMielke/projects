@@ -6,8 +6,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-public class ActionReceiver extends BroadcastReceiver {
-  private final static String LOG_TAG = ActionReceiver.class.getName();
+public class PlayerActionReceiver extends BroadcastReceiver {
+  private final static String LOG_TAG = PlayerActionReceiver.class.getName();
 
   @Override
   public void onReceive (Context context, Intent intent) {
