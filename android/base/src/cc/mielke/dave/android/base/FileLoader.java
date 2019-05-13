@@ -16,7 +16,7 @@ public abstract class FileLoader extends BaseComponent {
     super();
   }
 
-  protected abstract void load (InputStream stream);
+  protected abstract void load (InputStream stream, String name);
 
   private final void load (File file) {
     if (file.exists()) {
@@ -32,7 +32,7 @@ public abstract class FileLoader extends BaseComponent {
         Log.d(LOG_TAG, ("loading file: " + file.getAbsolutePath()));
 
         try {
-          load(new FileInputStream(file));
+          load(new FileInputStream(file), file.getName());
         } catch (IOException exception) {
           Log.w(LOG_TAG, ("file input error: " + exception.getMessage()));
         }
@@ -54,7 +54,7 @@ public abstract class FileLoader extends BaseComponent {
         }
       } else {
         Log.d(LOG_TAG, ("loading asset: " + path));
-        load(assets.open(path));
+        load(assets.open(path), path.substring(path.lastIndexOf(File.separatorChar)));
       }
     } catch (IOException exception) {
       Log.w(LOG_TAG, ("asset error: " + exception.getMessage()));

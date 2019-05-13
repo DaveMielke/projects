@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Properties;
 
+import cc.mielke.dave.android.base.PropertiesLoader;
+
 import android.util.Log;
 
 public class RadioPrograms extends RadioComponent {
@@ -16,22 +18,13 @@ public class RadioPrograms extends RadioComponent {
   private RadioProgram currentProgram = null;
 
   private final void addPrograms () {
-    File directory = getExternalStorageDirectory();
+    new PropertiesLoader() {
+      @Override
+      protected void load (Properties properties, String defaultName) {
+        String name = properties.getProperty("name", null);
+        if (name == null) name = defaultName;
 
-    if (directory != null) {
-      directory = new File(directory, RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);
-      File[] files = directory.listFiles();
-
-      if (files != null) {
-        for (File file : files) {
-          if (!file.isFile()) continue;
-
-          Properties properties = loadProperties(file);
-          if (properties == null) continue;
-
-          String name = properties.getProperty("name", null);
-          if (name == null) name = file.getName();
-
+        if (getProgram(name) == null) {
           RadioProgram program = new SimpleProgramBuilder()
             .setProgramName(name)
             .setMusicCollection(properties.getProperty("music", null))
@@ -41,9 +34,11 @@ public class RadioPrograms extends RadioComponent {
             .build();
 
           if (program != null) programs.put(name, program);
+        } else {
+          Log.w(LOG_TAG, ("program already defined: " + name));
         }
       }
-    }
+    }.load(RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);
   }
 
   public RadioPrograms () {

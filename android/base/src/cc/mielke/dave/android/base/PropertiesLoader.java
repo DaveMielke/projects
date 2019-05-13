@@ -12,11 +12,11 @@ public abstract class PropertiesLoader extends FileLoader {
     super();
   }
 
-  protected abstract void load (Properties properties);
+  protected abstract void load (Properties properties, String name);
 
   @Override
-  protected final void load (InputStream stream) {
+  protected final void load (InputStream stream, String name) {
     Properties properties = loadProperties(stream);
-    if (properties != null) load(properties);
+    if (properties != null) load(properties, name);
   }
 }
