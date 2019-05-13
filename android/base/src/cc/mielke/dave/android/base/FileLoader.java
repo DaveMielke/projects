@@ -3,7 +3,9 @@ package cc.mielke.dave.android.base;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
+
 import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import android.util.Log;
 import android.content.Context;
@@ -28,9 +30,7 @@ public abstract class FileLoader extends BaseComponent {
             load(new File(file, name));
           }
         }
-      } else {
-        Log.d(LOG_TAG, ("loading file: " + file.getAbsolutePath()));
-
+      } else if (file.isFile()) {
         try {
           load(new FileInputStream(file), file.getName());
         } catch (IOException exception) {
@@ -53,8 +53,10 @@ public abstract class FileLoader extends BaseComponent {
           load(assets, new File(path, name).getPath());
         }
       } else {
-        Log.d(LOG_TAG, ("loading asset: " + path));
-        load(assets.open(path), path.substring(path.lastIndexOf(File.separatorChar)));
+        try {
+          load(assets.open(path), path.substring(path.lastIndexOf(File.separatorChar) + 1));
+        } catch (FileNotFoundException exception) {
+        }
       }
     } catch (IOException exception) {
       Log.w(LOG_TAG, ("asset error: " + exception.getMessage()));

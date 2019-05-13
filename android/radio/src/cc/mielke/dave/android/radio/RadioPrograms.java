@@ -4,10 +4,8 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
-import java.io.File;
-import java.util.Properties;
-
 import cc.mielke.dave.android.base.PropertiesLoader;
+import java.util.Properties;
 
 import android.util.Log;
 
