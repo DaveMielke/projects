@@ -15,11 +15,12 @@ public class BaseApplication extends Application {
   private static Context applicationContext = null;
   private static Handler applicationHandler = null;
 
-  public static boolean setContext (Context context) {
+  public static void setContext (Context context) {
     synchronized (CONTEXT_LOCK) {
-      if (applicationContext != null) return false;
-      applicationContext = context.getApplicationContext();
-      return true;
+      if (applicationContext == null) {
+        applicationContext = context.getApplicationContext();
+        applicationHandler = new Handler(Looper.getMainLooper());
+      }
     }
   }
 
@@ -37,7 +38,6 @@ public class BaseApplication extends Application {
 
   public static Handler getHandler () {
     synchronized (CONTEXT_LOCK) {
-      if (applicationHandler == null) applicationHandler = new Handler(Looper.getMainLooper());
       return applicationHandler;
     }
   }

@@ -2,11 +2,11 @@ package cc.mielke.dave.android.radio;
 
 import android.util.Log;
 
-import android.app.Service;
+import cc.mielke.dave.android.base.BaseService;
 import android.os.IBinder;
 import android.content.Intent;
 
-public class RadioService extends Service {
+public class RadioService extends BaseService {
   private final static String LOG_TAG = RadioService.class.getName();
 
   private final static Object SERVICE_LOCK = new Object();

@@ -158,7 +158,7 @@ public class MainActivity extends BaseActivity {
   }
 
   @Override
-  public void onCreate (Bundle savedInstanceState) {
+  protected void onCreate (Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
@@ -193,7 +193,7 @@ public class MainActivity extends BaseActivity {
   }
 
   @Override
-  public void onDestroy () {
+  protected void onDestroy () {
     try {
       UriPlayer.getWatcher().setOnChangeListener(null);
       SpeechPlayer.getWatcher().setOnChangeListener(null);
@@ -203,13 +203,13 @@ public class MainActivity extends BaseActivity {
   }
 
   @Override
-  public void onResume () {
+  protected void onResume () {
     super.onResume();
     PositionMonitor.StopReason.INVISIBLE.start();
   }
 
   @Override
-  public void onPause () {
+  protected void onPause () {
     try {
       PositionMonitor.StopReason.INVISIBLE.stop();
     } finally {

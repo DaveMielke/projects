@@ -1,6 +1,7 @@
 package cc.mielke.dave.android.base;
 
 import android.app.Activity;
+import android.os.Bundle;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -8,6 +9,12 @@ import android.content.DialogInterface;
 import android.view.View;
 
 public abstract class BaseActivity extends Activity {
+  @Override
+  protected void onCreate (Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    BaseApplication.setContext(this);
+  }
+
   public final AlertDialog.Builder newAlertDialogBuilder (int name) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
