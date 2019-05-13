@@ -36,7 +36,7 @@ public class RadioPrograms extends RadioComponent {
           Log.w(LOG_TAG, ("program already defined: " + name));
         }
       }
-    }.load(RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);
+    }.loadFromFile(RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);
   }
 
   public RadioPrograms () {

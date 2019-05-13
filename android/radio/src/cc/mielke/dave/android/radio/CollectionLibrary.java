@@ -42,7 +42,7 @@ public abstract class CollectionLibrary extends RadioComponent {
           addCollection(title, properties.getProperty(title, null));
         }
       }
-    }.load(type);
+    }.loadFromFile(type);
   }
 
   protected CollectionLibrary (String type) {

@@ -9,23 +9,23 @@ import java.io.InputStreamReader;
 
 import android.util.Log;
 
-public abstract class CharacterLoader extends FileLoader {
-  private final static String LOG_TAG = CharacterLoader.class.getName();
+public abstract class CharactersLoader extends FileLoader {
+  private final static String LOG_TAG = CharactersLoader.class.getName();
 
-  protected CharacterLoader () {
+  protected CharactersLoader () {
     super();
   }
 
-  protected abstract void load (Reader reader, String name);
+  protected abstract void loadFromReader (Reader reader, String name);
 
   @Override
-  protected final void load (InputStream stream, String name) {
+  protected final void loadFromInputStream (InputStream stream, String name) {
     String encoding = "UTF-8";
 
     try {
       Reader reader = new InputStreamReader(stream, encoding);
       try {
-        load(reader, name);
+        loadFromReader(reader, name);
       } finally {
         try {
           reader.close();

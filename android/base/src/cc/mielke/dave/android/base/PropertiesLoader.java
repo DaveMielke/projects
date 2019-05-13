@@ -6,7 +6,7 @@ import java.util.Properties;
 
 import android.util.Log;
 
-public abstract class PropertiesLoader extends CharacterLoader {
+public abstract class PropertiesLoader extends CharactersLoader {
   private final static String LOG_TAG = PropertiesLoader.class.getName();
 
   protected PropertiesLoader () {
@@ -16,7 +16,7 @@ public abstract class PropertiesLoader extends CharacterLoader {
   protected abstract void load (Properties properties, String name);
 
   @Override
-  protected final void load (Reader reader, String name) {
+  protected final void loadFromReader (Reader reader, String name) {
     Properties properties = new Properties();
 
     try {
