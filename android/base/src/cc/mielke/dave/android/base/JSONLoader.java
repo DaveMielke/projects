@@ -12,12 +12,12 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected abstract void loadFromJSON (JSONObject json, String name);
+  protected abstract void load (JSONObject json, String name);
 
   @Override
-  protected final void loadFromString (String string, String name) {
+  protected final void load (String string, String name) {
     try {
-      loadFromJSON(new JSONObject(string), name);
+      load(new JSONObject(string), name);
     } catch (JSONException exception) {
       Log.w(LOG_TAG, ("JSON read error: " + exception.getMessage()));
     }

@@ -16,7 +16,7 @@ public abstract class PropertiesLoader extends CharactersLoader {
   protected abstract void load (Properties properties, String name);
 
   @Override
-  protected final void loadFromReader (Reader reader, String name) {
+  protected final void load (Reader reader, String name) {
     Properties properties = new Properties();
 
     try {

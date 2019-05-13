@@ -16,16 +16,16 @@ public abstract class CharactersLoader extends FileLoader {
     super();
   }
 
-  protected abstract void loadFromReader (Reader reader, String name);
+  protected abstract void load (Reader reader, String name);
 
   @Override
-  protected final void loadFromInputStream (InputStream stream, String name) {
+  protected final void load (InputStream stream, String name) {
     String encoding = "UTF-8";
 
     try {
       Reader reader = new InputStreamReader(stream, encoding);
       try {
-        loadFromReader(reader, name);
+        load(reader, name);
       } finally {
         try {
           reader.close();

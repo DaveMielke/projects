@@ -12,10 +12,10 @@ public abstract class StringLoader extends CharactersLoader {
     super();
   }
 
-  protected abstract void loadFromString (String string, String name);
+  protected abstract void load (String string, String name);
 
   @Override
-  protected final void loadFromReader (Reader reader, String name) {
+  protected final void load (Reader reader, String name) {
     StringBuilder characters = new StringBuilder();
 
     try {
@@ -26,7 +26,7 @@ public abstract class StringLoader extends CharactersLoader {
         characters.append(buffer, 0, count);
       }
 
-      loadFromString(characters.toString(), name);
+      load(characters.toString(), name);
     } catch (IOException exception) {
       Log.w(LOG_TAG, ("input error: " + exception.getMessage()));
     }

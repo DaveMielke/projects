@@ -18,23 +18,23 @@ public abstract class FileLoader extends BaseComponent {
     super();
   }
 
-  protected abstract void loadFromInputStream (InputStream stream, String name);
+  protected abstract void load (InputStream stream, String name);
 
-  private final void loadFromFile (File file) {
+  private final void load (File file) {
     if (file.exists()) {
       if (file.isDirectory()) {
         String[] names = file.list();
 
         if (names != null) {
           for (String name : names) {
-            loadFromFile(new File(file, name));
+            load(new File(file, name));
           }
         }
       } else if (file.isFile()) {
         try {
           InputStream stream = new FileInputStream(file);
           try {
-            loadFromInputStream(stream, file.getName());
+            load(stream, file.getName());
           } finally {
             try {
               stream.close();
@@ -49,23 +49,23 @@ public abstract class FileLoader extends BaseComponent {
     }
   }
 
-  private final void loadFromFile (File directory, String name) {
-    if (directory != null) loadFromFile(new File(directory, name));
+  private final void load (File directory, String name) {
+    if (directory != null) load(new File(directory, name));
   }
 
-  private final void loadFromAsset (AssetManager assets, String path) {
+  private final void load (AssetManager assets, String path) {
     try {
       String[] names = assets.list(path);
 
       if ((names != null) && (names.length > 0)) {
         for (String name : names) {
-          loadFromAsset(assets, (path + File.separatorChar + name));
+          load(assets, (path + File.separatorChar + name));
         }
       } else {
         try {
           InputStream stream = assets.open(path);
           try {
-            loadFromInputStream(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
+            load(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
           } finally {
             try {
               stream.close();
@@ -82,11 +82,11 @@ public abstract class FileLoader extends BaseComponent {
     }
   }
 
-  public final void loadFromFile (String name) {
+  public final void load (String name) {
     Context context = getContext();
 
-    loadFromFile(context.getFilesDir(), name);
-    loadFromFile(getExternalStorageDirectory(), name);
-    loadFromAsset(context.getAssets(), name);
+    load(context.getFilesDir(), name);
+    load(getExternalStorageDirectory(), name);
+    load(context.getAssets(), name);
   }
 }
