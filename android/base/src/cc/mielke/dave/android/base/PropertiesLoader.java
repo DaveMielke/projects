@@ -1,11 +1,12 @@
 package cc.mielke.dave.android.base;
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Properties;
 
 import android.util.Log;
 
-public abstract class PropertiesLoader extends FileLoader {
+public abstract class PropertiesLoader extends CharacterLoader {
   private final static String LOG_TAG = PropertiesLoader.class.getName();
 
   protected PropertiesLoader () {
@@ -15,8 +16,14 @@ public abstract class PropertiesLoader extends FileLoader {
   protected abstract void load (Properties properties, String name);
 
   @Override
-  protected final void load (InputStream stream, String name) {
-    Properties properties = loadProperties(stream);
-    if (properties != null) load(properties, name);
+  protected final void load (Reader reader, String name) {
+    Properties properties = new Properties();
+
+    try {
+      properties.load(reader);
+      load(properties, name);
+    } catch (IOException exception) {
+      Log.w(LOG_TAG, ("properties load error: " + exception.getMessage()));
+    }
   }
 }

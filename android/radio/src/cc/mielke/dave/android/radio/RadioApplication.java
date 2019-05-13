@@ -16,14 +16,20 @@ public class RadioApplication extends BaseApplication {
   }
 
   public static MusicLibrary getMusicLibrary () {
-    return musicLibrary;
+    synchronized (APPLICATION_LOCK) {
+      return musicLibrary;
+    }
   }
 
   public static BookLibrary getBookLibrary () {
-    return bookLibrary;
+    synchronized (APPLICATION_LOCK) {
+      return bookLibrary;
+    }
   }
 
   public static RadioPrograms getRadioPrograms () {
-    return radioPrograms;
+    synchronized (APPLICATION_LOCK) {
+      return radioPrograms;
+    }
   }
 }

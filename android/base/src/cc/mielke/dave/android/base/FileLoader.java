@@ -32,7 +32,16 @@ public abstract class FileLoader extends BaseComponent {
         }
       } else if (file.isFile()) {
         try {
-          load(new FileInputStream(file), file.getName());
+          InputStream stream = new FileInputStream(file);
+          try {
+            load(stream, file.getName());
+          } finally {
+            try {
+              stream.close();
+            } catch (IOException exception) {
+              Log.w(LOG_TAG, ("stream close error: " + exception.getMessage()));
+            }
+          }
         } catch (IOException exception) {
           Log.w(LOG_TAG, ("file input error: " + exception.getMessage()));
         }
@@ -54,8 +63,18 @@ public abstract class FileLoader extends BaseComponent {
         }
       } else {
         try {
-          load(assets.open(path), path.substring(path.lastIndexOf(File.separatorChar) + 1));
+          InputStream stream = assets.open(path);
+          try {
+            load(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
+          } finally {
+            try {
+              stream.close();
+            } catch (IOException exception) {
+              Log.w(LOG_TAG, ("stream close error: " + exception.getMessage()));
+            }
+          }
         } catch (FileNotFoundException exception) {
+          // ignore - opening an asset is the only way to test its existence
         }
       }
     } catch (IOException exception) {

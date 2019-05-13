@@ -11,12 +11,13 @@ import android.os.Handler;
 import android.os.Looper;
 
 public class BaseApplication extends Application {
-  private final static Object CONTEXT_LOCK = new Object();
+  protected final static Object APPLICATION_LOCK = new Object();
+
   private static Context applicationContext = null;
   private static Handler applicationHandler = null;
 
   public static void setContext (Context context) {
-    synchronized (CONTEXT_LOCK) {
+    synchronized (APPLICATION_LOCK) {
       if (applicationContext == null) {
         applicationContext = context.getApplicationContext();
         applicationHandler = new Handler(Looper.getMainLooper());
@@ -31,13 +32,13 @@ public class BaseApplication extends Application {
   }
 
   public static Context getContext () {
-    synchronized (CONTEXT_LOCK) {
+    synchronized (APPLICATION_LOCK) {
       return applicationContext;
     }
   }
 
   public static Handler getHandler () {
-    synchronized (CONTEXT_LOCK) {
+    synchronized (APPLICATION_LOCK) {
       return applicationHandler;
     }
   }

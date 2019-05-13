@@ -1,0 +1,40 @@
+package cc.mielke.dave.android.base;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.InputStreamReader;
+
+import android.util.Log;
+
+public abstract class CharacterLoader extends FileLoader {
+  private final static String LOG_TAG = CharacterLoader.class.getName();
+
+  protected CharacterLoader () {
+    super();
+  }
+
+  protected abstract void load (Reader reader, String name);
+
+  @Override
+  protected final void load (InputStream stream, String name) {
+    String encoding = "UTF-8";
+
+    try {
+      Reader reader = new InputStreamReader(stream, encoding);
+      try {
+        load(reader, name);
+      } finally {
+        try {
+          reader.close();
+        } catch (IOException exception) {
+          Log.w(LOG_TAG, ("reader close error: " + exception.getMessage()));
+        }
+      }
+    } catch (UnsupportedEncodingException exception) {
+      Log.e(LOG_TAG, ("unsupported character encoding" + encoding));
+    }
+  }
+}
