@@ -12,7 +12,7 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected abstract void load (JSONObject json, String name);
+  protected abstract void load (JSONObject object, String name);
 
   @Override
   protected final void load (String string, String name) {
