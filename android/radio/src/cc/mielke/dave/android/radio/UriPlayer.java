@@ -55,31 +55,33 @@ public abstract class UriPlayer extends RadioPlayer {
           uriWatcher.onPlayPauseChange(true);
           uriWatcher.onDurationChange(streamPlayer.getDuration());
           uriWatcher.onPositionChange(0);
-        }
 
-        if (requestAudioFocus()) {
-          PositionMonitor.StopReason.INACTIVE.start();
-          return true;
-        } else {
-          onUriPlayerFinished();
-        }
+          if (requestAudioFocus()) {
+            PositionMonitor.StopReason.INACTIVE.start();
+            return true;
+          } else {
+            onUriPlayerFinished();
+          }
 
-        return false;
+          return false;
+        }
       }
 
       @Override
       protected boolean onPlayerInfo (int info, int extra) {
-        return false;
+        return super.onPlayerInfo(info, extra);
       }
 
       @Override
       protected boolean onPlayerError (int error, int extra) {
-        return false;
+        return super.onPlayerError(error, extra);
       }
 
       @Override
       protected void onPlayerFinished () {
-        onUriPlayerFinished();
+        synchronized (AUDIO_LOCK) {
+          onUriPlayerFinished();
+        }
       }
     };
 
