@@ -77,6 +77,10 @@ public abstract class BaseActivity extends Activity {
   }
 
   public final void setVisible (View view, boolean yes) {
-    view.setVisibility(yes? View.VISIBLE: View.GONE);
+    int newVisibility = yes? View.VISIBLE: View.GONE;
+
+    if (newVisibility != view.getVisibility()) {
+      view.setVisibility(newVisibility);
+    }
   }
 }
