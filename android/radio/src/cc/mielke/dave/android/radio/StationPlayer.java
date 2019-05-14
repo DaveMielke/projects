@@ -15,6 +15,7 @@ public class StationPlayer extends UriPlayer {
 
   public StationPlayer (Uri uri) {
     super();
+
     stationUri = uri;
     setBaseDelay(RadioParameters.STATION_RETRY_DELAY);
   }

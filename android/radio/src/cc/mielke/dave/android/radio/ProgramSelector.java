@@ -103,11 +103,11 @@ public class ProgramSelector extends ActivityComponent {
                 Log.w(LOG_TAG, ("station not a JSON object: " + name));
               } else {
                 {
-                  String string = station.optString("short", name);
+                  String component = station.optString("label-component", name);
 
-                  if (!string.isEmpty()) {
+                  if (!component.isEmpty()) {
                     if (label.length() > 0) label.append(' ');
-                    label.append(string);
+                    label.append(component);
                   }
                 }
 

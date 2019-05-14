@@ -1,219 +1,255 @@
 {
   "Al Jazeera": {
-    "short": "AJ",
+    "label-component": "AJ",
+    "identifier": "aj-english",
     "listen": "https://english.streaming.aljazeera.net/aljazeera/english2/index4147.m3u8"
   },
 
   "British Broadcasting Corporation": {
-    "short": "BBC",
+    "label-component": "BBC",
     "listen": {
       "World Service": {
+        "identifier": "bbc-world-service",
         "listen": "http://www.bbc.co.uk/worldservice/meta/live/mp3/eneuk.pls"
       }
     }
   },
 
   "Canadian Broadcasting Corporation": {
-    "short": "CBC",
+    "label-component": "CBC",
     "listen": {
       "Radio One": {
         "listen": {
           "Alberta": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Calgary": {
+                "identifier": "cbc1-calgary",
                 "listen": "http://cbc_r1_cgy.akacast.akamaistream.net/7/298/451661/v1/rc.akacast.akamaistream.net/cbc_r1_cgy"
               },
 
               "Edmonton": {
+                "identifier": "cbc1-edmonton",
                 "listen": "http://cbc_r1_edm.akacast.akamaistream.net/7/904/451661/v1/rc.akacast.akamaistream.net/cbc_r1_edm"
               }
             }
           },
 
           "British Columbia": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Kamloops": {
+                "identifier": "cbc1-kamloops",
                 "listen": "http://cbc_r1_kam.akacast.akamaistream.net/7/440/451661/v1/rc.akacast.akamaistream.net/cbc_r1_kam"
               },
 
               "Kelowna": {
+                "identifier": "cbc1-kelowna",
                 "listen": "http://cbc_r1_kel.akacast.akamaistream.net/7/229/451661/v1/rc.akacast.akamaistream.net/cbc_r1_kel"
               },
 
               "Prince George": {
+                "identifier": "cbc1-prince-george",
                 "listen": "http://cbc_r1_prg.akacast.akamaistream.net/7/966/451661/v1/rc.akacast.akamaistream.net/cbc_r1_prg"
               },
 
               "Vancouver": {
+                "identifier": "cbc1-vancouver",
                 "listen": "http://cbc_r1_vcr.akacast.akamaistream.net/7/723/451661/v1/rc.akacast.akamaistream.net/cbc_r1_vcr"
               },
 
               "Victoria": {
+                "identifier": "cbc1-victoria",
                 "listen": "http://cbc_r1_vic.akacast.akamaistream.net/7/728/451661/v1/rc.akacast.akamaistream.net/cbc_r1_vic"
               }
             }
           },
 
           "Manitoba": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Winnipeg": {
+                "identifier": "cbc1-winnipeg",
                 "listen": "http://cbc_r1_wpg.akacast.akamaistream.net/7/831/451661/v1/rc.akacast.akamaistream.net/cbc_r1_wpg"
               }
             }
           },
 
           "New Brunswick": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Fredericton": {
+                "identifier": "cbc1-fredericton",
                 "listen": "http://cbc_r1_frd.akacast.akamaistream.net/7/553/451661/v1/rc.akacast.akamaistream.net/cbc_r1_frd"
               },
 
               "Moncton": {
+                "identifier": "cbc1-moncton",
                 "listen": "http://cbc_r1_mct.akacast.akamaistream.net/7/383/451661/v1/rc.akacast.akamaistream.net/cbc_r1_mct"
               },
 
               "Saint John": {
+                "identifier": "cbc1-saint-john",
                 "listen": "http://cbc_r1_snb.akacast.akamaistream.net/7/754/451661/v1/rc.akacast.akamaistream.net/cbc_r1_snb"
               }
             }
           },
 
           "Newfoundland and Labrador": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Corner Brook": {
+                "identifier": "cbc1-corner-brook",
                 "listen": "http://cbc_r1_cor.akacast.akamaistream.net/7/550/451661/v1/rc.akacast.akamaistream.net/cbc_r1_cor"
               },
 
               "Grand Falls-Gander": {
+                "identifier": "cbc1-grand-falls",
                 "listen": "http://cbc_r1_gfa.akacast.akamaistream.net/7/492/451661/v1/rc.akacast.akamaistream.net/cbc_r1_gfa"
               },
 
               "Labrador": {
+                "identifier": "cbc1-labrador",
                 "listen": "http://cbc_r1_gba.akacast.akamaistream.net/7/274/451661/v1/rc.akacast.akamaistream.net/cbc_r1_gba"
               },
 
               "St. John's": {
+                "identifier": "cbc1-st-johns",
                 "listen": "http://cbc_r1_snf.akacast.akamaistream.net/7/750/451661/v1/rc.akacast.akamaistream.net/cbc_r1_snf"
               }
             }
           },
 
           "Northwest Territories": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Inuvik": {
+                "identifier": "cbc1-inuvik",
                 "listen": "http://cbc_r1_ink.akacast.akamaistream.net/7/967/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ink"
               },
 
               "Yellowknife": {
+                "identifier": "cbc1-yellowknife",
                 "listen": "http://cbc_r1_ykn.akacast.akamaistream.net/7/369/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ykn"
               }
             }
           },
 
           "Nova Scotia": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Cape Breton": {
+                "identifier": "cbc1-cape-breton",
                 "listen": "http://cbc_r1_syd.akacast.akamaistream.net/7/897/451661/v1/rc.akacast.akamaistream.net/cbc_r1_syd"
               },
 
               "Halifax": {
+                "identifier": "cbc1-halifax",
                 "listen": "http://cbc_r1_hfx.akacast.akamaistream.net/7/981/451661/v1/rc.akacast.akamaistream.net/cbc_r1_hfx"
               }
             }
           },
 
           "Nunavut": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Iqaluit": {
+                "identifier": "cbc1-iqaluit",
                 "listen": "http://cbc_r1_iqa.akacast.akamaistream.net/7/325/451661/v1/rc.akacast.akamaistream.net/cbc_r1_iqa"
               }
             }
           },
 
           "Ontario": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Kitchener-Waterloo": {
+                "identifier": "cbc1-kitchener",
                 "listen": "http://cbc_r1_ekw.akacast.akamaistream.net/7/63/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ekw"
               },
 
               "London": {
+                "identifier": "cbc1-london",
                 "listen": "http://cbc_r1_ldn.akacast.akamaistream.net/7/104/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ldn"
               },
 
               "Ottawa": {
+                "identifier": "cbc1-ottawa",
                 "listen": "http://cbc_r1_ott.akacast.akamaistream.net/7/613/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ott"
               },
 
               "Sudbury": {
+                "identifier": "cbc1-sudbury",
                 "listen": "http://cbc_r1_sud.akacast.akamaistream.net/7/380/451661/v1/rc.akacast.akamaistream.net/cbc_r1_sud"
               },
 
               "Thunder Bay": {
+                "identifier": "cbc1-thunder-bay",
                 "listen": "http://cbc_r1_tba.akacast.akamaistream.net/7/245/451661/v1/rc.akacast.akamaistream.net/cbc_r1_tba"
               },
 
               "Toronto": {
+                "identifier": "cbc1-toronto",
                 "listen": "http://cbc_r1_tor.akacast.akamaistream.net/7/632/451661/v1/rc.akacast.akamaistream.net/cbc_r1_tor"
               },
 
               "Windsor": {
+                "identifier": "cbc1-windsor",
                 "listen": "http://cbc_r1_wdr.akacast.akamaistream.net/7/813/451661/v1/rc.akacast.akamaistream.net/cbc_r1_wdr"
               }
             }
           },
 
           "Prince Edward Island": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Charlottetown": {
+                "identifier": "cbc1-charlottetown",
                 "listen": "http://cbc_r1_chr.akacast.akamaistream.net/7/169/451661/v1/rc.akacast.akamaistream.net/cbc_r1_chr"
               }
             }
           },
 
           "Québec": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Montréal": {
+                "identifier": "cbc1-montreal",
                 "listen": "http://cbc_r1_mtl.akacast.akamaistream.net/7/35/451661/v1/rc.akacast.akamaistream.net/cbc_r1_mtl"
               },
 
-              "Nord Québec": {
+              "Nord-du-Québec": {
+                "identifier": "cbc1-quebec-nord",
                 "listen": "http://cbc_r1_n_mtl.akacast.akamaistream.net/7/823/451661/v1/rc.akacast.akamaistream.net/cbc_r1_n_mtl"
               },
 
               "Québec City": {
+                "identifier": "cbc1-quebec-city",
                 "listen": "http://cbc_r1_qqu.akacast.akamaistream.net/7/29/451661/v1/rc.akacast.akamaistream.net/cbc_r1_qqu"
               }
             }
           },
 
           "Saskatchewan": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Regina": {
+                "identifier": "cbc1-regina",
                 "listen": "http://cbc_r1_reg.akacast.akamaistream.net/7/666/451661/v1/rc.akacast.akamaistream.net/cbc_r1_reg"
               },
 
               "Saskatoon": {
+                "identifier": "cbc1-saskatoon",
                 "listen": "http://cbc_r1_ssk.akacast.akamaistream.net/7/842/451661/v1/rc.akacast.akamaistream.net/cbc_r1_ssk"
               }
             }
           },
 
           "Yukon": {
-            "short": "-",
+            "label-component": "-",
             "listen": {
               "Whitehorse": {
+                "identifier": "cbc1-whitehorse",
                 "listen": "http://cbc_r1_whs.akacast.akamaistream.net/7/319/451661/v1/rc.akacast.akamaistream.net/cbc_r1_whs"
               }
             }
@@ -224,22 +260,27 @@
       "Radio Two": {
         "listen": {
           "Atlantic Time": {
+            "identifier": "cbc2-atlantic",
             "listen": "http://cbc_r2_hfx.akacast.akamaistream.net/7/917/451661/v1/rc.akacast.akamaistream.net/cbc_r2_hfx"
           },
 
           "Eastern Time": {
+            "identifier": "cbc2-eastern",
             "listen": "http://cbc_r2_tor.akacast.akamaistream.net/7/364/451661/v1/rc.akacast.akamaistream.net/cbc_r2_tor"
           },
 
           "Central Time": {
+            "identifier": "cbc2-central",
             "listen": "http://cbc_r2_wpg.akacast.akamaistream.net/7/233/451661/v1/rc.akacast.akamaistream.net/cbc_r2_wpg"
           },
 
           "Mountain Time": {
+            "identifier": "cbc2-mountain",
             "listen": "http://cbc_r2_edm.akacast.akamaistream.net/7/40/451661/v1/rc.akacast.akamaistream.net/cbc_r2_edm"
           },
 
           "Pacific Time": {
+            "identifier": "cbc2-pacafic",
             "listen": "http://cbc_r2_vcr.akacast.akamaistream.net/7/773/451661/v1/rc.akacast.akamaistream.net/cbc_r2_vcr"
           }
         }
