@@ -112,14 +112,21 @@ public class UriWatcher extends RadioComponent {
             updateMetadata();
           } else {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(context, Uri.parse(uri));
+            try {
+              try {
+                retriever.setDataSource(context, Uri.parse(uri));
+              } catch (IllegalArgumentException exception) {
+                updateMetadata();
+                continue;
+              }
 
-            updateMetadata(
-              retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
-              retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-            );
-
-            retriever.release();
+              updateMetadata(
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+              );
+            } finally {
+              retriever.release();
+            }
           }
         }
       }

@@ -1,5 +1,13 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.Map;
+import java.util.HashMap;
+
+import cc.mielke.dave.android.base.JSONLoader;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import android.widget.Button;
 import android.content.DialogInterface;
 
@@ -58,16 +66,70 @@ public class ProgramSelector extends ActivityComponent {
 
   private final Action actionSelectStation =
     new Action() {
-      private final StationSelector stationSelector = new StationSelector(mainActivity);
-
       @Override
       public int getName () {
         return R.string.action_selectStation;
       }
 
+      private final Map<String, RadioProgram> stationPrograms = new HashMap<>();
+
+      private final void selectStation (final JSONObject object) {
+        final JSONArray names = object.names();
+        final int count = names.length();
+        final String[] items = new String[count];
+
+        for (int index=0; index<count; index+=1) {
+          items[index] = names.optString(index, "");
+        }
+
+        sort(items);
+
+        mainActivity.selectItem(
+          R.string.action_selectStation, items,
+          new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick (DialogInterface dialog, int position) {
+              String name = items[position];
+
+              {
+                JSONObject stations = object.optJSONObject(name);
+
+                if (stations != null) {
+                  selectStation(stations);
+                  return;
+                }
+              }
+
+              {
+                String url = object.optString(name, null);
+
+                if (url != null) {
+                  RadioProgram program = stationPrograms.get(url);
+
+                  if (program == null) {
+                    program = new RadioProgram();
+                    program.setName(name);
+                    program.addPlayers(new StationPlayer(url));
+                    stationPrograms.put(url, program);
+                  }
+
+                  setProgram(program);
+                  return;
+                }
+              }
+            }
+          }
+        );
+      }
+
       @Override
       public void performAction () {
-        stationSelector.selectStation();
+        new JSONLoader() {
+          @Override
+          protected void load (JSONObject object, String name) {
+            selectStation(object);
+          }
+        }.load("stations");
       }
     };
 
