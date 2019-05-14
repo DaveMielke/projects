@@ -5,10 +5,12 @@
   <string name="player_service_label">DM Radio Player Service</string>
 
   <string name="action_selectProgram">Select Program</string>
+  <string name="action_selectStation">Select Station</string>
+
   <string name="name_noProgram">Off</string>
   <string name="name_anonymousProgram">Unnamed</string>
+
   <string name="message_noProgram">program not selected</string>
-  <string name="message_noPrograms">no programs have been defined</string>
 
   <string name="action_uriPlay">Play</string>
   <string name="action_uriPause">Pause</string>
