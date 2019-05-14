@@ -1,8 +1,12 @@
 {
   "Al Jazeera": {
     "label-component": "AJ",
-    "identifier": "aj-english",
-    "listen": "https://english.streaming.aljazeera.net/aljazeera/english2/index4147.m3u8"
+    "listen": {
+      "English": {
+        "identifier": "aj-english",
+        "listen": "https://english.streaming.aljazeera.net/aljazeera/english2/index4147.m3u8"
+      }
+    }
   },
 
   "British Broadcasting Corporation": {
