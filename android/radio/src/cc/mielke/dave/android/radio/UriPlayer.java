@@ -61,6 +61,45 @@ public abstract class UriPlayer extends RadioPlayer {
     new MediaPlayer.OnInfoListener() {
       private final String getInfoMessage (int info) {
         switch (info) {
+          case MediaPlayer.MEDIA_INFO_AUDIO_NOT_PLAYING:
+            return "audio not playing";
+
+          case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+            return "improper/no interleaving";
+
+          case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+            return "resuming playback after buffering";
+
+          case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+            return "pausing for buffering";
+
+          case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
+            return "updated metadata";
+
+          case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+            return "not seekable";
+
+          case MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT:
+            return "started by previous media player";
+
+          case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
+            return "reading subtitle track took too long";
+
+          case MediaPlayer.MEDIA_INFO_UNKNOWN:
+            return "unspecified information";
+
+          case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
+            return "unsupported subtitle track";
+
+          case MediaPlayer.MEDIA_INFO_VIDEO_NOT_PLAYING:
+            return "video not playing";
+
+          case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
+            return "video rendering started";
+
+          case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+            return "video track lagging";
+
           default:
             return null;
         }
@@ -83,7 +122,7 @@ public abstract class UriPlayer extends RadioPlayer {
           }
         }
 
-        Log.w(LOG_TAG, log.toString());
+        Log.d(LOG_TAG, log.toString());
         return false;
       }
     };
@@ -92,8 +131,26 @@ public abstract class UriPlayer extends RadioPlayer {
     new MediaPlayer.OnErrorListener() {
       private final String getErrorMessage (int error) {
         switch (error) {
+          case MediaPlayer.MEDIA_ERROR_IO:
+            return "file/network problem";
+
+          case MediaPlayer.MEDIA_ERROR_MALFORMED:
+            return "malformed bit stream";
+
+          case MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
+            return "not valid for progressive playback";
+
           case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-            return "media player died";
+            return "server died";
+
+          case MediaPlayer.MEDIA_ERROR_TIMED_OUT:
+            return "operation took too long";
+
+          case MediaPlayer.MEDIA_ERROR_UNKNOWN:
+            return "unknown cause";
+
+          case MediaPlayer.MEDIA_ERROR_UNSUPPORTED:
+            return "unsupported feature";
 
           default:
             return null;
