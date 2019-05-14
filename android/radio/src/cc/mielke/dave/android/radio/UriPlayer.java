@@ -60,46 +60,46 @@ public abstract class UriPlayer extends RadioPlayer {
 
   private final static MediaPlayer.OnInfoListener mediaPlayerInfoListener =
     new MediaPlayer.OnInfoListener() {
-      private final String getInfoMessage (int info) {
+      private final Integer getInfoMessage (int info) {
         switch (info) {
           case MediaPlayer.MEDIA_INFO_AUDIO_NOT_PLAYING:
-            return "audio not playing";
+            return R.string.media_info_no_audio;
 
           case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-            return "improper/no interleaving";
+            return R.string.media_info_bad_interleaving;
 
           case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-            return "resuming playback after buffering";
+            return R.string.media_info_buffering_finished;
 
           case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-            return "pausing for buffering";
+            return R.string.media_info_buffering_started;
 
           case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-            return "updated metadata";
+            return R.string.media_info_metadata_change;
 
           case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-            return "not seekable";
+            return R.string.media_info_not_seekable;
 
           case MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT:
-            return "started by previous media player";
+            return R.string.media_info_next_player_started;
 
           case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
-            return "reading subtitle track took too long";
+            return R.string.media_info_subtitle_timeout;
 
           case MediaPlayer.MEDIA_INFO_UNKNOWN:
-            return "unspecified information";
+            return R.string.media_info_unspecified;
 
           case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
-            return "unsupported subtitle track";
+            return R.string.media_info_subtitle_unsupported;
 
           case MediaPlayer.MEDIA_INFO_VIDEO_NOT_PLAYING:
-            return "video not playing";
+            return R.string.media_info_no_video;
 
           case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-            return "video rendering started";
+            return R.string.media_info_video_started;
 
           case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-            return "video track lagging";
+            return R.string.media_info_video_lagging;
 
           default:
             return null;
@@ -115,11 +115,11 @@ public abstract class UriPlayer extends RadioPlayer {
         log.append(extra);
 
         {
-          String message = getInfoMessage(info);
+          Integer message = getInfoMessage(info);
 
           if (message != null) {
             log.append(": ");
-            log.append(message);
+            log.append(getResources().getString(message));
           }
         }
 
@@ -130,28 +130,28 @@ public abstract class UriPlayer extends RadioPlayer {
 
   private final static MediaPlayer.OnErrorListener mediaPlayerErrorListener =
     new MediaPlayer.OnErrorListener() {
-      private final String getErrorMessage (int error) {
+      private final Integer getErrorMessage (int error) {
         switch (error) {
           case MediaPlayer.MEDIA_ERROR_IO:
-            return "file/network problem";
+            return R.string.media_error_input_output;
 
           case MediaPlayer.MEDIA_ERROR_MALFORMED:
-            return "malformed bit stream";
+            return R.string.media_error_bad_stream;
 
           case MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
-            return "not valid for progressive playback";
+            return R.string.media_error_not_progressive;
 
           case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-            return "server died";
+            return R.string.media_error_server_died;
 
           case MediaPlayer.MEDIA_ERROR_TIMED_OUT:
-            return "operation took too long";
+            return R.string.media_error_operation_timeout;
 
           case MediaPlayer.MEDIA_ERROR_UNKNOWN:
-            return "unknown cause";
+            return R.string.media_error_unknown;
 
           case MediaPlayer.MEDIA_ERROR_UNSUPPORTED:
-            return "unsupported feature";
+            return R.string.media_error_unsupported_feature;
 
           default:
             return null;
@@ -167,11 +167,11 @@ public abstract class UriPlayer extends RadioPlayer {
         log.append(extra);
 
         {
-          String message = getErrorMessage(error);
+          Integer message = getErrorMessage(error);
 
           if (message != null) {
             log.append(": ");
-            log.append(message);
+            log.append(getResources().getString(message));
           }
         }
 

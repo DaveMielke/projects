@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+  <string name="media_error_input_output">file/network problem</string>
+  <string name="media_error_bad_stream">malformed bit stream</string>
+  <string name="media_error_unsupported_feature">unsupported feature</string>
+  <string name="media_error_not_progressive">not valid for progressive playback</string>
+  <string name="media_error_operation_timeout">operation took too long</string>
+  <string name="media_error_server_died">server died</string>
+  <string name="media_error_unknown">unknown cause</string>
+
+  <string name="media_info_next_player_started">started by previous media player</string>
+  <string name="media_info_not_seekable">not seekable</string>
+  <string name="media_info_buffering_started">pausing playback for buffering</string>
+  <string name="media_info_buffering_finished">resuming playback after buffering</string>
+  <string name="media_info_no_audio">audio is not playing</string>
+  <string name="media_info_no_video">video not playing</string>
+  <string name="media_info_video_started">video rendering started</string>
+  <string name="media_info_video_lagging">video track lagging</string>
+  <string name="media_info_bad_interleaving">improper/no interleaving</string>
+  <string name="media_info_metadata_change">updated metadata</string>
+  <string name="media_info_subtitle_timeout">reading subtitle track took too long</string>
+  <string name="media_info_subtitle_unsupported">unsupported subtitle track</string>
+  <string name="media_info_unspecified">unspecified information</string>
+</resources>
