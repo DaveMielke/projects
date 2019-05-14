@@ -143,8 +143,8 @@ public class ProgramSelector extends ActivityComponent {
       public void performAction () {
         new JSONLoader() {
           @Override
-          protected void load (JSONObject object, String name) {
-            selectStation(object, new StringBuilder());
+          protected void load (JSONObject root, String name) {
+            selectStation(root, new StringBuilder());
           }
         }.load(RadioParameters.RADIO_STATIONS_FILE);
       }

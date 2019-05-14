@@ -4,8 +4,9 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
-import cc.mielke.dave.android.base.PropertiesLoader;
-import java.util.Properties;
+import cc.mielke.dave.android.base.JSONLoader;
+import org.json.JSONObject;
+import java.util.Iterator;
 
 import android.util.Log;
 
@@ -16,24 +17,32 @@ public class RadioPrograms extends RadioComponent {
   private RadioProgram currentProgram = null;
 
   private final void addPrograms () {
-    new PropertiesLoader() {
+    new JSONLoader() {
       @Override
-      protected void load (Properties properties, String defaultName) {
-        String name = properties.getProperty("name", null);
-        if (name == null) name = defaultName;
+      protected void load (JSONObject root, String name) {
+        Iterator<String> titles = root.keys();
 
-        if (getProgram(name) == null) {
-          RadioProgram program = new SimpleProgramBuilder()
-            .setProgramName(name)
-            .setMusicCollection(properties.getProperty("music", null))
-            .setBookCollection(properties.getProperty("book", null))
-            .setAnnounceHours(properties.getProperty("hours", null) != null)
-            .setAnnounceMinutes(properties.getProperty("minutes", null) != null)
-            .build();
+        while (titles.hasNext()) {
+          String title = titles.next();
+          JSONObject object = root.optJSONObject(title);
 
-          if (program != null) programs.put(name, program);
-        } else {
-          Log.w(LOG_TAG, ("program already defined: " + name));
+          if (object != null) {
+            if (getProgram(title) == null) {
+              RadioProgram program = new SimpleProgramBuilder()
+                .setProgramName(title)
+                .setMusicCollection(object.optString("music", null))
+                .setBookCollection(object.optString("book", null))
+                .setAnnounceHours(object.optBoolean("hours"))
+                .setAnnounceMinutes(object.optBoolean("minutes"))
+                .build();
+
+              if (program != null) programs.put(title, program);
+            } else {
+              Log.w(LOG_TAG, ("program already defined: " + title));
+            }
+          } else {
+            Log.w(LOG_TAG, ("program not a JSON object: " + title));
+          }
         }
       }
     }.load(RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);

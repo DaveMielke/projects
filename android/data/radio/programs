@@ -1,0 +1,26 @@
+{
+  "The Bible": {
+    "book": "The Bible"
+  },
+
+  "Christian Music and Bible Reading": {
+    "book": "The Bible",
+    "music": "Christian Music",
+    "hours": true
+  },
+
+  "Musical Portraits": {
+    "music": "Musical Portraits",
+    "hours": true
+  },
+
+  "Guy Lombardo": {
+    "music": "Guy Lombardo",
+    "hours": true
+  },
+
+  "National Anthems": {
+    "music": "National Anthems",
+    "hours": true
+  }
+}
