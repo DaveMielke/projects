@@ -6,8 +6,10 @@ import java.util.HashMap;
 
 import java.io.File;
 
-import cc.mielke.dave.android.base.PropertiesLoader;
-import java.util.Properties;
+import cc.mielke.dave.android.base.JSONLoader;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import java.util.Iterator;
 
 import android.util.Log;
 
@@ -35,11 +37,14 @@ public abstract class CollectionLibrary extends RadioComponent {
   }
 
   private final void addCollections (String type) {
-    new PropertiesLoader() {
+    new JSONLoader() {
       @Override
-      public void load (Properties properties, String name) {
-        for (String title : properties.stringPropertyNames()) {
-          addCollection(title, properties.getProperty(title, null));
+      public void load (JSONObject object, String name) {
+        Iterator<String> iterator = object.keys();
+
+        while (iterator.hasNext()) {
+          String title = iterator.next();
+          addCollection(title, object.optString(title, null));
         }
       }
     }.load(type);
