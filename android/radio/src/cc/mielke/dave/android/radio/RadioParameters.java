@@ -9,6 +9,7 @@ public abstract class RadioParameters {
   public final static String MUSIC_LIBRARY_FILE = "music";
   public final static String BOOK_LIBRARY_FILE = "books";
   public final static String RADIO_PROGRAMS_SUBDIRECTORY = "Programs";
+  public final static String RADIO_STATIONS_FILE = "stations";
 
   public final static String[] AUDIO_EXTENSIONS = new String[] {
     ".mp3", ".mid"

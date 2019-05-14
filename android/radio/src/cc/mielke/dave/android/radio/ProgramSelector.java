@@ -129,7 +129,7 @@ public class ProgramSelector extends ActivityComponent {
           protected void load (JSONObject object, String name) {
             selectStation(object);
           }
-        }.load("stations");
+        }.load(RadioParameters.RADIO_STATIONS_FILE);
       }
     };
 
