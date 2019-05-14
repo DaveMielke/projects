@@ -16,6 +16,7 @@ public abstract class RadioParameters {
   };
 
   public final static long PROGRAM_DEFAULT_DELAY = TimeUnit.MINUTES.toMillis(20);
+  public final static long STATION_RETRY_DELAY = TimeUnit.MINUTES.toMillis(1);
 
   public final static long BOOK_INITIAL_DELAY = TimeUnit.MINUTES.toMillis(9);
   public final static long BOOK_BASE_DELAY = TimeUnit.MINUTES.toMillis(8);
