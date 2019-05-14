@@ -32,6 +32,7 @@ public abstract class UriPlayer extends RadioPlayer {
       uriWatcher.onUriChange(null);
       uriWatcher.onPlayPauseChange(null);
       uriWatcher.onDurationChange(0);
+      uriWatcher.onPositionChange(0);
 
       onRadioPlayerFinished(player);
     }

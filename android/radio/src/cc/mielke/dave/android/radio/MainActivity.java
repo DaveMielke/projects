@@ -87,6 +87,9 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onPositionChange (int milliseconds) {
+        boolean visible = milliseconds > 0;
+        setVisible(uriSeekView, visible);
+
         if (ApiTests.haveNougat) {
           uriSeekBar.setProgress(milliseconds, true);
         } else {
@@ -99,9 +102,12 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onDurationChange (int milliseconds) {
-        boolean visible = milliseconds > 0;
-        setVisible(uriSeekView, visible);
+        if (milliseconds < 0) milliseconds = 0;
         uriSeekBar.setMax(milliseconds);
+
+        boolean visible = milliseconds > 0;
+        setVisible(uriSeekBar, visible);
+        setVisible(uriSeekRemaining, visible);
         if (!visible) uriSeekBar.setProgress(0);
       }
     };
