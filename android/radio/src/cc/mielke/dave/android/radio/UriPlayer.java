@@ -1,12 +1,9 @@
 package cc.mielke.dave.android.radio;
 
-import java.io.IOException;
-
-import cc.mielke.dave.android.base.ApiTests;
-
 import android.util.Log;
 
-import android.media.MediaPlayer;
+import cc.mielke.dave.android.base.ApiTests;
+import cc.mielke.dave.android.base.StreamPlayer;
 import android.media.AudioAttributes;
 import android.net.Uri;
 
@@ -18,7 +15,6 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private final static UriWatcher uriWatcher = new UriWatcher();;
-  private final static MediaPlayer mediaPlayer = new MediaPlayer();
 
   public static UriWatcher getWatcher () {
     return uriWatcher;
@@ -46,213 +42,65 @@ public abstract class UriPlayer extends RadioPlayer {
     return AudioFocus.requestAudioFocus(false);
   }
 
-  private final static MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
-    new MediaPlayer.OnCompletionListener() {
+  private final static StreamPlayer streamPlayer =
+    new StreamPlayer(getContext()) {
       @Override
-      public void onCompletion (MediaPlayer player) {
-        if (RadioParameters.LOG_URI_PLAYER) {
-          Log.d(LOG_TAG, "media layer finished");
+      protected boolean getLogEvents () {
+        return RadioParameters.LOG_URI_PLAYER;
+      }
+
+      @Override
+      protected boolean onPlayerPrepared () {
+        synchronized (AUDIO_LOCK) {
+          uriWatcher.onPlayPauseChange(true);
+          uriWatcher.onDurationChange(streamPlayer.getDuration());
+          uriWatcher.onPositionChange(0);
         }
 
+        if (requestAudioFocus()) {
+          PositionMonitor.StopReason.INACTIVE.start();
+          return true;
+        } else {
+          onUriPlayerFinished();
+        }
+
+        return false;
+      }
+
+      @Override
+      protected boolean onPlayerInfo (int info, int extra) {
+        return false;
+      }
+
+      @Override
+      protected boolean onPlayerError (int error, int extra) {
+        return false;
+      }
+
+      @Override
+      protected void onPlayerFinished () {
         onUriPlayerFinished();
       }
     };
 
-  private final static MediaPlayer.OnInfoListener mediaPlayerInfoListener =
-    new MediaPlayer.OnInfoListener() {
-      private final Integer getInfoMessage (int info) {
-        switch (info) {
-          case MediaPlayer.MEDIA_INFO_AUDIO_NOT_PLAYING:
-            return R.string.media_info_no_audio;
-
-          case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-            return R.string.media_info_bad_interleaving;
-
-          case MediaPlayer.MEDIA_INFO_BUFFERING_END:
-            return R.string.media_info_buffering_finished;
-
-          case MediaPlayer.MEDIA_INFO_BUFFERING_START:
-            return R.string.media_info_buffering_started;
-
-          case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-            return R.string.media_info_metadata_change;
-
-          case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
-            return R.string.media_info_not_seekable;
-
-          case MediaPlayer.MEDIA_INFO_STARTED_AS_NEXT:
-            return R.string.media_info_next_player_started;
-
-          case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT:
-            return R.string.media_info_subtitle_timeout;
-
-          case MediaPlayer.MEDIA_INFO_UNKNOWN:
-            return R.string.media_info_unspecified;
-
-          case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE:
-            return R.string.media_info_subtitle_unsupported;
-
-          case MediaPlayer.MEDIA_INFO_VIDEO_NOT_PLAYING:
-            return R.string.media_info_no_video;
-
-          case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START:
-            return R.string.media_info_video_started;
-
-          case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-            return R.string.media_info_video_lagging;
-
-          default:
-            return null;
-        }
-      }
-
-      @Override
-      public boolean onInfo (MediaPlayer player, int info, int extra) {
-        StringBuilder log = new StringBuilder();
-        log.append("media player info ");
-        log.append(info);
-        log.append('.');
-        log.append(extra);
-
-        {
-          Integer message = getInfoMessage(info);
-
-          if (message != null) {
-            log.append(": ");
-            log.append(getResources().getString(message));
-          }
-        }
-
-        Log.d(LOG_TAG, log.toString());
-        return false;
-      }
-    };
-
-  private final static MediaPlayer.OnErrorListener mediaPlayerErrorListener =
-    new MediaPlayer.OnErrorListener() {
-      private final Integer getErrorMessage (int error) {
-        switch (error) {
-          case MediaPlayer.MEDIA_ERROR_IO:
-            return R.string.media_error_input_output;
-
-          case MediaPlayer.MEDIA_ERROR_MALFORMED:
-            return R.string.media_error_bad_stream;
-
-          case MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK:
-            return R.string.media_error_not_progressive;
-
-          case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
-            return R.string.media_error_server_died;
-
-          case MediaPlayer.MEDIA_ERROR_TIMED_OUT:
-            return R.string.media_error_operation_timeout;
-
-          case MediaPlayer.MEDIA_ERROR_UNKNOWN:
-            return R.string.media_error_unknown;
-
-          case MediaPlayer.MEDIA_ERROR_UNSUPPORTED:
-            return R.string.media_error_unsupported_feature;
-
-          default:
-            return null;
-        }
-      }
-
-      @Override
-      public boolean onError (MediaPlayer player, int error, int extra) {
-        StringBuilder log = new StringBuilder();
-        log.append("media player error ");
-        log.append(error);
-        log.append('.');
-        log.append(extra);
-
-        {
-          Integer message = getErrorMessage(error);
-
-          if (message != null) {
-            log.append(": ");
-            log.append(getResources().getString(message));
-          }
-        }
-
-        Log.e(LOG_TAG, log.toString());
-        return false;
-      }
-    };
-
-  private final static MediaPlayer.OnPreparedListener mediaPlayerPreparedListener =
-    new MediaPlayer.OnPreparedListener() {
-      @Override
-      public void onPrepared (MediaPlayer player) {
-        if (RadioParameters.LOG_URI_PLAYER) {
-          Log.d(LOG_TAG, "media layer prepared");
-        }
-
-        synchronized (AUDIO_LOCK) {
-          uriWatcher.onPlayPauseChange(true);
-          uriWatcher.onDurationChange(mediaPlayer.getDuration());
-          uriWatcher.onPositionChange(0);
-        }
-
-        if (RadioParameters.LOG_URI_PLAYER) {
-          Log.d(LOG_TAG, "starting media player");
-        }
-
-        if (requestAudioFocus()) {
-          mediaPlayer.start();
-          PositionMonitor.StopReason.INACTIVE.start();
-        } else {
-          onUriPlayerFinished();
-        }
-      }
-    };
-
-  static {
-    mediaPlayer.setOnInfoListener(mediaPlayerInfoListener);
-    mediaPlayer.setOnErrorListener(mediaPlayerErrorListener);
-    mediaPlayer.setOnPreparedListener(mediaPlayerPreparedListener);
-    mediaPlayer.setOnCompletionListener(mediaPlayerCompletionListener);
-  }
-
   public static int getPosition () {
     synchronized (AUDIO_LOCK) {
-      return mediaPlayer.getCurrentPosition();
+      return streamPlayer.getPosition();
     }
   }
 
   public static void setPosition (int milliseconds) {
     synchronized (AUDIO_LOCK) {
-      mediaPlayer.seekTo(milliseconds);
+      streamPlayer.setPosition(milliseconds);
     }
   }
 
   protected final boolean play (Uri uri, int audioContentType) {
     if (uri == null) return false;
-
-    if (RadioParameters.LOG_URI_PLAYER) {
-      Log.d(LOG_TAG, "resetting media player");
-    }
-
-    mediaPlayer.reset();
     logPlaying("URI", uri.toString());
 
     synchronized (AUDIO_LOCK) {
-      try {
-        if (RadioParameters.LOG_URI_PLAYER) {
-          Log.d(LOG_TAG, ("setting media player data source: " + uri.toString()));
-        }
-
-        mediaPlayer.setDataSource(getContext(), uri);
-      } catch (IOException exception) {
-        Log.w(LOG_TAG,
-          String.format(
-            "media player source error: %s: %s",
-            uri.toString(), exception.getMessage()
-          )
-        );
-
-        return false;
-      }
+      if (!streamPlayer.setSource(uri)) return false;
 
       if (ApiTests.HAVE_AudioAttributes) {
         AudioAttributes attributes = new AudioAttributes.Builder()
@@ -261,15 +109,11 @@ public abstract class UriPlayer extends RadioPlayer {
           .build();
 
         AudioFocus.setAudioAttributes(attributes);
-        mediaPlayer.setAudioAttributes(attributes);
-      }
-
-      if (RadioParameters.LOG_URI_PLAYER) {
-        Log.d(LOG_TAG, "preparing media player");
+        streamPlayer.setAudioAttributes(attributes);
       }
 
       onPlayStart();
-      mediaPlayer.prepareAsync();
+      streamPlayer.startPlayer();
       uriWatcher.onUriChange(uri);
       return true;
     }
@@ -283,8 +127,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       synchronized (AUDIO_LOCK) {
-        mediaPlayer.stop();
-        mediaPlayer.reset();
+        streamPlayer.stopPlayer();
         onUriPlayerFinished(this);
       }
     } finally {
@@ -293,8 +136,8 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private final void suspendPlayer (boolean pause) {
-    if (mediaPlayer.isPlaying()) {
-      mediaPlayer.pause();
+    if (streamPlayer.isPlaying()) {
+      streamPlayer.suspendPlayer();
       PositionMonitor.StopReason.PAUSE.stop();
     }
 
@@ -306,7 +149,7 @@ public abstract class UriPlayer extends RadioPlayer {
 
   private final boolean resumePlayer (boolean isPaused) {
     if (isPaused) {
-      if (mediaPlayer.isPlaying()) {
+      if (streamPlayer.isPlaying()) {
         throw new IllegalStateException("playing without audio focus");
       }
 
@@ -314,7 +157,7 @@ public abstract class UriPlayer extends RadioPlayer {
       uriWatcher.onPlayPauseChange(true);
     }
 
-    mediaPlayer.start();
+    streamPlayer.resumePlayer();
     PositionMonitor.StopReason.PAUSE.start();
     return true;
   }
@@ -349,7 +192,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionSuspend () {
     synchronized (AUDIO_LOCK) {
       if (!AudioFocus.isAudioFocusActive()) return false;
-      if (!mediaPlayer.isPlaying()) return false;
+      if (!streamPlayer.isPlaying()) return false;
       suspendPlayer(false);
       return true;
     }
@@ -359,7 +202,7 @@ public abstract class UriPlayer extends RadioPlayer {
   protected final boolean actionResume () {
     synchronized (AUDIO_LOCK) {
       if (!AudioFocus.isAudioFocusActive()) return false;
-      if (mediaPlayer.isPlaying()) return false;
+      if (streamPlayer.isPlaying()) return false;
       return resumePlayer(false);
     }
   }
