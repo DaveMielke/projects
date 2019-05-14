@@ -6,12 +6,15 @@ import java.util.HashMap;
 import cc.mielke.dave.android.base.JSONLoader;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import org.json.JSONException;
+
+import android.util.Log;
 
 import android.widget.Button;
 import android.content.DialogInterface;
 
 public class ProgramSelector extends ActivityComponent {
+  private final static String LOG_TAG = ProgramSelector.class.getName();
+
   private final Button selectorButton;
 
   private final void updateButtonText () {
@@ -73,16 +76,20 @@ public class ProgramSelector extends ActivityComponent {
 
       private final Map<String, RadioProgram> stationPrograms = new HashMap<>();
 
-      private final void selectStation (final JSONObject object) {
-        final JSONArray names = object.names();
-        final int count = names.length();
-        final String[] items = new String[count];
+      private final void selectStation (final JSONObject stations, final StringBuilder label) {
+        final String[] items;
 
-        for (int index=0; index<count; index+=1) {
-          items[index] = names.optString(index, "");
+        {
+          JSONArray names = stations.names();
+          int count = names.length();
+          items = new String[count];
+
+          for (int index=0; index<count; index+=1) {
+            items[index] = names.optString(index, "");
+          }
+
+          sort(items);
         }
-
-        sort(items);
 
         mainActivity.selectItem(
           R.string.action_selectStation, items,
@@ -90,31 +97,41 @@ public class ProgramSelector extends ActivityComponent {
             @Override
             public void onClick (DialogInterface dialog, int position) {
               String name = items[position];
+              JSONObject station = stations.optJSONObject(name);
 
-              {
-                JSONObject stations = object.optJSONObject(name);
+              if (station == null) {
+                Log.w(LOG_TAG, ("station not a JSON object: " + name));
+              } else {
+                {
+                  String string = station.optString("short", name);
 
-                if (stations != null) {
-                  selectStation(stations);
-                  return;
+                  if (!string.isEmpty()) {
+                    if (label.length() > 0) label.append(' ');
+                    label.append(string);
+                  }
                 }
-              }
 
-              {
-                String url = object.optString(name, null);
+                String key = "listen";
+                Object object = station.opt(key);
 
-                if (url != null) {
+                if (object == null) {
+                  Log.w(LOG_TAG, (key + " not specified: " + name));
+                } else if (object instanceof String) {
+                  String url = (String)object;
                   RadioProgram program = stationPrograms.get(url);
 
                   if (program == null) {
                     program = new RadioProgram();
-                    program.setName(name);
+                    program.setName(label.toString());
                     program.addPlayers(new StationPlayer(url));
                     stationPrograms.put(url, program);
                   }
 
                   setProgram(program);
-                  return;
+                } else if (object instanceof JSONObject) {
+                  selectStation((JSONObject)object, label);
+                } else {
+                  Log.w(LOG_TAG, (key + " specified incorrectly: " + name));
                 }
               }
             }
@@ -127,7 +144,7 @@ public class ProgramSelector extends ActivityComponent {
         new JSONLoader() {
           @Override
           protected void load (JSONObject object, String name) {
-            selectStation(object);
+            selectStation(object, new StringBuilder());
           }
         }.load(RadioParameters.RADIO_STATIONS_FILE);
       }
