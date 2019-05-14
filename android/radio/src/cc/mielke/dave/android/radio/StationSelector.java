@@ -7,8 +7,6 @@ import org.json.JSONException;
 
 import android.content.DialogInterface;
 
-import android.net.Uri;
-
 public class StationSelector extends ActivityComponent {
   public StationSelector (MainActivity activity) {
     super(activity);
@@ -45,7 +43,7 @@ public class StationSelector extends ActivityComponent {
             String url = object.optString(name, null);
 
             if (url != null) {
-              Uri uri = Uri.parse(url);
+              RadioPlayer player = new StationPlayer(url);
               return;
             }
           }
