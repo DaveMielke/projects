@@ -45,7 +45,7 @@ public class RadioPrograms extends RadioComponent {
           }
         }
       }
-    }.load(RadioParameters.RADIO_PROGRAMS_SUBDIRECTORY);
+    }.load(RadioParameters.RADIO_PROGRAMS_FILE);
   }
 
   public RadioPrograms () {

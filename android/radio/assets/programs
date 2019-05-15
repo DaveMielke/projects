@@ -1,0 +1,9 @@
+{
+  "Announce Each Hour": {
+    "hours": true
+  },
+
+  "Announce Each Minute": {
+    "minutes": true
+  }
+}

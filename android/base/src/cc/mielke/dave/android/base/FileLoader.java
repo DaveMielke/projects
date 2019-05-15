@@ -22,15 +22,11 @@ public abstract class FileLoader extends BaseComponent {
 
   private final void load (File file) {
     if (file.exists()) {
-      if (file.isDirectory()) {
-        String[] names = file.list();
-
-        if (names != null) {
-          for (String name : names) {
-            load(new File(file, name));
-          }
-        }
-      } else if (file.isFile()) {
+      if (!file.isFile()) {
+        Log.w(LOG_TAG, ("not a file: " + file.getAbsolutePath()));
+      } else if (!file.canRead()) {
+        Log.w(LOG_TAG, ("file not readable: " + file.getAbsolutePath()));
+      } else {
         try {
           InputStream stream = new FileInputStream(file);
           try {
@@ -55,28 +51,18 @@ public abstract class FileLoader extends BaseComponent {
 
   private final void load (AssetManager assets, String path) {
     try {
-      String[] names = assets.list(path);
-
-      if ((names != null) && (names.length > 0)) {
-        for (String name : names) {
-          load(assets, (path + File.separatorChar + name));
-        }
-      } else {
+      InputStream stream = assets.open(path);
+      try {
+        load(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
+      } finally {
         try {
-          InputStream stream = assets.open(path);
-          try {
-            load(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
-          } finally {
-            try {
-              stream.close();
-            } catch (IOException exception) {
-              Log.w(LOG_TAG, ("asset input stream close error: " + exception.getMessage()));
-            }
-          }
-        } catch (FileNotFoundException exception) {
-          // ignore - opening an asset is the only way to test its existence
+          stream.close();
+        } catch (IOException exception) {
+          Log.w(LOG_TAG, ("asset input stream close error: " + exception.getMessage()));
         }
       }
+    } catch (FileNotFoundException exception) {
+      // ignore - opening an asset is the only way to test its existence
     } catch (IOException exception) {
       Log.w(LOG_TAG, ("asset open error: " + exception.getMessage()));
     }
