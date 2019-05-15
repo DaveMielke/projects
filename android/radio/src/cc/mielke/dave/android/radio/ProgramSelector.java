@@ -144,12 +144,26 @@ public class ProgramSelector extends ActivityComponent {
 
       @Override
       public void performAction () {
-        new JSONLoader() {
+        new AsyncTask<Object, Object, Object>() {
+          private JSONObject radioStations = null;
+
           @Override
-          protected void load (JSONObject root, String name) {
-            selectStation(root, new StringBuilder());
+          protected Object doInBackground (Object... arguments) {
+            new JSONLoader() {
+              @Override
+              protected void load (JSONObject root, String name) {
+                radioStations = root;
+              }
+            }.load(RadioParameters.RADIO_STATIONS_FILE);
+
+            return null;
           }
-        }.load(RadioParameters.RADIO_STATIONS_FILE);
+
+          @Override
+          protected void onPostExecute (Object result) {
+            selectStation(radioStations, new StringBuilder());
+          }
+        }.execute();
       }
     };
 
@@ -168,6 +182,7 @@ public class ProgramSelector extends ActivityComponent {
         return null;
       }
 
+      @Override
       protected void onPostExecute (Object result) {
         String[] names = getProgramNames();
         sort(names);
