@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import android.util.Log;
+import android.os.AsyncTask;
 
 import android.widget.Button;
 import android.content.DialogInterface;
@@ -17,9 +18,7 @@ public class ProgramSelector extends ActivityComponent {
 
   private final Button selectorButton;
 
-  private final void updateButtonText () {
-    RadioProgram program = getRadioProgram();
-
+  private final void updateButtonText (RadioProgram program) {
     if (program != null) {
       selectorButton.setText(program.getName());
     } else {
@@ -27,13 +26,17 @@ public class ProgramSelector extends ActivityComponent {
     }
   }
 
+  private final void updateButtonText () {
+    updateButtonText(CurrentProgram.get());
+  }
+
   private final void setProgram (RadioProgram program) {
-    getRadioPrograms().setProgram(program);
-    updateButtonText();
+    CurrentProgram.set(program);
+    updateButtonText(program);
   }
 
   private final void setProgram (String name) {
-    setProgram(getRadioPrograms().getProgram(name));
+    setProgram(getPrograms().getProgram(name));
   }
 
   public ProgramSelector (MainActivity activity) {
@@ -44,7 +47,7 @@ public class ProgramSelector extends ActivityComponent {
   }
 
   private final String[] getProgramNames () {
-    String[] names = getRadioPrograms().getNames();
+    String[] names = getPrograms().getNames();
     if (names == null) names = new String[]{};
     return names;
   }
@@ -156,34 +159,46 @@ public class ProgramSelector extends ActivityComponent {
   };
 
   public final void selectProgram () {
-    String[] names = getProgramNames();
-    sort(names);
-
-    final int actionCount = actions.length;
-    final String[] items = new String[actionCount + names.length];
-
-    {
-      int index = 0;
-
-      for (Action action : actions) {
-        items[index++] = getString(action.getName());
+    new AsyncTask<Object, Object, Object>() {
+      @Override
+      protected Object doInBackground (Object... arguments) {
+        RadioApplication.updateMusicLibrary();
+        RadioApplication.updateBookLibrary();
+        RadioApplication.updateRadioPrograms();
+        return null;
       }
 
-      System.arraycopy(names, 0, items, index, names.length);
-    }
+      protected void onPostExecute (Object result) {
+        String[] names = getProgramNames();
+        sort(names);
 
-    mainActivity.selectItem(
-      R.string.action_selectProgram, items,
-      new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick (DialogInterface dialog, int position) {
-          if (position < actionCount) {
-            actions[position].performAction();
-          } else {
-            setProgram(items[position]);
+        final int actionCount = actions.length;
+        final String[] items = new String[actionCount + names.length];
+
+        {
+          int index = 0;
+
+          for (Action action : actions) {
+            items[index++] = getString(action.getName());
           }
+
+          System.arraycopy(names, 0, items, index, names.length);
         }
+
+        mainActivity.selectItem(
+          R.string.action_selectProgram, items,
+          new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick (DialogInterface dialog, int position) {
+              if (position < actionCount) {
+                actions[position].performAction();
+              } else {
+                setProgram(items[position]);
+              }
+            }
+          }
+        );
       }
-    );
+    }.execute();
   }
 }

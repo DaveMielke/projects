@@ -14,7 +14,6 @@ public class RadioPrograms extends RadioComponent {
   private final static String LOG_TAG = RadioPrograms.class.getName();
 
   private final static Map<String, RadioProgram> programs = new HashMap<>();
-  private RadioProgram currentProgram = null;
 
   private final void addPrograms () {
     new JSONLoader() {
@@ -64,39 +63,5 @@ public class RadioPrograms extends RadioComponent {
     synchronized (this) {
       return programs.get(name);
     }
-  }
-
-  public final RadioProgram getProgram () {
-    synchronized (this) {
-      return currentProgram;
-    }
-  }
-
-  private final String getProgramName () {
-    return RadioProgram.getExternalName(currentProgram);
-  }
-
-  public final RadioPrograms setProgram (RadioProgram newProgram) {
-    synchronized (this) {
-      if (newProgram != currentProgram) {
-        StringBuilder log = new StringBuilder("changing program: ");
-
-        log.append(getProgramName());
-        if (currentProgram != null) currentProgram.stop();
-
-        currentProgram = newProgram;
-        log.append(" -> ");
-        log.append(getProgramName());
-        Log.i(LOG_TAG, log.toString());
-
-        if (currentProgram != null) {
-          currentProgram.start();
-        } else {
-          updateNotification();
-        }
-      }
-    }
-
-    return this;
   }
 }

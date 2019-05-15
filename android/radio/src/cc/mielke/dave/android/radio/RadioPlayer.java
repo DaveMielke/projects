@@ -44,6 +44,12 @@ public abstract class RadioPlayer extends AudioComponent {
     }
   }
 
+  private static RadioPlayer getCurrentPlayer () {
+    RadioProgram program = CurrentProgram.get();
+    if (program == null) return null;
+    return program.getCurrentPlayer();
+  }
+
   protected boolean actionPlayPause () {
     return false;
   }
@@ -150,7 +156,7 @@ public abstract class RadioPlayer extends AudioComponent {
 
     public final boolean perform () {
       synchronized (AUDIO_LOCK) {
-        RadioPlayer player = getRadioPlayer();
+        RadioPlayer player = getCurrentPlayer();
         if (player == null) return false;
         return actionPerformer.perform(player);
       }
@@ -306,7 +312,7 @@ public abstract class RadioPlayer extends AudioComponent {
     if (ApiTests.HAVE_AudioAttributes) AudioFocus.setAudioAttributes(null);
 
     if (player == null) {
-      player = getRadioPlayer();
+      player = getCurrentPlayer();
     }
 
     if (player != null) {

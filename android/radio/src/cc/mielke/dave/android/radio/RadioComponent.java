@@ -17,24 +17,12 @@ public abstract class RadioComponent extends BaseComponent {
     return RadioApplication.getBookLibrary();
   }
 
-  protected static RadioPrograms getRadioPrograms () {
+  protected static RadioPrograms getPrograms () {
     return RadioApplication.getRadioPrograms();
   }
 
-  protected static RadioProgram getRadioProgram () {
-    RadioPrograms programs = getRadioPrograms();
-    if (programs == null) return null;
-    return programs.getProgram();
-  }
-
-  protected static RadioPlayer getRadioPlayer () {
-    RadioProgram program = getRadioProgram();
-    if (program == null) return null;
-    return program.getCurrentPlayer();
-  }
-
   protected static void updateNotification (CharSequence title, CharSequence text) {
-    if (getRadioProgram() == null) {
+    if (CurrentProgram.get() == null) {
       title = getString(R.string.state_noProgram);
       text = null;
     }
