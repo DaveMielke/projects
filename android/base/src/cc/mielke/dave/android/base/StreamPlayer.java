@@ -19,7 +19,7 @@ public class StreamPlayer {
     return false;
   }
 
-  protected boolean onPlayerPrepared () {
+  protected boolean onPlayerStart () {
     return true;
   }
 
@@ -34,6 +34,16 @@ public class StreamPlayer {
   protected void onPlayerFinished () {
   }
 
+  private final void resetPlayer () {
+    synchronized (this) {
+      if (getLogEvents()) {
+        Log.d(LOG_TAG, "resetting media player");
+      }
+
+      mediaPlayer.reset();
+    }
+  }
+
   private final MediaPlayer.OnCompletionListener mediaPlayerCompletionListener =
     new MediaPlayer.OnCompletionListener() {
       @Override
@@ -46,7 +56,7 @@ public class StreamPlayer {
       }
     };
 
-  public final Integer getInfoMessage (int info) {
+  public static Integer getInfoMessage (int info) {
     switch (info) {
       case MediaPlayer.MEDIA_INFO_AUDIO_NOT_PLAYING:
         return R.string.media_info_no_audio;
@@ -116,7 +126,7 @@ public class StreamPlayer {
       }
     };
 
-  public final Integer getErrorMessage (int error) {
+  public static Integer getErrorMessage (int error) {
     switch (error) {
       case MediaPlayer.MEDIA_ERROR_IO:
         return R.string.media_error_input_output;
@@ -176,7 +186,7 @@ public class StreamPlayer {
           Log.d(LOG_TAG, "media player prepared");
         }
 
-        if (onPlayerPrepared()) {
+        if (onPlayerStart()) {
           if (getLogEvents()) {
             Log.d(LOG_TAG, "starting media player");
           }
@@ -201,16 +211,6 @@ public class StreamPlayer {
   public void setPosition (int milliseconds) {
     synchronized (this) {
       mediaPlayer.seekTo(milliseconds);
-    }
-  }
-
-  private final void resetPlayer () {
-    synchronized (this) {
-      if (getLogEvents()) {
-        Log.d(LOG_TAG, "resetting media player");
-      }
-
-      mediaPlayer.reset();
     }
   }
 
@@ -244,7 +244,7 @@ public class StreamPlayer {
     }
   }
 
-  public final void startPlayer () {
+  public final void start () {
     synchronized (this) {
       if (getLogEvents()) {
         Log.d(LOG_TAG, "preparing media player");
@@ -254,7 +254,7 @@ public class StreamPlayer {
     }
   }
 
-  public final void stopPlayer () {
+  public final void stop () {
     synchronized (this) {
       mediaPlayer.stop();
       resetPlayer();
@@ -267,13 +267,13 @@ public class StreamPlayer {
     }
   }
 
-  public final void suspendPlayer () {
+  public final void suspend () {
     synchronized (this) {
       mediaPlayer.pause();
     }
   }
 
-  public final void resumePlayer () {
+  public final void resume () {
     synchronized (this) {
       mediaPlayer.start();
     }

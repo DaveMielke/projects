@@ -50,7 +50,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       @Override
-      protected boolean onPlayerPrepared () {
+      protected boolean onPlayerStart () {
         synchronized (AUDIO_LOCK) {
           uriWatcher.onPlayPauseChange(true);
           uriWatcher.onDurationChange(streamPlayer.getDuration());
@@ -115,8 +115,8 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       onPlayStart();
-      streamPlayer.startPlayer();
       uriWatcher.onUriChange(uri);
+      streamPlayer.start();
       return true;
     }
   }
@@ -129,7 +129,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       synchronized (AUDIO_LOCK) {
-        streamPlayer.stopPlayer();
+        streamPlayer.stop();
         onUriPlayerFinished(this);
       }
     } finally {
@@ -139,7 +139,7 @@ public abstract class UriPlayer extends RadioPlayer {
 
   private final void suspendPlayer (boolean pause) {
     if (streamPlayer.isPlaying()) {
-      streamPlayer.suspendPlayer();
+      streamPlayer.suspend();
       PositionMonitor.StopReason.PAUSE.stop();
     }
 
@@ -159,7 +159,7 @@ public abstract class UriPlayer extends RadioPlayer {
       uriWatcher.onPlayPauseChange(true);
     }
 
-    streamPlayer.resumePlayer();
+    streamPlayer.resume();
     PositionMonitor.StopReason.PAUSE.start();
     return true;
   }
