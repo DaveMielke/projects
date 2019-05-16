@@ -13,13 +13,53 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected final String getString (JSONObject object, String key, CharSequence label) {
-    Object string = object.remove(key);
-    if (string == null) return null;
-    if (string instanceof String) return (String)string;
+  protected final String[] getNames (JSONObject object) {
+    String[] names = new String[object.length()];
+    Iterator<String> iterator = object.keys();
+    int index = 0;
 
-    Log.w(LOG_TAG, ("\"" + key + "\" is not a string: " + label));
+    while (iterator.hasNext()) {
+      names[index++] = iterator.next();
+    }
+
+    return names;
+  }
+
+  private final void logUnexpectedType (String type, String key, CharSequence label) {
+    StringBuilder log = new StringBuilder();
+
+    log.append("not a ");
+    log.append(type);
+
+    log.append(": ");
+    log.append(key);
+
+    log.append(": ");
+    log.append(label);
+
+    Log.w(LOG_TAG, log.toString());
+  }
+
+  protected final String getString (JSONObject object, String key, CharSequence label) {
+    Object value = object.remove(key);
+
+    if (value != null) {
+      if (value instanceof String) return (String)value;
+      logUnexpectedType("string", key, label);
+    }
+
     return null;
+  }
+
+  protected final boolean getBoolean (JSONObject object, String key, CharSequence label) {
+    Object value = object.remove(key);
+
+    if (value != null) {
+      if (value instanceof Boolean) return (Boolean)value;
+      logUnexpectedType("boolean", key, label);
+    }
+
+    return false;
   }
 
   protected final void logUnhandledKeys (JSONObject object, CharSequence label) {

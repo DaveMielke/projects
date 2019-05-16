@@ -3,7 +3,6 @@ package cc.mielke.dave.android.radio;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import android.util.Log;
 
@@ -98,10 +97,8 @@ public class RadioStations extends RadioComponent {
 
       private final Group loadGroup (JSONObject stations, StringBuilder label) {
         Map<String, Entry> entries = new HashMap<>();
-        Iterator<String> iterator = stations.keys();
 
-        while (iterator.hasNext()) {
-          String name = iterator.next();
+        for (String name : getNames(stations)) {
           JSONObject element = stations.optJSONObject(name);
 
           int labelLength = label.length();

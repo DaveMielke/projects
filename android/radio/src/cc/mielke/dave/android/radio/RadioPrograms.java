@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import cc.mielke.dave.android.base.JSONLoader;
 import org.json.JSONObject;
-import java.util.Iterator;
 
 import android.util.Log;
 
@@ -19,20 +18,17 @@ public class RadioPrograms extends RadioComponent {
     new JSONLoader() {
       @Override
       protected void load (JSONObject root, String name) {
-        Iterator<String> titles = root.keys();
-
-        while (titles.hasNext()) {
-          String title = titles.next();
+        for (String title : getNames(root)) {
           JSONObject object = root.optJSONObject(title);
 
           if (object != null) {
             if (getProgram(title) == null) {
               RadioProgram program = new SimpleProgramBuilder()
                 .setProgramName(title)
-                .setMusicCollection(object.optString("music", null))
-                .setBookCollection(object.optString("book", null))
-                .setAnnounceHours(object.optBoolean("hours"))
-                .setAnnounceMinutes(object.optBoolean("minutes"))
+                .setMusicCollection(getString(object, "music", title))
+                .setBookCollection(getString(object, "book", title))
+                .setAnnounceHours(getBoolean(object, "hours", title))
+                .setAnnounceMinutes(getBoolean(object, "minutes", title))
                 .build();
 
               if (program != null) programs.put(title, program);

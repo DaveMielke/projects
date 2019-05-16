@@ -8,7 +8,6 @@ import java.io.File;
 
 import cc.mielke.dave.android.base.JSONLoader;
 import org.json.JSONObject;
-import java.util.Iterator;
 
 import android.util.Log;
 
@@ -39,11 +38,9 @@ public abstract class CollectionLibrary extends RadioComponent {
     new JSONLoader() {
       @Override
       public void load (JSONObject root, String name) {
-        Iterator<String> titles = root.keys();
-
-        while (titles.hasNext()) {
-          String title = titles.next();
-          addCollection(title, root.optString(title, null));
+        for (String title : getNames(root)) {
+          String directory = getString(root, title, name);
+          if (directory != null) addCollection(title, directory);
         }
       }
     }.load(type);
