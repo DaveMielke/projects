@@ -53,23 +53,23 @@ public abstract class JSONLoader extends StringLoader {
     return object.remove(key);
   }
 
-  protected final JSONObject getJSONObject (JSONObject object, String key, CharSequence label) {
+  protected final JSONObject getObject (JSONObject object, String key, CharSequence label) {
     Object value = getValue(object, key);
 
     if (value != null) {
       if (value instanceof JSONObject) return (JSONObject)value;
-      logUnexpectedType("JSON object", key, label);
+      logUnexpectedType("object", key, label);
     }
 
     return null;
   }
 
-  protected final JSONArray getJSONArray (JSONObject object, String key, CharSequence label) {
+  protected final JSONArray getArray (JSONObject object, String key, CharSequence label) {
     Object value = getValue(object, key);
 
     if (value != null) {
       if (value instanceof JSONArray) return (JSONArray)value;
-      logUnexpectedType("JSON array", key, label);
+      logUnexpectedType("array", key, label);
     }
 
     return null;
@@ -97,7 +97,7 @@ public abstract class JSONLoader extends StringLoader {
     return false;
   }
 
-  protected final int getInt (JSONObject object, String key, CharSequence label) {
+  protected final int getInteger (JSONObject object, String key, CharSequence label) {
     Object value = getValue(object, key);
 
     if (value != null) {

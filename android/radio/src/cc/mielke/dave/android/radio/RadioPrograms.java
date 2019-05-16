@@ -19,7 +19,7 @@ public class RadioPrograms extends RadioComponent {
       @Override
       protected void load (JSONObject root, String name) {
         for (String title : getKeys(root)) {
-          JSONObject object = getJSONObject(root, title, name);
+          JSONObject object = getObject(root, title, name);
           if (object == null) continue;
 
           if (getProgram(title) != null) {

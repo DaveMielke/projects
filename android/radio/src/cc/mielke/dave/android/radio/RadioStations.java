@@ -101,7 +101,7 @@ public class RadioStations extends RadioComponent {
         for (String name : getKeys(stations)) {
           int labelLength = label.length();
           appendToLabel(label, name);
-          JSONObject element = getJSONObject(stations, name, label);
+          JSONObject element = getObject(stations, name, label);
 
           if (element != null) {
             String key = "listen";
