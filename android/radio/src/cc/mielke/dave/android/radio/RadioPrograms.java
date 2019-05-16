@@ -19,24 +19,21 @@ public class RadioPrograms extends RadioComponent {
       @Override
       protected void load (JSONObject root, String name) {
         for (String title : getNames(root)) {
-          JSONObject object = root.optJSONObject(title);
+          JSONObject object = getJSONObject(root, title, name);
+          if (object == null) continue;
 
-          if (object != null) {
-            if (getProgram(title) == null) {
-              RadioProgram program = new SimpleProgramBuilder()
-                .setProgramName(title)
-                .setMusicCollection(getString(object, "music", title))
-                .setBookCollection(getString(object, "book", title))
-                .setAnnounceHours(getBoolean(object, "hours", title))
-                .setAnnounceMinutes(getBoolean(object, "minutes", title))
-                .build();
-
-              if (program != null) programs.put(title, program);
-            } else {
-              Log.w(LOG_TAG, ("program already defined: " + title));
-            }
+          if (getProgram(title) != null) {
+            Log.w(LOG_TAG, ("program already defined: " + title));
           } else {
-            Log.w(LOG_TAG, ("program not a JSON object: " + title));
+            RadioProgram program = new SimpleProgramBuilder()
+              .setProgramName(title)
+              .setMusicCollection(getString(object, "music", title))
+              .setBookCollection(getString(object, "book", title))
+              .setAnnounceHours(getBoolean(object, "hours", title))
+              .setAnnounceMinutes(getBoolean(object, "minutes", title))
+              .build();
+
+            if (program != null) programs.put(title, program);
           }
         }
       }

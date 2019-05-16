@@ -99,19 +99,16 @@ public class RadioStations extends RadioComponent {
         Map<String, Entry> entries = new HashMap<>();
 
         for (String name : getNames(stations)) {
-          JSONObject element = stations.optJSONObject(name);
-
           int labelLength = label.length();
           appendToLabel(label, name);
+          JSONObject element = getJSONObject(stations, name, label);
 
-          if (element == null) {
-            Log.w(LOG_TAG, ("not an object: " + label));
-          } else {
+          if (element != null) {
             String key = "listen";
             Object object = element.remove(key);
 
             if (object == null) {
-              Log.w(LOG_TAG, ("\"" + key + "\" has not been specified: " + label));
+              Log.w(LOG_TAG, ("\"" + key + "\" not specified: " + label));
             } else if (object instanceof String) {
               String url = (String)object;
 
@@ -133,7 +130,7 @@ public class RadioStations extends RadioComponent {
 
               entries.put(name, loadGroup((JSONObject)object, label));
             } else {
-              Log.w(LOG_TAG, ("\"" + key + "\" has been specified incorrectly: " + label));
+              Log.w(LOG_TAG, ("\"" + key + "\" specified incorrectly: " + label));
             }
 
             logUnhandledKeys(element, label);

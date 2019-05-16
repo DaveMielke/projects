@@ -30,14 +30,14 @@ public abstract class JSONLoader extends StringLoader {
     Iterator<String> iterator = object.keys();
 
     while (iterator.hasNext()) {
-      Log.w(LOG_TAG, ("key has not been handled: " + iterator.next() + ": " + label));
+      Log.w(LOG_TAG, ("key not handled: " + iterator.next() + ": " + label));
     }
   }
 
   private final void logUnexpectedType (String type, String key, CharSequence label) {
     StringBuilder log = new StringBuilder();
 
-    log.append("not a ");
+    log.append("not ");
     log.append(type);
 
     log.append(": ");
