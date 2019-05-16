@@ -18,7 +18,7 @@ public class RadioPrograms extends RadioComponent {
     new JSONLoader() {
       @Override
       protected void load (JSONObject root, String name) {
-        for (String title : getNames(root)) {
+        for (String title : getKeys(root)) {
           JSONObject object = getJSONObject(root, title, name);
           if (object == null) continue;
 

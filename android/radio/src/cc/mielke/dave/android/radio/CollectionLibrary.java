@@ -38,7 +38,7 @@ public abstract class CollectionLibrary extends RadioComponent {
     new JSONLoader() {
       @Override
       public void load (JSONObject root, String name) {
-        for (String title : getNames(root)) {
+        for (String title : getKeys(root)) {
           String directory = getString(root, title, name);
           if (directory != null) addCollection(title, directory);
         }

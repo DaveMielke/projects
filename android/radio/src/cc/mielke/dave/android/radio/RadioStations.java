@@ -98,7 +98,7 @@ public class RadioStations extends RadioComponent {
       private final Group loadGroup (JSONObject stations, StringBuilder label) {
         Map<String, Entry> entries = new HashMap<>();
 
-        for (String name : getNames(stations)) {
+        for (String name : getKeys(stations)) {
           int labelLength = label.length();
           appendToLabel(label, name);
           JSONObject element = getJSONObject(stations, name, label);

@@ -14,16 +14,16 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected final String[] getNames (JSONObject object) {
-    String[] names = new String[object.length()];
+  protected final String[] getKeys (JSONObject object) {
+    String[] keys = new String[object.length()];
     Iterator<String> iterator = object.keys();
     int index = 0;
 
     while (iterator.hasNext()) {
-      names[index++] = iterator.next();
+      keys[index++] = iterator.next();
     }
 
-    return names;
+    return keys;
   }
 
   protected final void logUnhandledKeys (JSONObject object, CharSequence label) {
