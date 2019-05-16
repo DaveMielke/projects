@@ -144,24 +144,28 @@ public class ProgramSelector extends ActivityComponent {
 
       @Override
       public void performAction () {
-        new AsyncTask<Object, Object, Object>() {
-          private JSONObject radioStations = null;
-
+        new AsyncTask<Object, Object, JSONObject>() {
           @Override
-          protected Object doInBackground (Object... arguments) {
+          protected JSONObject doInBackground (Object... arguments) {
+            class Stations {
+              public JSONObject root = null;
+            }
+
+            final Stations stations = new Stations();
+
             new JSONLoader() {
               @Override
               protected void load (JSONObject root, String name) {
-                radioStations = root;
+                stations.root = root;
               }
             }.load(RadioParameters.RADIO_STATIONS_FILE);
 
-            return null;
+            return stations.root;
           }
 
           @Override
-          protected void onPostExecute (Object result) {
-            selectStation(radioStations, new StringBuilder());
+          protected void onPostExecute (JSONObject stations) {
+            selectStation(stations, new StringBuilder());
           }
         }.execute();
       }
