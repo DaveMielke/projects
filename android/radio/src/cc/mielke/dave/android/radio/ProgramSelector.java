@@ -1,12 +1,5 @@
 package cc.mielke.dave.android.radio;
 
-import java.util.Map;
-import java.util.HashMap;
-
-import cc.mielke.dave.android.base.JSONLoader;
-import org.json.JSONObject;
-import org.json.JSONArray;
-
 import android.util.Log;
 import android.os.AsyncTask;
 
@@ -77,65 +70,22 @@ public class ProgramSelector extends ActivityComponent {
         return R.string.action_selectStation;
       }
 
-      private final Map<String, RadioProgram> stationPrograms = new HashMap<>();
-
-      private final void selectStation (final JSONObject stations, final StringBuilder label) {
-        final String[] items;
-
-        {
-          JSONArray names = stations.names();
-          int count = names.length();
-          items = new String[count];
-
-          for (int index=0; index<count; index+=1) {
-            items[index] = names.optString(index, "");
-          }
-
-          sort(items);
-        }
+      private final void selectStation (final RadioStations.Group group) {
+        final String[] names = group.getNames();
+        sort(names);
 
         mainActivity.selectItem(
-          R.string.action_selectStation, items,
+          R.string.action_selectStation, names,
           new DialogInterface.OnClickListener() {
             @Override
             public void onClick (DialogInterface dialog, int position) {
-              String name = items[position];
-              JSONObject station = stations.optJSONObject(name);
+              String name = names[position];
+              RadioStations.Entry entry = group.getEntry(name);
 
-              if (station == null) {
-                Log.w(LOG_TAG, ("station not a JSON object: " + name));
-              } else {
-                {
-                  String component = station.optString("label-component", name);
-
-                  if (!component.isEmpty()) {
-                    if (label.length() > 0) label.append(' ');
-                    label.append(component);
-                  }
-                }
-
-                String key = "listen";
-                Object object = station.opt(key);
-
-                if (object == null) {
-                  Log.w(LOG_TAG, (key + " not specified: " + name));
-                } else if (object instanceof String) {
-                  String url = (String)object;
-                  RadioProgram program = stationPrograms.get(url);
-
-                  if (program == null) {
-                    program = new RadioProgram();
-                    program.setName(label.toString());
-                    program.addPlayers(new StationPlayer(url));
-                    stationPrograms.put(url, program);
-                  }
-
-                  setProgram(program);
-                } else if (object instanceof JSONObject) {
-                  selectStation((JSONObject)object, label);
-                } else {
-                  Log.w(LOG_TAG, (key + " specified incorrectly: " + name));
-                }
+              if (entry instanceof RadioStations.Station) {
+                setProgram(((RadioStations.Station)entry).getProgram());
+              } else if (entry instanceof RadioStations.Group) {
+                selectStation((RadioStations.Group)entry);
               }
             }
           }
@@ -144,28 +94,15 @@ public class ProgramSelector extends ActivityComponent {
 
       @Override
       public void performAction () {
-        new AsyncTask<Object, Object, JSONObject>() {
+        new AsyncTask<Object, Object, RadioStations>() {
           @Override
-          protected JSONObject doInBackground (Object... arguments) {
-            class Stations {
-              public JSONObject root = null;
-            }
-
-            final Stations stations = new Stations();
-
-            new JSONLoader() {
-              @Override
-              protected void load (JSONObject root, String name) {
-                stations.root = root;
-              }
-            }.load(RadioParameters.RADIO_STATIONS_FILE);
-
-            return stations.root;
+          protected RadioStations doInBackground (Object... arguments) {
+            return new RadioStations();
           }
 
           @Override
-          protected void onPostExecute (JSONObject stations) {
-            selectStation(stations, new StringBuilder());
+          protected void onPostExecute (RadioStations stations) {
+            selectStation(stations.getRoot());
           }
         }.execute();
       }

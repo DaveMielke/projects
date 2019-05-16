@@ -13,7 +13,9 @@ import org.json.JSONObject;
 public class RadioStations extends RadioComponent {
   private final static String LOG_TAG = RadioStations.class.getName();
 
-  public abstract static class Entry {
+  private final Map<String, RadioProgram> urlPrograms = new HashMap<>();
+
+  public abstract class Entry {
     private final String entryLabel;
 
     protected Entry (String label) {
@@ -25,7 +27,7 @@ public class RadioStations extends RadioComponent {
     }
   }
 
-  public static class Station extends Entry {
+  public class Station extends Entry {
     private final String stationURL;
     private final String stationIdentifier;
 
@@ -42,9 +44,26 @@ public class RadioStations extends RadioComponent {
     public final String getIdentifier () {
       return stationIdentifier;
     }
+
+    public final RadioProgram getProgram () {
+      String url = getURL();
+
+      synchronized (urlPrograms) {
+        RadioProgram program = urlPrograms.get(url);
+
+        if (program == null) {
+          program = new RadioProgram();
+          program.setName(getLabel());
+          program.addPlayers(new StationPlayer(url));
+          urlPrograms.put(url, program);
+        }
+
+        return program;
+      }
+    }
   }
 
-  public static class Group extends Entry {
+  public class Group extends Entry {
     private final Map<String, Entry> groupEntries;
 
     public Group (String label, Map<String, Entry> entries) {
@@ -64,7 +83,6 @@ public class RadioStations extends RadioComponent {
 
   private Group rootGroup = null;
   private final Map<String, Station> identifiedStations = new HashMap<>();
-  private final Map<String, RadioProgram> radioPrograms = new HashMap<>();
 
   public final Group getRoot () {
     return rootGroup;
@@ -72,23 +90,6 @@ public class RadioStations extends RadioComponent {
 
   public final Station getStation (String identifier) {
     return identifiedStations.get(identifier);
-  }
-
-  public final RadioProgram getProgram (Station station) {
-    String url = station.getURL();
-
-    synchronized (radioPrograms) {
-      RadioProgram program = radioPrograms.get(url);
-
-      if (program == null) {
-        program = new RadioProgram();
-        program.setName(station.getLabel());
-        program.addPlayers(new StationPlayer(url));
-        radioPrograms.put(url, program);
-      }
-
-      return program;
-    }
   }
 
   private final Group loadGroup (JSONObject stations, StringBuilder label) {
