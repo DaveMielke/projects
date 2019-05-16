@@ -4,6 +4,7 @@ import android.util.Log;
 
 import cc.mielke.dave.android.base.ApiTests;
 import cc.mielke.dave.android.base.StreamPlayer;
+import cc.mielke.dave.android.base.AndroidMediaPlayer;
 import android.media.AudioAttributes;
 import android.net.Uri;
 
@@ -43,7 +44,7 @@ public abstract class UriPlayer extends RadioPlayer {
   }
 
   private final static StreamPlayer streamPlayer =
-    new StreamPlayer(getContext()) {
+    new AndroidMediaPlayer(getContext()) {
       @Override
       protected boolean getLogEvents () {
         return RadioParameters.LOG_URI_PLAYER;
@@ -65,16 +66,6 @@ public abstract class UriPlayer extends RadioPlayer {
 
           return false;
         }
-      }
-
-      @Override
-      protected boolean onPlayerInfo (int info, int extra) {
-        return super.onPlayerInfo(info, extra);
-      }
-
-      @Override
-      protected boolean onPlayerError (int error, int extra) {
-        return super.onPlayerError(error, extra);
       }
 
       @Override
