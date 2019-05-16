@@ -1,6 +1,7 @@
 package cc.mielke.dave.android.base;
 
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import java.util.Iterator;
 
@@ -25,6 +26,14 @@ public abstract class JSONLoader extends StringLoader {
     return names;
   }
 
+  protected final void logUnhandledKeys (JSONObject object, CharSequence label) {
+    Iterator<String> iterator = object.keys();
+
+    while (iterator.hasNext()) {
+      Log.w(LOG_TAG, ("key has not been handled: " + iterator.next() + ": " + label));
+    }
+  }
+
   private final void logUnexpectedType (String type, String key, CharSequence label) {
     StringBuilder log = new StringBuilder();
 
@@ -40,8 +49,34 @@ public abstract class JSONLoader extends StringLoader {
     Log.w(LOG_TAG, log.toString());
   }
 
+  private final Object getValue (JSONObject object, String key) {
+    return object.remove(key);
+  }
+
+  protected final JSONObject getJSONObject (JSONObject object, String key, CharSequence label) {
+    Object value = getValue(object, key);
+
+    if (value != null) {
+      if (value instanceof JSONObject) return (JSONObject)value;
+      logUnexpectedType("JSON object", key, label);
+    }
+
+    return null;
+  }
+
+  protected final JSONArray getJSONArray (JSONObject object, String key, CharSequence label) {
+    Object value = getValue(object, key);
+
+    if (value != null) {
+      if (value instanceof JSONArray) return (JSONArray)value;
+      logUnexpectedType("JSON array", key, label);
+    }
+
+    return null;
+  }
+
   protected final String getString (JSONObject object, String key, CharSequence label) {
-    Object value = object.remove(key);
+    Object value = getValue(object, key);
 
     if (value != null) {
       if (value instanceof String) return (String)value;
@@ -52,7 +87,7 @@ public abstract class JSONLoader extends StringLoader {
   }
 
   protected final boolean getBoolean (JSONObject object, String key, CharSequence label) {
-    Object value = object.remove(key);
+    Object value = getValue(object, key);
 
     if (value != null) {
       if (value instanceof Boolean) return (Boolean)value;
@@ -62,12 +97,37 @@ public abstract class JSONLoader extends StringLoader {
     return false;
   }
 
-  protected final void logUnhandledKeys (JSONObject object, CharSequence label) {
-    Iterator<String> iterator = object.keys();
+  protected final int getInt (JSONObject object, String key, CharSequence label) {
+    Object value = getValue(object, key);
 
-    while (iterator.hasNext()) {
-      Log.w(LOG_TAG, ("key has not been handled: " + iterator.next() + ": " + label));
+    if (value != null) {
+      if (value instanceof Integer) return (Integer)value;
+      logUnexpectedType("integer", key, label);
     }
+
+    return 0;
+  }
+
+  protected final long getLong (JSONObject object, String key, CharSequence label) {
+    Object value = getValue(object, key);
+
+    if (value != null) {
+      if (value instanceof Long) return (Long)value;
+      logUnexpectedType("long", key, label);
+    }
+
+    return 0L;
+  }
+
+  protected final double getDouble (JSONObject object, String key, CharSequence label) {
+    Object value = getValue(object, key);
+
+    if (value != null) {
+      if (value instanceof Double) return (Double)value;
+      logUnexpectedType("double", key, label);
+    }
+
+    return 0d;
   }
 
   protected abstract void load (JSONObject root, String name);
