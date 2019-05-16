@@ -14,6 +14,8 @@ import android.util.Log;
 public abstract class CollectionLibrary extends RadioComponent {
   private final static String LOG_TAG = CollectionLibrary.class.getName();
 
+  private final Map<String, File> nameToRoot = new HashMap<>();
+
   protected final void addCollection (String name, String directory) {
     synchronized (nameToRoot) {
       if (nameToRoot.get(name) != null) {
@@ -50,8 +52,6 @@ public abstract class CollectionLibrary extends RadioComponent {
     super();
     addCollections(type);
   }
-
-  private final Map<String, File> nameToRoot = new HashMap<>();
 
   public final File getRoot (String name) {
     synchronized (nameToRoot) {

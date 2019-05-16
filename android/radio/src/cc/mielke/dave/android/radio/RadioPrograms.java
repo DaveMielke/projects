@@ -12,7 +12,7 @@ import android.util.Log;
 public class RadioPrograms extends RadioComponent {
   private final static String LOG_TAG = RadioPrograms.class.getName();
 
-  private final static Map<String, RadioProgram> programs = new HashMap<>();
+  private final Map<String, RadioProgram> programs = new HashMap<>();
 
   private final void addPrograms () {
     new JSONLoader() {
