@@ -59,24 +59,27 @@ public class RadioStations extends RadioComponent {
   }
 
   public class Group extends Entry {
-    private final Map<String, Entry> groupEntries;
-
-    public Group (String label, Map<String, Entry> entries) {
+    public Group (String label) {
       super(label);
-      groupEntries = entries;
+    }
+
+    private final Map<String, Entry> groupEntries = new HashMap<>();
+
+    private final void putEntry (String name, Entry entry) {
+      groupEntries.put(name, entry);
+    }
+
+    public final Entry getEntry (String name) {
+      return groupEntries.get(name);
     }
 
     public final String[] getNames () {
       Set<String> names = groupEntries.keySet();
       return names.toArray(new String[names.size()]);
     }
-
-    public final Entry getEntry (String name) {
-      return groupEntries.get(name);
-    }
   }
 
-  private Group rootGroup = null;
+  private final Group rootGroup = new Group("");
   private final Map<String, Station> identifiedStations = new HashMap<>();
   private final Map<Station, RadioProgram> stationPrograms = new HashMap<>();
 
@@ -95,15 +98,24 @@ public class RadioStations extends RadioComponent {
         label.append(text);
       }
 
-      private final Group loadGroup (JSONObject stations, StringBuilder label) {
-        Map<String, Entry> entries = new HashMap<>();
-
+      private final void loadGroup (JSONObject stations, Group group, StringBuilder label) {
         for (String name : getKeys(stations)) {
-          int labelLength = label.length();
-          appendToLabel(label, name);
-          JSONObject element = getObject(stations, name, label);
+          final int labelLength = label.length();
 
-          if (element != null) {
+          try {
+            appendToLabel(label, name);
+
+            JSONObject element = getObject(stations, name, label);
+            if (element == null) continue;
+            final Entry oldEntry = group.getEntry(name);
+
+            if (oldEntry != null) {
+              if (!(oldEntry instanceof Group)) {
+                Log.w(LOG_TAG, ("station already defined: " + label));
+                continue;
+              }
+            }
+
             String key = "listen";
             Object object = element.remove(key);
 
@@ -117,8 +129,11 @@ public class RadioStations extends RadioComponent {
 
               Station station = new Station(label.toString(), url, identifier);
               if (identifier != null) identifiedStations.put(identifier, station);
-              entries.put(name, station);
+
+              group.putEntry(name, station);
             } else if (object instanceof JSONObject) {
+              Group subgroup;
+
               {
                 String text = getString(element, "within-label", label);
 
@@ -128,23 +143,28 @@ public class RadioStations extends RadioComponent {
                 }
               }
 
-              entries.put(name, loadGroup((JSONObject)object, label));
+              if (oldEntry == null) {
+                subgroup = new Group(label.toString());
+                group.putEntry(name, subgroup);
+              } else {
+                subgroup = (Group)oldEntry;
+              }
+
+              loadGroup((JSONObject)object, subgroup, label);
             } else {
               Log.w(LOG_TAG, ("\"" + key + "\" specified incorrectly: " + label));
             }
 
             logUnhandledKeys(element, label);
+          } finally {
+            label.setLength(labelLength);
           }
-
-          label.setLength(labelLength);
         }
-
-        return new Group(label.toString(), entries);
       }
 
       @Override
       protected void load (JSONObject root, String name) {
-        rootGroup = loadGroup(root, new StringBuilder());
+        loadGroup(root, rootGroup, new StringBuilder());
       }
     }.load(RadioParameters.RADIO_STATIONS_FILE);
   }
