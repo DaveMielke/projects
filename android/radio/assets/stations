@@ -1,6 +1,6 @@
 {
   "Al Jazeera": {
-    "label-component": "AJ",
+    "within-label": "AJ",
     "listen": {
       "English": {
         "identifier": "aj-english",
@@ -10,7 +10,7 @@
   },
 
   "British Broadcasting Corporation": {
-    "label-component": "BBC",
+    "within-label": "BBC",
     "listen": {
       "World Service": {
         "identifier": "bbc-world-service",
@@ -20,12 +20,12 @@
   },
 
   "Canadian Broadcasting Corporation": {
-    "label-component": "CBC",
+    "within-label": "CBC",
     "listen": {
       "Radio One": {
         "listen": {
           "Alberta": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Calgary": {
                 "identifier": "cbc1-calgary",
@@ -40,7 +40,7 @@
           },
 
           "British Columbia": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Kamloops": {
                 "identifier": "cbc1-kamloops",
@@ -70,7 +70,7 @@
           },
 
           "Manitoba": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Winnipeg": {
                 "identifier": "cbc1-winnipeg",
@@ -80,7 +80,7 @@
           },
 
           "New Brunswick": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Fredericton": {
                 "identifier": "cbc1-fredericton",
@@ -100,7 +100,7 @@
           },
 
           "Newfoundland and Labrador": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Corner Brook": {
                 "identifier": "cbc1-corner-brook",
@@ -125,7 +125,7 @@
           },
 
           "Northwest Territories": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Inuvik": {
                 "identifier": "cbc1-inuvik",
@@ -140,7 +140,7 @@
           },
 
           "Nova Scotia": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Cape Breton": {
                 "identifier": "cbc1-cape-breton",
@@ -155,7 +155,7 @@
           },
 
           "Nunavut": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Iqaluit": {
                 "identifier": "cbc1-iqaluit",
@@ -165,7 +165,7 @@
           },
 
           "Ontario": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Kitchener-Waterloo": {
                 "identifier": "cbc1-kitchener",
@@ -205,7 +205,7 @@
           },
 
           "Prince Edward Island": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Charlottetown": {
                 "identifier": "cbc1-charlottetown",
@@ -215,7 +215,7 @@
           },
 
           "Québec": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Montréal": {
                 "identifier": "cbc1-montreal",
@@ -235,7 +235,7 @@
           },
 
           "Saskatchewan": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Regina": {
                 "identifier": "cbc1-regina",
@@ -250,7 +250,7 @@
           },
 
           "Yukon": {
-            "label-component": "-",
+            "within-label": "-",
             "listen": {
               "Whitehorse": {
                 "identifier": "cbc1-whitehorse",

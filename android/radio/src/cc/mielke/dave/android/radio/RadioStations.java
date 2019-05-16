@@ -92,6 +92,28 @@ public class RadioStations extends RadioComponent {
     return identifiedStations.get(identifier);
   }
 
+  private final String getString (JSONObject object, String key, CharSequence label) {
+    Object string = object.remove(key);
+    if (string == null) return null;
+    if (string instanceof String) return (String)string;
+
+    Log.w(LOG_TAG, ("\"" + key + "\" is not a string: " + label));
+    return null;
+  }
+
+  private final void logUnhandledKeys (JSONObject object, CharSequence label) {
+    Iterator<String> iterator = object.keys();
+
+    while (iterator.hasNext()) {
+      Log.w(LOG_TAG, ("key not handled: " + iterator.next() + ": " + label));
+    }
+  }
+
+  private final void appendToLabel (StringBuilder label, String text) {
+    if (label.length() > 0) label.append(' ');
+    label.append(text);
+  }
+
   private final Group loadGroup (JSONObject stations, StringBuilder label) {
     Map<String, Entry> entries = new HashMap<>();
     Iterator<String> iterator = stations.keys();
@@ -100,42 +122,45 @@ public class RadioStations extends RadioComponent {
       String name = iterator.next();
       JSONObject element = stations.optJSONObject(name);
 
+      int labelLength = label.length();
+      appendToLabel(label, name);
+
       if (element == null) {
-        Log.w(LOG_TAG, ("element not a JSON object: " + name));
+        Log.w(LOG_TAG, ("not an object: " + label));
       } else {
-        int labelLength = label.length();
-
-        {
-          String component = element.optString("label-component", name);
-
-          if (!component.isEmpty()) {
-            if (label.length() > 0) label.append(' ');
-            label.append(component);
-          }
-        }
-
         String key = "listen";
         Object object = element.remove(key);
 
         if (object == null) {
-          Log.w(LOG_TAG, (key + " not specified: " + name));
+          Log.w(LOG_TAG, ("\"" + key + "\" not specified: " + label));
         } else if (object instanceof String) {
           String url = (String)object;
 
-          String identifier = element.optString("identifier");
+          String identifier = getString(element, "identifier", label);
           if ((identifier != null) && identifier.isEmpty()) identifier = null;
 
           Station station = new Station(label.toString(), url, identifier);
           if (identifier != null) identifiedStations.put(identifier, station);
           entries.put(name, station);
         } else if (object instanceof JSONObject) {
+          {
+            String text = getString(element, "within-label", label);
+
+            if (text != null) {
+              label.setLength(labelLength);
+              appendToLabel(label, text);
+            }
+          }
+
           entries.put(name, loadGroup((JSONObject)object, label));
         } else {
-          Log.w(LOG_TAG, (key + " specified incorrectly: " + name));
+          Log.w(LOG_TAG, ("\"" + key + "\" specified incorrectly: " + label));
         }
 
-        label.setLength(labelLength);
+        logUnhandledKeys(element, label);
       }
+
+      label.setLength(labelLength);
     }
 
     return new Group(label.toString(), entries);
