@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import java.io.File;
 
-import cc.mielke.dave.android.base.JSONLoader;
+import cc.mielke.dave.android.base.JSONObjectLoader;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -37,7 +37,7 @@ public abstract class CollectionLibrary extends RadioComponent {
   }
 
   private final void addCollections (String type) {
-    new JSONLoader() {
+    new JSONObjectLoader() {
       @Override
       public void load (JSONObject root, String name) {
         for (String title : getKeys(root)) {

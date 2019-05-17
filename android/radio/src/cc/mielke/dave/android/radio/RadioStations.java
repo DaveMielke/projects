@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import android.util.Log;
 
-import cc.mielke.dave.android.base.JSONLoader;
+import cc.mielke.dave.android.base.JSONObjectLoader;
 import org.json.JSONObject;
 
 public class RadioStations extends RadioComponent {
@@ -86,7 +86,7 @@ public class RadioStations extends RadioComponent {
   }
 
   private final void loadStations () {
-    new JSONLoader() {
+    new JSONObjectLoader() {
       private final void appendToLabel (StringBuilder label, String text) {
         if (label.length() > 0) label.append(' ');
         label.append(text);

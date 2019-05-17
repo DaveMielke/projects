@@ -129,15 +129,4 @@ public abstract class JSONLoader extends StringLoader {
 
     return 0d;
   }
-
-  protected abstract void load (JSONObject root, String name);
-
-  @Override
-  protected final void load (String string, String name) {
-    try {
-      load(new JSONObject(string), name);
-    } catch (JSONException exception) {
-      Log.w(LOG_TAG, ("JSON read error: " + exception.getMessage()));
-    }
-  }
 }

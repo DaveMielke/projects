@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 
-import cc.mielke.dave.android.base.JSONLoader;
+import cc.mielke.dave.android.base.JSONObjectLoader;
 import org.json.JSONObject;
 
 import android.util.Log;
@@ -15,7 +15,7 @@ public class RadioPrograms extends RadioComponent {
   private final Map<String, RadioProgram> programs = new HashMap<>();
 
   private final void addPrograms () {
-    new JSONLoader() {
+    new JSONObjectLoader() {
       @Override
       protected void load (JSONObject root, String name) {
         for (String title : getKeys(root)) {
