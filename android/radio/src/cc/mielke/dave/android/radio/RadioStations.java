@@ -117,7 +117,10 @@ public class RadioStations extends RadioComponent {
             Object object = element.remove(key);
 
             if (object == null) {
-              Log.w(LOG_TAG, (jsonKeyToString(key) + " not specified: " + label));
+              jsonLogProblem(
+                "%s not specified: %s",
+                jsonKeyToString(key), label
+              );
             } else if (object instanceof String) {
               String url = (String)object;
               String identifier = jsonGetString(element, "identifier", label);
@@ -162,7 +165,10 @@ public class RadioStations extends RadioComponent {
 
               loadGroup((JSONObject)object, subgroup, label);
             } else {
-              Log.w(LOG_TAG, (jsonKeyToString(key) + " specified incorrectly: " + label));
+              jsonLogProblem(
+                "%s specified incorrectly: %s",
+                jsonKeyToString(key), label
+              );
             }
 
             jsonLogUnhandledKeys(element, label);

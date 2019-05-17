@@ -45,7 +45,7 @@ public abstract class JSONLoader extends StringLoader {
 
     while (iterator.hasNext()) {
       jsonLogProblem(
-        "key not handled: %s: %s",
+        "%s not handled: %s",
         jsonKeyToString(iterator.next()), label
       );
     }
@@ -59,7 +59,7 @@ public abstract class JSONLoader extends StringLoader {
       String found = (value == JSONObject.NULL)? "null": value.getClass().getSimpleName();
 
       jsonLogProblem(
-        "%s expected but %s found: %s: %s",
+        "%s expected but %s found for %s: %s",
         expected, found, jsonKeyToString(key), label
       );
     }
