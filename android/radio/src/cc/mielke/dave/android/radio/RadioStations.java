@@ -123,13 +123,19 @@ public class RadioStations extends RadioComponent {
               Log.w(LOG_TAG, ("\"" + key + "\" not specified: " + label));
             } else if (object instanceof String) {
               String url = (String)object;
-
               String identifier = getString(element, "identifier", label);
-              if ((identifier != null) && identifier.isEmpty()) identifier = null;
+
+              if (identifier != null) {
+                if (identifier.isEmpty()) {
+                  identifier = null;
+                } else if (getStation(identifier) != null) {
+                  Log.w(LOG_TAG, ("station identifier already assigned: " + identifier));
+                  identifier = null;
+                }
+              }
 
               Station station = new Station(label.toString(), url, identifier);
               if (identifier != null) identifiedStations.put(identifier, station);
-
               group.putEntry(name, station);
             } else if (object instanceof JSONObject) {
               Group subgroup;
