@@ -14,6 +14,10 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
+  protected static void jsonLogProblem (String format, Object... arguments) {
+    Log.w(LOG_TAG, ("JSON problem: " + String.format(format, arguments)));
+  }
+
   protected static String[] jsonGetKeys (JSONObject object) {
     String[] keys = new String[object.length()];
     Iterator<String> iterator = object.keys();
@@ -30,7 +34,7 @@ public abstract class JSONLoader extends StringLoader {
     Iterator<String> iterator = object.keys();
 
     while (iterator.hasNext()) {
-      Log.w(LOG_TAG, ("key not handled: " + iterator.next() + ": " + label));
+      jsonLogProblem("key not handled: %s: %s", iterator.next(), label);
     }
   }
 
@@ -44,11 +48,9 @@ public abstract class JSONLoader extends StringLoader {
     if (value != null) {
       if (type.isInstance(value)) return (T)value;
 
-      Log.w(LOG_TAG,
-        String.format(
-          "%s expected: %s: %s",
-          type.getSimpleName(), jsonKeyToString(key), label
-        )
+      jsonLogProblem(
+        "%s expected: %s: %s",
+        type.getSimpleName(), jsonKeyToString(key), label
       );
     }
 
