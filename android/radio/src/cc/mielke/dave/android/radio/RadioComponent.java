@@ -17,6 +17,10 @@ public abstract class RadioComponent extends BaseComponent {
     return RadioApplication.getBookLibrary();
   }
 
+  protected static RadioStations getStations () {
+    return RadioApplication.getRadioStations();
+  }
+
   protected static RadioPrograms getPrograms () {
     return RadioApplication.getRadioPrograms();
   }

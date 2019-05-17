@@ -39,12 +39,6 @@ public class ProgramSelector extends ActivityComponent {
     updateButtonText();
   }
 
-  private final String[] getProgramNames () {
-    String[] names = getPrograms().getNames();
-    if (names == null) names = new String[]{};
-    return names;
-  }
-
   private interface Action {
     public int getName ();
     public void performAction ();
@@ -97,7 +91,7 @@ public class ProgramSelector extends ActivityComponent {
         new AsyncTask<Object, Object, RadioStations>() {
           @Override
           protected RadioStations doInBackground (Object... arguments) {
-            return new RadioStations();
+            return getStations();
           }
 
           @Override
@@ -114,18 +108,17 @@ public class ProgramSelector extends ActivityComponent {
   };
 
   public final void selectProgram () {
-    new AsyncTask<Object, Object, Object>() {
+    new AsyncTask<Object, Object, RadioPrograms>() {
       @Override
-      protected Object doInBackground (Object... arguments) {
-        RadioApplication.updateMusicLibrary();
-        RadioApplication.updateBookLibrary();
-        RadioApplication.updateRadioPrograms();
-        return null;
+      protected RadioPrograms doInBackground (Object... arguments) {
+        RadioApplication.refresh();
+        return getPrograms();
       }
 
       @Override
-      protected void onPostExecute (Object result) {
-        String[] names = getProgramNames();
+      protected void onPostExecute (RadioPrograms programs) {
+        String[] names = programs.getNames();
+        if (names == null) names = new String[0];
         sort(names);
 
         final int actionCount = actions.length;
