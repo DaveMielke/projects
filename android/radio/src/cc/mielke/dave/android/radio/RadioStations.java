@@ -165,10 +165,7 @@ public class RadioStations extends RadioComponent {
 
               loadGroup((JSONObject)object, subgroup, label);
             } else {
-              jsonLogProblem(
-                "%s specified incorrectly: %s",
-                jsonKeyToString(key), label
-              );
+              jsonLogUnexpectedType(object, key, label, String.class, JSONObject.class);
             }
 
             jsonLogUnhandledKeys(element, label);

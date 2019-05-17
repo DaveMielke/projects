@@ -14,18 +14,12 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected static void jsonLogProblem (String problem) {
+  protected static void jsonLogProblem (CharSequence problem) {
     Log.w(LOG_TAG, ("JSON problem: " + problem));
   }
 
   protected static void jsonLogProblem (String format, Object... arguments) {
     jsonLogProblem(String.format(format, arguments));
-  }
-
-  protected static String jsonKeyToString (Object key) {
-    if (key instanceof String) return "\"" + key + "\"";
-    if (key instanceof Integer) return "[" + key + "]";
-    return null;
   }
 
   protected static String[] jsonGetKeys (JSONObject object) {
@@ -40,6 +34,12 @@ public abstract class JSONLoader extends StringLoader {
     return keys;
   }
 
+  protected static String jsonKeyToString (Object key) {
+    if (key instanceof String) return "\"" + key + "\"";
+    if (key instanceof Integer) return "[" + key + "]";
+    return null;
+  }
+
   protected static void jsonLogUnhandledKeys (JSONObject object, CharSequence label) {
     Iterator<String> iterator = object.keys();
 
@@ -51,17 +51,58 @@ public abstract class JSONLoader extends StringLoader {
     }
   }
 
+  protected static void jsonLogUnexpectedType (Object value, Object key, CharSequence label, Class... types) {
+    StringBuilder problem = new StringBuilder();
+
+    if (types != null) {
+      int count = types.length;
+
+      if (count > 0) {
+        int last = count - 1;
+        int index = 0;
+
+        while (true) {
+          problem.append(types[index].getSimpleName());
+          if (index == last) break;
+
+          if (count > 2) problem.append(',');
+          if (++index == last) problem.append(" or");
+          problem.append(' ');
+        }
+
+        problem.append(" expected");
+      }
+    }
+
+    if (value != null) {
+      if (problem.length() > 0) problem.append(" but ");
+
+      if (value == JSONObject.NULL) {
+        problem.append("null");
+      } else {
+        problem.append(value.getClass().getSimpleName());
+      }
+
+      problem.append(" found");
+    }
+
+    if (key != null) {
+      if (problem.length() > 0) problem.append(" for ");
+      problem.append(jsonKeyToString(key));
+    }
+
+    if ((label != null) && (label.length() > 0)) {
+      if (problem.length() > 0) problem.append(": ");
+      problem.append(label);
+    }
+
+    jsonLogProblem(problem);
+  }
+
   private static <T> T jsonGetVerified (Object value, Class<? extends T> type, Object key, CharSequence label) {
     if (value != null) {
       if (type.isInstance(value)) return (T)value;
-
-      String expected = type.getSimpleName();
-      String found = (value == JSONObject.NULL)? "null": value.getClass().getSimpleName();
-
-      jsonLogProblem(
-        "%s expected but %s found for %s: %s",
-        expected, found, jsonKeyToString(key), label
-      );
+      jsonLogUnexpectedType(value, key, label, type);
     }
 
     return null;
