@@ -14,7 +14,7 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected static String[] getKeys (JSONObject object) {
+  protected static String[] jsonGetKeys (JSONObject object) {
     String[] keys = new String[object.length()];
     Iterator<String> iterator = object.keys();
     int index = 0;
@@ -26,7 +26,7 @@ public abstract class JSONLoader extends StringLoader {
     return keys;
   }
 
-  protected static void logUnhandledKeys (JSONObject object, CharSequence label) {
+  protected static void jsonLogUnhandledKeys (JSONObject object, CharSequence label) {
     Iterator<String> iterator = object.keys();
 
     while (iterator.hasNext()) {
@@ -34,20 +34,20 @@ public abstract class JSONLoader extends StringLoader {
     }
   }
 
-  private static String keyToString (Object key) {
+  private static String jsonKeyToString (Object key) {
     if (key instanceof String) return "\"" + key + "\"";
     if (key instanceof Integer) return "[" + key + "]";
     return null;
   }
 
-  private static <T> T getVerified (Object value, Class<? extends T> type, Object key, CharSequence label) {
+  private static <T> T jsonGetVerified (Object value, Class<? extends T> type, Object key, CharSequence label) {
     if (value != null) {
       if (type.isInstance(value)) return (T)value;
 
       Log.w(LOG_TAG,
         String.format(
-          "not a %s: %s: %s",
-          type.getSimpleName(), keyToString(key), label
+          "%s expected: %s: %s",
+          type.getSimpleName(), jsonKeyToString(key), label
         )
       );
     }
@@ -55,110 +55,110 @@ public abstract class JSONLoader extends StringLoader {
     return null;
   }
 
-  private static JSONObject getVerifiedObject (Object value, Object key, CharSequence label) {
-    return getVerified(value, JSONObject.class, key, label);
+  private static JSONObject jsonGetVerifiedObject (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, JSONObject.class, key, label);
   }
 
-  private static JSONArray getVerifiedArray (Object value, Object key, CharSequence label) {
-    return getVerified(value, JSONArray.class, key, label);
+  private static JSONArray jsonGetVerifiedArray (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, JSONArray.class, key, label);
   }
 
-  private static String getVerifiedString (Object value, Object key, CharSequence label) {
-    return getVerified(value, String.class, key, label);
+  private static String jsonGetVerifiedString (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, String.class, key, label);
   }
 
-  private static Boolean getVerifiedBoolean (Object value, Object key, CharSequence label) {
-    return getVerified(value, Boolean.class, key, label);
+  private static Boolean jsonGetVerifiedBoolean (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, Boolean.class, key, label);
   }
 
-  private static Integer getVerifiedInteger (Object value, Object key, CharSequence label) {
-    return getVerified(value, Integer.class, key, label);
+  private static Integer jsonGetVerifiedInteger (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, Integer.class, key, label);
   }
 
-  private static Long getVerifiedLong (Object value, Object key, CharSequence label) {
-    return getVerified(value, Long.class, key, label);
+  private static Long jsonGetVerifiedLong (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, Long.class, key, label);
   }
 
-  private static Double getVerifiedDouble (Object value, Object key, CharSequence label) {
-    return getVerified(value, Double.class, key, label);
+  private static Double jsonGetVerifiedDouble (Object value, Object key, CharSequence label) {
+    return jsonGetVerified(value, Double.class, key, label);
   }
 
-  private static Object getValue (JSONObject object, String key) {
+  private static Object jsonGetValue (JSONObject object, String key) {
     return object.remove(key);
   }
 
-  protected static JSONObject getObject (JSONObject object, String key, CharSequence label) {
-    return getVerifiedObject(getValue(object, key), key, label);
+  protected static JSONObject jsonGetObject (JSONObject object, String key, CharSequence label) {
+    return jsonGetVerifiedObject(jsonGetValue(object, key), key, label);
   }
 
-  protected static JSONArray getArray (JSONObject object, String key, CharSequence label) {
-    return getVerifiedArray(getValue(object, key), key, label);
+  protected static JSONArray jsonGetArray (JSONObject object, String key, CharSequence label) {
+    return jsonGetVerifiedArray(jsonGetValue(object, key), key, label);
   }
 
-  protected static String getString (JSONObject object, String key, CharSequence label) {
-    return getVerifiedString(getValue(object, key), key, label);
+  protected static String jsonGetString (JSONObject object, String key, CharSequence label) {
+    return jsonGetVerifiedString(jsonGetValue(object, key), key, label);
   }
 
-  protected static boolean getBoolean (JSONObject object, String key, CharSequence label) {
-    Boolean value = getVerifiedBoolean(getValue(object, key), key, label);
+  protected static boolean jsonGetBoolean (JSONObject object, String key, CharSequence label) {
+    Boolean value = jsonGetVerifiedBoolean(jsonGetValue(object, key), key, label);
     if (value == null) return false;
     return value;
   }
 
-  protected static int getInteger (JSONObject object, String key, CharSequence label) {
-    Integer value = getVerifiedInteger(getValue(object, key), key, label);
+  protected static int jsonGetInteger (JSONObject object, String key, CharSequence label) {
+    Integer value = jsonGetVerifiedInteger(jsonGetValue(object, key), key, label);
     if (value == null) return 0;
     return value;
   }
 
-  protected static long getLong (JSONObject object, String key, CharSequence label) {
-    Long value = getVerifiedLong(getValue(object, key), key, label);
+  protected static long jsonGetLong (JSONObject object, String key, CharSequence label) {
+    Long value = jsonGetVerifiedLong(jsonGetValue(object, key), key, label);
     if (value == null) return 0;
     return value;
   }
 
-  protected static double getDouble (JSONObject object, String key, CharSequence label) {
-    Double value = getVerifiedDouble(getValue(object, key), key, label);
+  protected static double jsonGetDouble (JSONObject object, String key, CharSequence label) {
+    Double value = jsonGetVerifiedDouble(jsonGetValue(object, key), key, label);
     if (value == null) return 0d;
     return value;
   }
 
-  private static Object getValue (JSONArray array, int index) {
+  private static Object jsonGetValue (JSONArray array, int index) {
     return array.opt(index);
   }
 
-  protected static JSONObject getObject (JSONArray array, int index, CharSequence label) {
-    return getVerifiedObject(getValue(array, index), index, label);
+  protected static JSONObject jsonGetObject (JSONArray array, int index, CharSequence label) {
+    return jsonGetVerifiedObject(jsonGetValue(array, index), index, label);
   }
 
-  protected static JSONArray getArray (JSONArray array, int index, CharSequence label) {
-    return getVerifiedArray(getValue(array, index), index, label);
+  protected static JSONArray jsonGetArray (JSONArray array, int index, CharSequence label) {
+    return jsonGetVerifiedArray(jsonGetValue(array, index), index, label);
   }
 
-  protected static String getString (JSONArray array, int index, CharSequence label) {
-    return getVerifiedString(getValue(array, index), index, label);
+  protected static String jsonGetString (JSONArray array, int index, CharSequence label) {
+    return jsonGetVerifiedString(jsonGetValue(array, index), index, label);
   }
 
-  protected static boolean getBoolean (JSONArray array, int index, CharSequence label) {
-    Boolean value = getVerifiedBoolean(getValue(array, index), index, label);
+  protected static boolean jsonGetBoolean (JSONArray array, int index, CharSequence label) {
+    Boolean value = jsonGetVerifiedBoolean(jsonGetValue(array, index), index, label);
     if (value == null) return false;
     return value;
   }
 
-  protected static int getInteger (JSONArray array, int index, CharSequence label) {
-    Integer value = getVerifiedInteger(getValue(array, index), index, label);
+  protected static int jsonGetInteger (JSONArray array, int index, CharSequence label) {
+    Integer value = jsonGetVerifiedInteger(jsonGetValue(array, index), index, label);
     if (value == null) return 0;
     return value;
   }
 
-  protected static long getLong (JSONArray array, int index, CharSequence label) {
-    Long value = getVerifiedLong(getValue(array, index), index, label);
+  protected static long jsonGetLong (JSONArray array, int index, CharSequence label) {
+    Long value = jsonGetVerifiedLong(jsonGetValue(array, index), index, label);
     if (value == null) return 0;
     return value;
   }
 
-  protected static double getDouble (JSONArray array, int index, CharSequence label) {
-    Double value = getVerifiedDouble(getValue(array, index), index, label);
+  protected static double jsonGetDouble (JSONArray array, int index, CharSequence label) {
+    Double value = jsonGetVerifiedDouble(jsonGetValue(array, index), index, label);
     if (value == null) return 0d;
     return value;
   }

@@ -18,8 +18,8 @@ public class RadioPrograms extends RadioComponent {
     new JSONObjectLoader() {
       @Override
       protected void load (JSONObject root, String name) {
-        for (String title : getKeys(root)) {
-          JSONObject object = getObject(root, title, name);
+        for (String title : jsonGetKeys(root)) {
+          JSONObject object = jsonGetObject(root, title, name);
           if (object == null) continue;
 
           if (getProgram(title) != null) {
@@ -27,12 +27,13 @@ public class RadioPrograms extends RadioComponent {
           } else {
             RadioProgram program = new SimpleProgramBuilder()
               .setProgramName(title)
-              .setMusicCollection(getString(object, "music", title))
-              .setBookCollection(getString(object, "book", title))
-              .setAnnounceHours(getBoolean(object, "hours", title))
-              .setAnnounceMinutes(getBoolean(object, "minutes", title))
+              .setMusicCollection(jsonGetString(object, "music", title))
+              .setBookCollection(jsonGetString(object, "book", title))
+              .setAnnounceHours(jsonGetBoolean(object, "hours", title))
+              .setAnnounceMinutes(jsonGetBoolean(object, "minutes", title))
               .build();
 
+            jsonLogUnhandledKeys(object, title);
             if (program != null) programs.put(title, program);
           }
         }

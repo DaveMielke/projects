@@ -93,11 +93,11 @@ public class RadioStations extends RadioComponent {
       }
 
       private final void loadGroup (JSONObject stations, Group group, StringBuilder label) {
-        for (String name : getKeys(stations)) {
+        for (String name : jsonGetKeys(stations)) {
           final int labelLength = label.length();
 
           try {
-            JSONObject element = getObject(
+            JSONObject element = jsonGetObject(
               stations, name,
               ((label.length() > 0)? label: RadioParameters.RADIO_STATIONS_FILE)
             );
@@ -120,7 +120,7 @@ public class RadioStations extends RadioComponent {
               Log.w(LOG_TAG, ("\"" + key + "\" not specified: " + label));
             } else if (object instanceof String) {
               String url = (String)object;
-              String identifier = getString(element, "identifier", label);
+              String identifier = jsonGetString(element, "identifier", label);
 
               Station station = new Station(label.toString(), url);
               group.putEntry(name, station);
@@ -145,7 +145,7 @@ public class RadioStations extends RadioComponent {
               Group subgroup;
 
               {
-                String text = getString(element, "within-label", label);
+                String text = jsonGetString(element, "within-label", label);
 
                 if (text != null) {
                   label.setLength(labelLength);
@@ -165,7 +165,7 @@ public class RadioStations extends RadioComponent {
               Log.w(LOG_TAG, ("\"" + key + "\" specified incorrectly: " + label));
             }
 
-            logUnhandledKeys(element, label);
+            jsonLogUnhandledKeys(element, label);
           } finally {
             label.setLength(labelLength);
           }
