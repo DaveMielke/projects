@@ -3,29 +3,31 @@ package cc.mielke.dave.android.radio;
 import android.util.Log;
 import android.os.AsyncTask;
 
-import android.widget.Button;
+import android.widget.TextView;
 import android.content.DialogInterface;
 
 public class ProgramSelector extends ActivityComponent {
   private final static String LOG_TAG = ProgramSelector.class.getName();
 
-  private final Button selectorButton;
+  private final TextView programNameView;
 
-  private final void updateButtonText (RadioProgram program) {
+  private final void showProgramName (RadioProgram program) {
+    TextView view = programNameView;
+
     if (program != null) {
-      selectorButton.setText(program.getName());
+      view.setText(program.getName());
     } else {
-      selectorButton.setText(R.string.message_noProgram);
+      view.setText(R.string.message_noProgram);
     }
   }
 
-  private final void updateButtonText () {
-    updateButtonText(CurrentProgram.get());
+  private final void showProgramName () {
+    showProgramName(CurrentProgram.get());
   }
 
   private final void setProgram (RadioProgram program) {
     CurrentProgram.set(program);
-    updateButtonText(program);
+    showProgramName(program);
   }
 
   private final void setProgram (String name) {
@@ -35,8 +37,8 @@ public class ProgramSelector extends ActivityComponent {
   public ProgramSelector (MainActivity activity) {
     super(activity);
 
-    selectorButton = mainActivity.findViewById(R.id.button_selectProgram);
-    updateButtonText();
+    programNameView = mainActivity.findViewById(R.id.button_selectProgram);
+    showProgramName();
   }
 
   private interface Action {
