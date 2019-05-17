@@ -129,7 +129,12 @@ public class RadioStations extends RadioComponent {
                   if (oldStation == null) {
                     identifiedStations.put(identifier, station);
                   } else {
-                    Log.w(LOG_TAG, ("station identifier already assigned: " + identifier));
+                    Log.w(LOG_TAG,
+                      String.format(
+                        "station identifier already defined: %s: %s & %s",
+                        identifier, label, oldStation.getLabel()
+                      )
+                    );
                   }
                 }
               }
