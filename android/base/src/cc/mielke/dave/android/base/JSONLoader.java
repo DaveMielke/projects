@@ -22,6 +22,12 @@ public abstract class JSONLoader extends StringLoader {
     jsonLogProblem(String.format(format, arguments));
   }
 
+  protected static String jsonKeyToString (Object key) {
+    if (key instanceof String) return "\"" + key + "\"";
+    if (key instanceof Integer) return "[" + key + "]";
+    return null;
+  }
+
   protected static String[] jsonGetKeys (JSONObject object) {
     String[] keys = new String[object.length()];
     Iterator<String> iterator = object.keys();
@@ -43,12 +49,6 @@ public abstract class JSONLoader extends StringLoader {
         jsonKeyToString(iterator.next()), label
       );
     }
-  }
-
-  private static String jsonKeyToString (Object key) {
-    if (key instanceof String) return "\"" + key + "\"";
-    if (key instanceof Integer) return "[" + key + "]";
-    return null;
   }
 
   private static <T> T jsonGetVerified (Object value, Class<? extends T> type, Object key, CharSequence label) {
