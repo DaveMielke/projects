@@ -48,9 +48,12 @@ public abstract class JSONLoader extends StringLoader {
     if (value != null) {
       if (type.isInstance(value)) return (T)value;
 
+      String expected = type.getSimpleName();
+      String found = (value == JSONObject.NULL)? "null": value.getClass().getSimpleName();
+
       jsonLogProblem(
-        "%s expected: %s: %s",
-        type.getSimpleName(), jsonKeyToString(key), label
+        "%s expected but %s found: %s: %s",
+        expected, found, jsonKeyToString(key), label
       );
     }
 
