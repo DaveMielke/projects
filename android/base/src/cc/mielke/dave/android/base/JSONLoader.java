@@ -14,7 +14,7 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
-  protected final String[] getKeys (JSONObject object) {
+  protected static String[] getKeys (JSONObject object) {
     String[] keys = new String[object.length()];
     Iterator<String> iterator = object.keys();
     int index = 0;
@@ -26,7 +26,7 @@ public abstract class JSONLoader extends StringLoader {
     return keys;
   }
 
-  protected final void logUnhandledKeys (JSONObject object, CharSequence label) {
+  protected static void logUnhandledKeys (JSONObject object, CharSequence label) {
     Iterator<String> iterator = object.keys();
 
     while (iterator.hasNext()) {
@@ -34,99 +34,132 @@ public abstract class JSONLoader extends StringLoader {
     }
   }
 
-  private final void logUnexpectedType (String type, String key, CharSequence label) {
-    StringBuilder log = new StringBuilder();
-
-    log.append("not ");
-    log.append(type);
-
-    log.append(": ");
-    log.append(key);
-
-    log.append(": ");
-    log.append(label);
-
-    Log.w(LOG_TAG, log.toString());
+  private static String keyToString (Object key) {
+    if (key instanceof String) return "\"" + key + "\"";
+    if (key instanceof Integer) return "[" + key + "]";
+    return null;
   }
 
-  private final Object getValue (JSONObject object, String key) {
+  private static <T> T getVerified (Object value, Class<? extends T> type, Object key, CharSequence label) {
+    if (value != null) {
+      if (type.isInstance(value)) return (T)value;
+
+      Log.w(LOG_TAG,
+        String.format(
+          "not a %s: %s: %s",
+          type.getSimpleName(), keyToString(key), label
+        )
+      );
+    }
+
+    return null;
+  }
+
+  private static JSONObject getVerifiedObject (Object value, Object key, CharSequence label) {
+    return getVerified(value, JSONObject.class, key, label);
+  }
+
+  private static JSONArray getVerifiedArray (Object value, Object key, CharSequence label) {
+    return getVerified(value, JSONArray.class, key, label);
+  }
+
+  private static String getVerifiedString (Object value, Object key, CharSequence label) {
+    return getVerified(value, String.class, key, label);
+  }
+
+  private static Boolean getVerifiedBoolean (Object value, Object key, CharSequence label) {
+    return getVerified(value, Boolean.class, key, label);
+  }
+
+  private static Integer getVerifiedInteger (Object value, Object key, CharSequence label) {
+    return getVerified(value, Integer.class, key, label);
+  }
+
+  private static Long getVerifiedLong (Object value, Object key, CharSequence label) {
+    return getVerified(value, Long.class, key, label);
+  }
+
+  private static Double getVerifiedDouble (Object value, Object key, CharSequence label) {
+    return getVerified(value, Double.class, key, label);
+  }
+
+  private static Object getValue (JSONObject object, String key) {
     return object.remove(key);
   }
 
-  protected final JSONObject getObject (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof JSONObject) return (JSONObject)value;
-      logUnexpectedType("object", key, label);
-    }
-
-    return null;
+  protected static JSONObject getObject (JSONObject object, String key, CharSequence label) {
+    return getVerifiedObject(getValue(object, key), key, label);
   }
 
-  protected final JSONArray getArray (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof JSONArray) return (JSONArray)value;
-      logUnexpectedType("array", key, label);
-    }
-
-    return null;
+  protected static JSONArray getArray (JSONObject object, String key, CharSequence label) {
+    return getVerifiedArray(getValue(object, key), key, label);
   }
 
-  protected final String getString (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof String) return (String)value;
-      logUnexpectedType("string", key, label);
-    }
-
-    return null;
+  protected static String getString (JSONObject object, String key, CharSequence label) {
+    return getVerifiedString(getValue(object, key), key, label);
   }
 
-  protected final boolean getBoolean (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof Boolean) return (Boolean)value;
-      logUnexpectedType("boolean", key, label);
-    }
-
-    return false;
+  protected static boolean getBoolean (JSONObject object, String key, CharSequence label) {
+    Boolean value = getVerifiedBoolean(getValue(object, key), key, label);
+    if (value == null) return false;
+    return value;
   }
 
-  protected final int getInteger (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof Integer) return (Integer)value;
-      logUnexpectedType("integer", key, label);
-    }
-
-    return 0;
+  protected static int getInteger (JSONObject object, String key, CharSequence label) {
+    Integer value = getVerifiedInteger(getValue(object, key), key, label);
+    if (value == null) return 0;
+    return value;
   }
 
-  protected final long getLong (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
-
-    if (value != null) {
-      if (value instanceof Long) return (Long)value;
-      logUnexpectedType("long", key, label);
-    }
-
-    return 0L;
+  protected static long getLong (JSONObject object, String key, CharSequence label) {
+    Long value = getVerifiedLong(getValue(object, key), key, label);
+    if (value == null) return 0;
+    return value;
   }
 
-  protected final double getDouble (JSONObject object, String key, CharSequence label) {
-    Object value = getValue(object, key);
+  protected static double getDouble (JSONObject object, String key, CharSequence label) {
+    Double value = getVerifiedDouble(getValue(object, key), key, label);
+    if (value == null) return 0d;
+    return value;
+  }
 
-    if (value != null) {
-      if (value instanceof Double) return (Double)value;
-      logUnexpectedType("double", key, label);
-    }
+  private static Object getValue (JSONArray array, int index) {
+    return array.opt(index);
+  }
 
-    return 0d;
+  protected static JSONObject getObject (JSONArray array, int index, CharSequence label) {
+    return getVerifiedObject(getValue(array, index), index, label);
+  }
+
+  protected static JSONArray getArray (JSONArray array, int index, CharSequence label) {
+    return getVerifiedArray(getValue(array, index), index, label);
+  }
+
+  protected static String getString (JSONArray array, int index, CharSequence label) {
+    return getVerifiedString(getValue(array, index), index, label);
+  }
+
+  protected static boolean getBoolean (JSONArray array, int index, CharSequence label) {
+    Boolean value = getVerifiedBoolean(getValue(array, index), index, label);
+    if (value == null) return false;
+    return value;
+  }
+
+  protected static int getInteger (JSONArray array, int index, CharSequence label) {
+    Integer value = getVerifiedInteger(getValue(array, index), index, label);
+    if (value == null) return 0;
+    return value;
+  }
+
+  protected static long getLong (JSONArray array, int index, CharSequence label) {
+    Long value = getVerifiedLong(getValue(array, index), index, label);
+    if (value == null) return 0;
+    return value;
+  }
+
+  protected static double getDouble (JSONArray array, int index, CharSequence label) {
+    Double value = getVerifiedDouble(getValue(array, index), index, label);
+    if (value == null) return 0d;
+    return value;
   }
 }

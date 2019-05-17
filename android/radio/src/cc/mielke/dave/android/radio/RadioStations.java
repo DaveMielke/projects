@@ -97,10 +97,13 @@ public class RadioStations extends RadioComponent {
           final int labelLength = label.length();
 
           try {
-            appendToLabel(label, name);
+            JSONObject element = getObject(
+              stations, name,
+              ((label.length() > 0)? label: RadioParameters.RADIO_STATIONS_FILE)
+            );
 
-            JSONObject element = getObject(stations, name, label);
             if (element == null) continue;
+            appendToLabel(label, name);
             final Entry oldEntry = group.getEntry(name);
 
             if (oldEntry != null) {
