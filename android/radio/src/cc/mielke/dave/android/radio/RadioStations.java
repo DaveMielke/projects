@@ -26,20 +26,14 @@ public class RadioStations extends RadioComponent {
 
   public class Station extends Entry {
     private final String stationURL;
-    private final String stationIdentifier;
 
-    public Station (String label, String url, String identifier) {
+    public Station (String label, String url) {
       super(label);
       stationURL = url;
-      stationIdentifier = identifier;
     }
 
     public final String getURL () {
       return stationURL;
-    }
-
-    public final String getIdentifier () {
-      return stationIdentifier;
     }
 
     public final RadioProgram getProgram () {
@@ -125,18 +119,20 @@ public class RadioStations extends RadioComponent {
               String url = (String)object;
               String identifier = getString(element, "identifier", label);
 
+              Station station = new Station(label.toString(), url);
+              group.putEntry(name, station);
+
               if (identifier != null) {
-                if (identifier.isEmpty()) {
-                  identifier = null;
-                } else if (getStation(identifier) != null) {
-                  Log.w(LOG_TAG, ("station identifier already assigned: " + identifier));
-                  identifier = null;
+                if (!identifier.isEmpty()) {
+                  final Station oldStation = getStation(identifier);
+
+                  if (oldStation == null) {
+                    identifiedStations.put(identifier, station);
+                  } else {
+                    Log.w(LOG_TAG, ("station identifier already assigned: " + identifier));
+                  }
                 }
               }
-
-              Station station = new Station(label.toString(), url, identifier);
-              if (identifier != null) identifiedStations.put(identifier, station);
-              group.putEntry(name, station);
             } else if (object instanceof JSONObject) {
               Group subgroup;
 

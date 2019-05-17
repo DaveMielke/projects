@@ -16,28 +16,22 @@ public abstract class BaseActivity extends Activity {
   }
 
   public final AlertDialog.Builder newAlertDialogBuilder (int name) {
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
+    StringBuilder title = new StringBuilder();
     {
-      StringBuilder title = new StringBuilder();
-
       String[] components = new String[] {
         BaseApplication.getName(this),
-        (name == 0)? null: getString(name)
+        getString(name)
       };
 
       for (String component : components) {
-        if (component == null) continue;
-        if (component.isEmpty()) continue;
-
         if (title.length() > 0) title.append(" - ");
         title.append(component);
       }
-
-      if (title.length() > 0) builder.setTitle(title.toString());
     }
 
-    return builder;
+    return new AlertDialog.Builder(this)
+      .setTitle(title.toString())
+      ;
   }
 
   public final AlertDialog.Builder newAlertDialogBuilder () {
