@@ -14,8 +14,12 @@ public abstract class JSONLoader extends StringLoader {
     super();
   }
 
+  protected static void jsonLogProblem (String problem) {
+    Log.w(LOG_TAG, ("JSON problem: " + problem));
+  }
+
   protected static void jsonLogProblem (String format, Object... arguments) {
-    Log.w(LOG_TAG, ("JSON problem: " + String.format(format, arguments)));
+    jsonLogProblem(String.format(format, arguments));
   }
 
   protected static String[] jsonGetKeys (JSONObject object) {
@@ -34,7 +38,10 @@ public abstract class JSONLoader extends StringLoader {
     Iterator<String> iterator = object.keys();
 
     while (iterator.hasNext()) {
-      jsonLogProblem("key not handled: %s: %s", iterator.next(), label);
+      jsonLogProblem(
+        "key not handled: %s: %s",
+        jsonKeyToString(iterator.next()), label
+      );
     }
   }
 
