@@ -97,12 +97,12 @@ public class RadioStations extends RadioComponent {
           final int labelLength = label.length();
 
           try {
-            JSONObject element = jsonGetObject(
+            JSONObject properties = jsonGetObject(
               stations, name,
               ((label.length() > 0)? label: RadioParameters.RADIO_STATIONS_FILE)
             );
 
-            if (element == null) continue;
+            if (properties == null) continue;
             appendToLabel(label, name);
             final Entry oldEntry = group.getEntry(name);
 
@@ -114,7 +114,7 @@ public class RadioStations extends RadioComponent {
             }
 
             String key = "listen";
-            Object object = element.remove(key);
+            Object object = properties.remove(key);
 
             if (object == null) {
               jsonLogProblem(
@@ -123,7 +123,7 @@ public class RadioStations extends RadioComponent {
               );
             } else if (object instanceof String) {
               String url = (String)object;
-              String identifier = jsonGetString(element, "identifier", label);
+              String identifier = jsonGetString(properties, "identifier", label);
 
               Station station = new Station(label.toString(), url);
               group.putEntry(name, station);
@@ -148,7 +148,7 @@ public class RadioStations extends RadioComponent {
               Group subgroup;
 
               {
-                String text = jsonGetString(element, "within-label", label);
+                String text = jsonGetString(properties, "within-label", label);
 
                 if (text != null) {
                   label.setLength(labelLength);
@@ -168,7 +168,7 @@ public class RadioStations extends RadioComponent {
               jsonLogUnexpectedType(object, key, label, String.class, JSONObject.class);
             }
 
-            jsonLogUnhandledKeys(element, label);
+            jsonLogUnhandledKeys(properties, label);
           } finally {
             label.setLength(labelLength);
           }

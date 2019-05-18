@@ -13,15 +13,15 @@ public abstract class PropertiesLoader extends CharactersLoader {
     super();
   }
 
-  protected abstract void load (Properties properties, String name);
+  protected abstract void load (Properties properties, String path);
 
   @Override
-  protected final void load (Reader reader, String name) {
+  protected final void load (Reader reader, String path) {
     Properties properties = new Properties();
 
     try {
       properties.load(reader);
-      load(properties, name);
+      load(properties, path);
     } catch (IOException exception) {
       Log.w(LOG_TAG, ("properties load error: " + exception.getMessage()));
     }

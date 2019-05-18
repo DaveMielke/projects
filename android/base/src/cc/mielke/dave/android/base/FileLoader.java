@@ -18,19 +18,21 @@ public abstract class FileLoader extends BaseComponent {
     super();
   }
 
-  protected abstract void load (InputStream stream, String name);
+  protected abstract void load (InputStream stream, String path);
 
   private final void load (File file) {
     if (file.exists()) {
+      String path = file.getAbsolutePath();
+
       if (!file.isFile()) {
-        Log.w(LOG_TAG, ("not a file: " + file.getAbsolutePath()));
+        Log.w(LOG_TAG, ("not a file: " + path));
       } else if (!file.canRead()) {
-        Log.w(LOG_TAG, ("file not readable: " + file.getAbsolutePath()));
+        Log.w(LOG_TAG, ("file not readable: " + path));
       } else {
         try {
           InputStream stream = new FileInputStream(file);
           try {
-            load(stream, file.getName());
+            load(stream, path);
           } finally {
             try {
               stream.close();
@@ -45,15 +47,15 @@ public abstract class FileLoader extends BaseComponent {
     }
   }
 
-  private final void load (File directory, String name) {
-    if (directory != null) load(new File(directory, name));
+  private final void load (File directory, String path) {
+    if (directory != null) load(new File(directory, path));
   }
 
   private final void load (AssetManager assets, String path) {
     try {
       InputStream stream = assets.open(path);
       try {
-        load(stream, path.substring(path.lastIndexOf(File.separatorChar) + 1));
+        load(stream, path);
       } finally {
         try {
           stream.close();
@@ -68,11 +70,11 @@ public abstract class FileLoader extends BaseComponent {
     }
   }
 
-  public final void load (String name) {
+  public final void load (String path) {
     Context context = getContext();
 
-    load(context.getFilesDir(), name);
-    load(getExternalStorageDirectory(), name);
-    load(context.getAssets(), name);
+    load(context.getFilesDir(), path);
+    load(getExternalStorageDirectory(), path);
+    load(context.getAssets(), path);
   }
 }

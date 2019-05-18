@@ -12,12 +12,12 @@ public abstract class JSONArrayLoader extends JSONLoader {
     super();
   }
 
-  protected abstract void load (JSONArray root, String name);
+  protected abstract void load (JSONArray root, String path);
 
   @Override
-  protected final void load (String string, String name) {
+  protected final void load (String string, String path) {
     try {
-      load(new JSONArray(string), name);
+      load(new JSONArray(string), path);
     } catch (JSONException exception) {
       Log.w(LOG_TAG, ("JSON array read error: " + exception.getMessage()));
     }

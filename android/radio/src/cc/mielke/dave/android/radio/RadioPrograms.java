@@ -17,24 +17,24 @@ public class RadioPrograms extends RadioComponent {
   private final void addPrograms () {
     new JSONObjectLoader() {
       @Override
-      protected void load (JSONObject root, String name) {
-        for (String key : jsonGetKeys(root)) {
-          JSONObject properties = jsonGetObject(root, key, name);
+      protected void load (JSONObject root, String path) {
+        for (String name : jsonGetKeys(root)) {
+          JSONObject properties = jsonGetObject(root, name, path);
           if (properties == null) continue;
 
-          if (getProgram(key) != null) {
-            Log.w(LOG_TAG, ("program already defined: " + key));
+          if (getProgram(name) != null) {
+            Log.w(LOG_TAG, ("program already defined: " + name));
           } else {
             RadioProgram program = new SimpleProgramBuilder()
-              .setProgramName(key)
-              .setMusicCollection(jsonGetString(properties, "music", key))
-              .setBookCollection(jsonGetString(properties, "book", key))
-              .setAnnounceHours(jsonGetBoolean(properties, "hours", key))
-              .setAnnounceMinutes(jsonGetBoolean(properties, "minutes", key))
+              .setProgramName(name)
+              .setMusicCollection(jsonGetString(properties, "music", name))
+              .setBookCollection(jsonGetString(properties, "book", name))
+              .setAnnounceHours(jsonGetBoolean(properties, "hours", name))
+              .setAnnounceMinutes(jsonGetBoolean(properties, "minutes", name))
               .build();
 
-            jsonLogUnhandledKeys(properties, key);
-            if (program != null) programs.put(key, program);
+            jsonLogUnhandledKeys(properties, name);
+            if (program != null) programs.put(name, program);
           }
         }
       }
