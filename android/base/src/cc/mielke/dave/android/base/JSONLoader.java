@@ -136,7 +136,7 @@ public abstract class JSONLoader extends StringLoader {
     return jsonGetVerified(value, Double.class, key, path);
   }
 
-  private static Object jsonGetValue (JSONObject object, String key) {
+  protected static Object jsonGetValue (JSONObject object, String key) {
     return object.remove(key);
   }
 
@@ -176,7 +176,7 @@ public abstract class JSONLoader extends StringLoader {
     return value;
   }
 
-  private static Object jsonGetValue (JSONArray array, int index) {
+  protected static Object jsonGetValue (JSONArray array, int index) {
     return array.opt(index);
   }
 

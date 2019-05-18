@@ -116,7 +116,7 @@ public class RadioStations extends RadioComponent {
             }
 
             String key = "listen";
-            Object object = properties.remove(key);
+            Object object = jsonGetValue(properties, key);
 
             if (object == null) {
               jsonLogProblem("%s not specified: %s", jsonKeyToString(key), path);
