@@ -23,16 +23,16 @@ public abstract class CollectionPlayer extends FilePlayer {
     return collectionLibrary;
   }
 
-  protected static boolean hasAudioExtension (String name) {
-    for (String extension : RadioParameters.AUDIO_EXTENSIONS) {
-      if (name.endsWith(extension)) return true;
-    }
-
-    return false;
+  protected static boolean isAudioExtension (String extension) {
+    return RadioParameters.AUDIO_EXTENSIONS.contains(extension.toLowerCase());
   }
 
   protected static boolean hasAudioExtension (File file) {
-    return hasAudioExtension(file.getName());
+    String name = file.getName();
+    int index = name.lastIndexOf('.');
+    if (index < 1) return false;
+    if (++index == name.length()) return false;
+    return isAudioExtension(name.substring(index));
   }
 
   protected static void sortByPath (ArrayList<File> files) {

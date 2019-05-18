@@ -1,19 +1,30 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import java.util.Set;
+import java.util.HashSet;
+
 import java.util.concurrent.TimeUnit;
 
 public abstract class RadioParameters {
   private RadioParameters () {
   }
 
+  private static <TYPE> Set<TYPE> toUnmodificableSet (TYPE... values) {
+    return Collections.unmodifiableSet(new HashSet<TYPE>(Arrays.asList(values)));
+  }
+
+  public final static Set<String> AUDIO_EXTENSIONS =
+    toUnmodificableSet(
+      "mp3", "wav", "mid"
+    );
+
   public final static String MUSIC_LIBRARY_FILE = "music";
   public final static String BOOK_LIBRARY_FILE = "books";
   public final static String RADIO_PROGRAMS_FILE = "programs";
   public final static String RADIO_STATIONS_FILE = "stations";
-
-  public final static String[] AUDIO_EXTENSIONS = new String[] {
-    ".mp3", ".mid"
-  };
 
   public final static long PROGRAM_DEFAULT_DELAY = TimeUnit.MINUTES.toMillis(20);
   public final static long STATION_RETRY_DELAY = TimeUnit.MINUTES.toMillis(1);

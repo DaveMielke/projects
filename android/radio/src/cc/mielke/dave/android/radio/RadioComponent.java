@@ -42,7 +42,7 @@ public abstract class RadioComponent extends BaseComponent {
     updateNotification(null);
   }
 
-  protected final <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {
+  protected static <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {
     if (list.isEmpty()) return null;
     int index = (int)Math.round(Math.floor((double)list.size() * Math.random()));
     return list.remove(index);
