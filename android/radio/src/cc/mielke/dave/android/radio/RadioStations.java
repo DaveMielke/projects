@@ -92,19 +92,21 @@ public class RadioStations extends RadioComponent {
         label.append(text);
       }
 
-      private final void loadGroup (JSONObject stations, Group group, StringBuilder label) {
+      private final void loadGroup (JSONObject stations, Group group, StringBuilder label, StringBuilder path) {
         for (String name : jsonGetKeys(stations)) {
-          final int labelLength = label.length();
+          JSONObject properties = jsonGetObject(stations, name, path);
+          if (properties == null) continue;
+
+          int labelLength = label.length();
+          int pathLength = path.length();
 
           try {
-            JSONObject properties = jsonGetObject(
-              stations, name,
-              ((label.length() > 0)? label: RadioParameters.RADIO_STATIONS_FILE)
-            );
-
-            if (properties == null) continue;
             appendToLabel(label, name);
-            final Entry oldEntry = group.getEntry(name);
+
+            path.append(" -> ");
+            path.append(name);
+
+            Entry oldEntry = group.getEntry(name);
 
             if (oldEntry != null) {
               if (!(oldEntry instanceof Group)) {
@@ -117,20 +119,17 @@ public class RadioStations extends RadioComponent {
             Object object = properties.remove(key);
 
             if (object == null) {
-              jsonLogProblem(
-                "%s not specified: %s",
-                jsonKeyToString(key), label
-              );
+              jsonLogProblem("%s not specified: %s", jsonKeyToString(key), path);
             } else if (object instanceof String) {
               String url = (String)object;
-              String identifier = jsonGetString(properties, "identifier", label);
+              String identifier = jsonGetString(properties, "identifier", path);
 
               Station station = new Station(label.toString(), url);
               group.putEntry(name, station);
 
               if (identifier != null) {
                 if (!identifier.isEmpty()) {
-                  final Station oldStation = getStation(identifier);
+                  Station oldStation = getStation(identifier);
 
                   if (oldStation == null) {
                     identifiedStations.put(identifier, station);
@@ -148,7 +147,7 @@ public class RadioStations extends RadioComponent {
               Group subgroup;
 
               {
-                String text = jsonGetString(properties, "within-label", label);
+                String text = jsonGetString(properties, "within-label", path);
 
                 if (text != null) {
                   label.setLength(labelLength);
@@ -163,21 +162,22 @@ public class RadioStations extends RadioComponent {
                 subgroup = (Group)oldEntry;
               }
 
-              loadGroup((JSONObject)object, subgroup, label);
+              loadGroup((JSONObject)object, subgroup, label, path);
             } else {
-              jsonLogUnexpectedType(object, key, label, String.class, JSONObject.class);
+              jsonLogUnexpectedType(object, key, path, String.class, JSONObject.class);
             }
 
-            jsonLogUnhandledKeys(properties, label);
+            jsonLogUnhandledKeys(properties, path);
           } finally {
             label.setLength(labelLength);
+            path.setLength(pathLength);
           }
         }
       }
 
       @Override
-      protected void load (JSONObject root, String name) {
-        loadGroup(root, rootGroup, new StringBuilder());
+      protected void load (JSONObject root, String path) {
+        loadGroup(root, rootGroup, new StringBuilder(), new StringBuilder(path));
       }
     }.load(RadioParameters.RADIO_STATIONS_FILE);
   }
