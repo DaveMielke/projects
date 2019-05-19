@@ -5,6 +5,7 @@
   <string name="player_service_label">DM Radio Player Service</string>
 
   <string name="action_selectProgram">Select Program</string>
+  <string name="action_selectSchedule">Select Schedule</string>
   <string name="action_selectStation">Select Station</string>
 
   <string name="name_noProgram">Off</string>

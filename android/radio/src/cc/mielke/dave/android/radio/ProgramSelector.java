@@ -105,9 +105,43 @@ public class ProgramSelector extends ActivityComponent {
       }
     };
 
+  private final Action actionSelectSchedule =
+    new Action() {
+      @Override
+      public int getName () {
+        return R.string.action_selectSchedule;
+      }
+
+      @Override
+      public void performAction () {
+        new AsyncTask<Object, Object, RadioSchedules>() {
+          @Override
+          protected RadioSchedules doInBackground (Object... arguments) {
+            return getRadioSchedules();
+          }
+
+          @Override
+          protected void onPostExecute (final RadioSchedules schedules) {
+            final String[] names = schedules.getNames();
+            sort(names);
+
+            mainActivity.selectItem(
+              R.string.action_selectSchedule, names,
+              new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick (DialogInterface dialog, int position) {
+                }
+              }
+            );
+          }
+        }.execute();
+      }
+    };
+
   private final Action[] actions = new Action[] {
     actionNoProgram
   , actionSelectStation
+  , actionSelectSchedule
   };
 
   public final void selectProgram () {
