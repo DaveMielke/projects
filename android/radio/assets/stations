@@ -3,7 +3,7 @@
     "within-label": "AJ",
     "listen": {
       "English": {
-        "identifier": "aj-english",
+        "identifier": "aljazeera",
         "listen": "https://english.streaming.aljazeera.net/aljazeera/english2/index4147.m3u8"
       }
     }
@@ -13,7 +13,7 @@
     "within-label": "BBC",
     "listen": {
       "World Service": {
-        "identifier": "bbc-world-service",
+        "identifier": "bbc-world",
         "listen": "http://www.bbc.co.uk/worldservice/meta/live/mp3/eneuk.pls"
       }
     }
