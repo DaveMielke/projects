@@ -1,5 +1,6 @@
 package cc.mielke.dave.android.radio;
 
+import cc.mielke.dave.android.base.CollectionHelper;
 import java.util.ArrayList;
 import java.io.File;
 
@@ -46,7 +47,7 @@ public class BookPlayer extends CollectionPlayer {
           }
 
           if (!bookFiles.isEmpty()) {
-            sortByPath(bookFiles);
+            CollectionHelper.sortByPath(bookFiles);
             break;
           }
         }

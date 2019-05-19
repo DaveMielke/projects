@@ -1,11 +1,7 @@
 package cc.mielke.dave.android.radio;
 
-import cc.mielke.dave.android.base.ApiTests;
-
 import cc.mielke.dave.android.base.CollectionHelper;
-import java.util.Collections;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.io.File;
 
 import android.util.Log;
@@ -34,22 +30,6 @@ public abstract class CollectionPlayer extends FilePlayer {
     if (index < 1) return false;
     if (++index == name.length()) return false;
     return isAudioExtension(name.substring(index));
-  }
-
-  protected static void sortByPath (ArrayList<File> files) {
-    Comparator<File> comparator =
-      new Comparator<File>() {
-        @Override
-        public int compare (File file1, File file2) {
-          return file1.getAbsolutePath().compareTo(file2.getAbsolutePath());
-        }
-      };
-
-    if (ApiTests.HAVE_ArrayList_sort) {
-      files.sort(comparator);
-    } else {
-      Collections.sort(files, comparator);
-    }
   }
 
   private final ArrayList<File> collectionMembers = new ArrayList<>();
