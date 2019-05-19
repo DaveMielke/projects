@@ -12,7 +12,7 @@ import org.json.JSONObject;
 public class RadioStations extends RadioComponent {
   private final static String LOG_TAG = RadioStations.class.getName();
 
-  public abstract class Entry {
+  public abstract static class Entry {
     private final String entryLabel;
 
     protected Entry (String label) {
@@ -24,7 +24,7 @@ public class RadioStations extends RadioComponent {
     }
   }
 
-  public class Station extends Entry {
+  public static class Station extends Entry {
     private final String stationURL;
 
     public Station (String label, String url) {
@@ -35,24 +35,9 @@ public class RadioStations extends RadioComponent {
     public final String getURL () {
       return stationURL;
     }
-
-    public final RadioProgram getProgram () {
-      synchronized (stationPrograms) {
-        RadioProgram program = stationPrograms.get(this);
-
-        if (program == null) {
-          program = new RadioProgram();
-          program.setName(getLabel());
-          program.addPlayers(new StationPlayer(getURL()));
-          stationPrograms.put(this, program);
-        }
-
-        return program;
-      }
-    }
   }
 
-  public class Group extends Entry {
+  public static class Group extends Entry {
     public Group (String label) {
       super(label);
     }
@@ -83,6 +68,21 @@ public class RadioStations extends RadioComponent {
 
   public final Station getStation (String identifier) {
     return identifiedStations.get(identifier);
+  }
+
+  public final RadioProgram getProgram (Station station) {
+    synchronized (stationPrograms) {
+      RadioProgram program = stationPrograms.get(station);
+
+      if (program == null) {
+        program = new RadioProgram();
+        program.setName(station.getLabel());
+        program.addPlayers(new StationPlayer(station.getURL()));
+        stationPrograms.put(station, program);
+      }
+
+      return program;
+    }
   }
 
   private final void loadStations () {

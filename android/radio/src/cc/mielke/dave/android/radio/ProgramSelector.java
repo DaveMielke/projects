@@ -79,7 +79,8 @@ public class ProgramSelector extends ActivityComponent {
               RadioStations.Entry entry = group.getEntry(name);
 
               if (entry instanceof RadioStations.Station) {
-                setProgram(((RadioStations.Station)entry).getProgram());
+                RadioStations.Station station = (RadioStations.Station)entry;
+                setProgram(getStations().getProgram(station));
               } else if (entry instanceof RadioStations.Group) {
                 selectStation((RadioStations.Group)entry);
               }
