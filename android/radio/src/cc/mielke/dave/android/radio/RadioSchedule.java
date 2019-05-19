@@ -10,6 +10,26 @@ import android.util.Log;
 public class RadioSchedule extends RadioComponent {
   private final static String LOG_TAG = RadioSchedule.class.getName();
 
+  private final String scheduleName;
+
+  public final String getName () {
+    return scheduleName;
+  }
+
+  public final String getExternalName () {
+    {
+      String name = getName();
+      if ((name != null) && !name.isEmpty()) return name;
+    }
+
+    return getString(R.string.name_anonymousSchedule);
+  }
+
+  public static String getExternalName (RadioSchedule schedule) {
+    if (schedule == null) return getString(R.string.name_noSchedule);
+    return schedule.getExternalName();
+  }
+
   private static class RuleException extends Exception {
     public RuleException (String message) {
       super(message);
@@ -58,8 +78,9 @@ public class RadioSchedule extends RadioComponent {
   private final static char commentCharacter = '#';
   private final static Pattern splitPattern = Pattern.compile("\\s+");
 
-  public RadioSchedule (String... rules) {
+  public RadioSchedule (String name, String... rules) {
     super();
+    scheduleName = name;
 
     for (String rule : rules) {
       {
@@ -97,5 +118,11 @@ public class RadioSchedule extends RadioComponent {
         }
       }
     }
+  }
+
+  public final void start () {
+  }
+
+  public final void stop () {
   }
 }

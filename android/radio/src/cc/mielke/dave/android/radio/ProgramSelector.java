@@ -130,6 +130,9 @@ public class ProgramSelector extends ActivityComponent {
               new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick (DialogInterface dialog, int position) {
+                  String name = names[position];
+                  RadioSchedule schedule = getRadioSchedules().getSchedule(name);
+                  CurrentSchedule.set(schedule);
                 }
               }
             );

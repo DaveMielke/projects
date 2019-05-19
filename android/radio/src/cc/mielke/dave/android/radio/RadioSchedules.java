@@ -55,7 +55,7 @@ public class RadioSchedules extends RadioComponent {
             if (rules.isEmpty()) {
               Log.w(LOG_TAG, ("no rules: " + name));
             } else {
-              radioSchedules.put(name, new RadioSchedule(rules.toArray(new String[rules.size()])));
+              radioSchedules.put(name, new RadioSchedule(name, rules.toArray(new String[rules.size()])));
             }
           }
         }

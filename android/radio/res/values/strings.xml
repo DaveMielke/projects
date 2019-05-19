@@ -11,6 +11,9 @@
   <string name="name_noProgram">Off</string>
   <string name="name_anonymousProgram">Unnamed</string>
 
+  <string name="name_noSchedule">None</string>
+  <string name="name_anonymousSchedule">Unnamed</string>
+
   <string name="message_noProgram">program not selected</string>
 
   <string name="action_uriPlay">Play</string>
