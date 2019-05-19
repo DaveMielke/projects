@@ -31,7 +31,7 @@ public class ProgramSelector extends ActivityComponent {
   }
 
   private final void setProgram (String name) {
-    setProgram(getPrograms().getProgram(name));
+    setProgram(getCustomPrograms().getProgram(name));
   }
 
   public ProgramSelector (MainActivity activity) {
@@ -80,7 +80,7 @@ public class ProgramSelector extends ActivityComponent {
 
               if (entry instanceof RadioStations.Station) {
                 RadioStations.Station station = (RadioStations.Station)entry;
-                setProgram(getStations().getProgram(station));
+                setProgram(getRadioStations().getProgram(station));
               } else if (entry instanceof RadioStations.Group) {
                 selectStation((RadioStations.Group)entry);
               }
@@ -94,7 +94,7 @@ public class ProgramSelector extends ActivityComponent {
         new AsyncTask<Object, Object, RadioStations>() {
           @Override
           protected RadioStations doInBackground (Object... arguments) {
-            return getStations();
+            return getRadioStations();
           }
 
           @Override
@@ -111,15 +111,15 @@ public class ProgramSelector extends ActivityComponent {
   };
 
   public final void selectProgram () {
-    new AsyncTask<Object, Object, RadioPrograms>() {
+    new AsyncTask<Object, Object, CustomPrograms>() {
       @Override
-      protected RadioPrograms doInBackground (Object... arguments) {
-        RadioApplication.refresh();
-        return getPrograms();
+      protected CustomPrograms doInBackground (Object... arguments) {
+        RadioApplication.refreshData();
+        return getCustomPrograms();
       }
 
       @Override
-      protected void onPostExecute (RadioPrograms programs) {
+      protected void onPostExecute (CustomPrograms programs) {
         String[] names = programs.getNames();
         if (names == null) names = new String[0];
         sort(names);

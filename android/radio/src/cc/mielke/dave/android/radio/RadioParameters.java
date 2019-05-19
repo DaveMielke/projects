@@ -15,7 +15,7 @@ public abstract class RadioParameters {
 
   public final static String MUSIC_LIBRARY_FILE = "music";
   public final static String BOOK_LIBRARY_FILE = "books";
-  public final static String RADIO_PROGRAMS_FILE = "programs";
+  public final static String CUSTOM_PROGRAMS_FILE = "programs";
   public final static String RADIO_STATIONS_FILE = "stations";
 
   public final static long PROGRAM_DEFAULT_DELAY = TimeUnit.MINUTES.toMillis(20);

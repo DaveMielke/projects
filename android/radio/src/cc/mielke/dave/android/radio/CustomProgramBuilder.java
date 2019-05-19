@@ -2,10 +2,10 @@ package cc.mielke.dave.android.radio;
 
 import android.util.Log;
 
-public class SimpleProgramBuilder extends RadioComponent {
-  private final static String LOG_TAG = SimpleProgramBuilder.class.getName();
+public class CustomProgramBuilder extends RadioComponent {
+  private final static String LOG_TAG = CustomProgramBuilder.class.getName();
 
-  public SimpleProgramBuilder () {
+  public CustomProgramBuilder () {
     super();
   }
 
@@ -15,27 +15,27 @@ public class SimpleProgramBuilder extends RadioComponent {
   private boolean announceHours = false;
   private boolean announceMinutes = false;
 
-  public final SimpleProgramBuilder setProgramName (String name) {
+  public final CustomProgramBuilder setProgramName (String name) {
     programName = name;
     return this;
   }
 
-  public final SimpleProgramBuilder setMusicCollection (String collection) {
+  public final CustomProgramBuilder setMusicCollection (String collection) {
     musicCollection = collection;
     return this;
   }
 
-  public final SimpleProgramBuilder setBookCollection (String collection) {
+  public final CustomProgramBuilder setBookCollection (String collection) {
     bookCollection = collection;
     return this;
   }
 
-  public final SimpleProgramBuilder setAnnounceHours (boolean yes) {
+  public final CustomProgramBuilder setAnnounceHours (boolean yes) {
     announceHours = yes;
     return this;
   }
 
-  public final SimpleProgramBuilder setAnnounceMinutes (boolean yes) {
+  public final CustomProgramBuilder setAnnounceMinutes (boolean yes) {
     announceMinutes = yes;
     return this;
   }
@@ -96,7 +96,7 @@ public class SimpleProgramBuilder extends RadioComponent {
     );
 
     if (hasPlayers) return program;
-    Log.w(LOG_TAG, ("no players: " + programName));
+    Log.w(LOG_TAG, ("no players: " + name));
     return null;
   }
 }

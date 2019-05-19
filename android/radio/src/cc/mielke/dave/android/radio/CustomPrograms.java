@@ -9,10 +9,23 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-public class RadioPrograms extends RadioComponent {
-  private final static String LOG_TAG = RadioPrograms.class.getName();
+public class CustomPrograms extends RadioComponent {
+  private final static String LOG_TAG = CustomPrograms.class.getName();
 
-  private final Map<String, RadioProgram> programs = new HashMap<>();
+  private final Map<String, RadioProgram> customPrograms = new HashMap<>();
+
+  public final String[] getNames () {
+    synchronized (this) {
+      Set<String> names = customPrograms.keySet();
+      return names.toArray(new String[names.size()]);
+    }
+  }
+
+  public final RadioProgram getProgram (String name) {
+    synchronized (this) {
+      return customPrograms.get(name);
+    }
+  }
 
   private final void addPrograms () {
     new JSONObjectLoader() {
@@ -25,7 +38,7 @@ public class RadioPrograms extends RadioComponent {
           if (getProgram(name) != null) {
             Log.w(LOG_TAG, ("program already defined: " + name));
           } else {
-            RadioProgram program = new SimpleProgramBuilder()
+            RadioProgram program = new CustomProgramBuilder()
               .setProgramName(name)
               .setMusicCollection(jsonGetString(properties, "music", name))
               .setBookCollection(jsonGetString(properties, "book", name))
@@ -34,28 +47,15 @@ public class RadioPrograms extends RadioComponent {
               .build();
 
             jsonLogUnhandledKeys(properties, name);
-            if (program != null) programs.put(name, program);
+            if (program != null) customPrograms.put(name, program);
           }
         }
       }
-    }.load(RadioParameters.RADIO_PROGRAMS_FILE);
+    }.load(RadioParameters.CUSTOM_PROGRAMS_FILE);
   }
 
-  public RadioPrograms () {
+  public CustomPrograms () {
     super();
     addPrograms();
-  }
-
-  public final String[] getNames () {
-    synchronized (this) {
-      Set<String> names = programs.keySet();
-      return names.toArray(new String[names.size()]);
-    }
-  }
-
-  public final RadioProgram getProgram (String name) {
-    synchronized (this) {
-      return programs.get(name);
-    }
   }
 }

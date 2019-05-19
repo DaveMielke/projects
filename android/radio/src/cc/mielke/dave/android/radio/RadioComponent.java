@@ -15,12 +15,12 @@ public abstract class RadioComponent extends BaseComponent {
     return RadioApplication.getBookLibrary();
   }
 
-  protected static RadioStations getStations () {
-    return RadioApplication.getRadioStations();
+  protected static CustomPrograms getCustomPrograms () {
+    return RadioApplication.getCustomPrograms();
   }
 
-  protected static RadioPrograms getPrograms () {
-    return RadioApplication.getRadioPrograms();
+  protected static RadioStations getRadioStations () {
+    return RadioApplication.getRadioStations();
   }
 
   protected static void updateNotification (CharSequence title, CharSequence text) {

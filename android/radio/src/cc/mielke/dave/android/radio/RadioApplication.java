@@ -5,15 +5,15 @@ import cc.mielke.dave.android.base.BaseApplication;
 public class RadioApplication extends BaseApplication {
   private static MusicLibrary musicLibrary = null;
   private static BookLibrary bookLibrary = null;
+  private static CustomPrograms customPrograms = null;
   private static RadioStations radioStations = null;
-  private static RadioPrograms radioPrograms = null;
 
-  public static void refresh () {
+  public static void refreshData () {
     synchronized (APPLICATION_LOCK) {
       musicLibrary = null;
       bookLibrary = null;
+      customPrograms = null;
       radioStations = null;
-      radioPrograms = null;
     }
   }
 
@@ -36,17 +36,17 @@ public class RadioApplication extends BaseApplication {
     }
   }
 
+  public static CustomPrograms getCustomPrograms () {
+    synchronized (APPLICATION_LOCK) {
+      if (customPrograms == null) customPrograms = new CustomPrograms();
+      return customPrograms;
+    }
+  }
+
   public static RadioStations getRadioStations () {
     synchronized (APPLICATION_LOCK) {
       if (radioStations == null) radioStations = new RadioStations();
       return radioStations;
-    }
-  }
-
-  public static RadioPrograms getRadioPrograms () {
-    synchronized (APPLICATION_LOCK) {
-      if (radioPrograms == null) radioPrograms = new RadioPrograms();
-      return radioPrograms;
     }
   }
 }
