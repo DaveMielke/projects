@@ -1,0 +1,109 @@
+{
+  "Dave Mielke": [
+    "#cbc1-ottawa mon-fri 16:00-17:59 # (holidays)",
+    "#cbc1-ottawa mon-thu 11:00-11:59 mar 25-28 # Canada Reads",
+
+    "# for when we're on daylight time but Europe is on standard time",
+    "#portraits mon-fri 15:00-15:59",
+    "#bbc-world mon-fri 16:00-16:59",
+    "#bbc-world sat     15:00-15:59",
+
+    "#cbc1-ottawa  mon-fri 10:00-11:29 # q",
+    "#bbc-world    mon-fri 12:00-12:59 # OS",
+    "#cbc1-ottawa  thu     14:00-14:59 # Now or Never",
+    "#cbc1-halifax mon-fri 20:00-20:59 # Ideas",
+    "#cbc1-ottawa  mon-fri 20:00-20:59 # The Current Review",
+    "#cbc1-ottawa  mon-fri 21:00-21:59 # Ideas",
+
+    "cbc1-winnipeg dec 25 01:00-06:59",
+    "christian     dec 25 05:30-11:59",
+    "cbc1-halifax  dec 25 12:00-14:59 # Messiah, Queen's Message",
+    "christian     dec 25 20:00-23:59",
+    "cbc1-halifax  dec 26 14:00-14:59 # Quirks and Quarks",
+    "cbc1-ottawa   dec 26 16:00-16:59 # Giving Back",
+    "cbc1-ottawa   dec 26 17:00-17:59 # The Longing for Belonging",
+    "bbc-world     dec 29 15:00-15:59 # The New Year International Comedy Show",
+    "christian     dec 31 20:00-23:59",
+
+    "cbc1-ottawa mon-fri 05:30-08:36 # Ottawa Morning",
+    "cbc1-ottawa mon-fri 08:37-09:59 # The Current",
+
+    "cbc1-ottawa mon 11:32-11:59 # Because News",
+    "cbc1-ottawa tue 11:32-11:59 # The Doc Project",
+    "cbc1-ottawa wed 11:32-11:59 # The Debaters",
+    "cbc1-ottawa thu 11:32-11:59 # Under the Influence",
+
+    "cbc1-ottawa mon-fri 12:00-12:59 # Ontario Today",
+
+    "bbc-world   mon-thu 13:00-13:59 # Outlook",
+    "bbc-world   fri     13:00-13:59 # The Fifth Floor",
+
+    "cbc1-ottawa   mon 14:00-14:59 # Ideas in the Afternoon",
+    "cbc1-winnipeg thu 14:00-14:59 # Out in the Open",
+
+    "bbc-world mon 15:00-15:29 # The Why Factor/Hard Talk",
+    "bbc-world tue 15:00-15:29 # The Documentary/World Hacks",
+    "bbc-world wed 15:00-15:29 # The Compass/Hard Talk",
+    "bbc-world thu 15:00-15:29 # Assignment/The Inquiry",
+    "bbc-world fri 15:00-15:29 # Trending/Hard Talk",
+
+    "bbc-world mon 15:30-15:59 # Discovery",
+    "bbc-world tue 15:30-15:59 # Digital Planet",
+    "bbc-world wed 15:30-15:59 # Health Check",
+    "bbc-world thu 15:30-15:59 # Science in Action",
+    "bbc-world fri 15:30-15:59 # Crowd Science",
+
+    "cbc1-ottawa mon-fri 18:00-18:29 # The World at Six",
+    "cbc1-ottawa mon-fri 18:30-19:59 # As It Happens",
+
+    "cbc1-ottawa    mon 23:00-23:59 # Quirks and Quarks",
+    "cbc1-ottawa    tue 23:32-23:59 # BBC - The Documentary",
+    "bbc-world      fri 23:00-23:59 # The Real Story",
+    "bbc-world      sat 23:00-23:59 # From Our Own Correspondant, Boston Calling",
+
+    "aljazeera     tue-sat 00:00-00:32 # News",
+    "aljazeera     tue     00:33-00:59 # Counting the Cost/The Stream",
+    "aljazeera     wed     00:33-00:59 # The Listening Post/The Stream",
+    "aljazeera     thu     00:33-00:59 # Witness/The Stream",
+    "aljazeera     fri     00:33-00:59 # AJ Selects/The Stream",
+    "aljazeera     sat     00:33-00:59 # Science in a Golden Age/Talk to Al-Jazeera",
+    "cbc1-ottawa   tue-sat 01:00-01:59 # PRI - The World",
+
+    "cbc1-halifax tue 02:00-02:30 # BBC - Discovery",
+    "cbc1-halifax wed 02:00-02:30 # BBC - In the Studio",
+    "cbc1-halifax thu 02:00-02:30 # BBC - World Hacks",
+    "cbc1-halifax fri 02:00-02:30 # BBC - The Inquiry",
+    "cbc1-halifax sat 02:00-02:30 # BBC - The Compass",
+
+    "cbc1-halifax tue 02:31-02:59 # BBC - The Food Chain",
+    "cbc1-halifax wed 02:31-02:59 # BBC - Heart and Soul",
+    "cbc1-halifax thu 02:31-02:59 # ABC - Off Track/Science Friction",
+    "cbc1-halifax fri 02:31-02:59 # DW - World in Progress",
+    "cbc1-halifax sat 02:31-02:59 # ABC - The Health Report",
+
+    "cbc1-vancouver sat 07:00-07:59 # DW - Inside Europe",
+    "cbc1-vancouver sat 08:00-08:31 # ABC - Rear Vision",
+    "cbc1-vancouver sat 08:32-08:59 # BBC - The Conversation",
+    "cbc1-ottawa    sat 09:00-09:59 # The House",
+    "cbc1-ottawa    sat 10:00-10:59 # Day 6",
+    "cbc1-ottawa    sat 11:00-11:31 # Because News",
+    "cbc1-ottawa    sat 11:32-11:59 # Under the Influence",
+    "cbc1-ottawa    sat 12:00-12:59 # Quirks and Quarks",
+    "cbc1-ottawa    sat 13:00-13:31 # White Coat, Black Art",
+    "cbc1-ottawa    sat 13:32-13:59 # The Debaters",
+    "bbc-world      sat 14:00-14:59 # From the Ground Up, Heart and Soul, World Questions, The Documentary",
+    "portraits      sat 15:00-16:59",
+    "cbc1-calgary   sat 17:00-17:59 # Now or Never",
+    "cbc1-ottawa    sat 18:00-18:29 # The World This Weekend",
+    "cbc1-ottawa  sun 00:00-00:59 # The House",
+    "cbc1-halifax sun 01:00-01:59 # BBC - The Science Hour (Science in Action, Crowd Science)",
+
+    "cbc1-winnipeg mon 00:00-00:59 # PRI - This American Life",
+    "cbc1-winnipeg mon 01:00-01:59 # The Sunday Edition - Round Midnight",
+    "cbc1-halifax  mon 02:00-02:34 # DW - Living Planet",
+    "cbc1-halifax  mon 02:35-02:59 # BBC - The Why Factor",
+
+    "portraits mon-fri 13:00-14:59",
+    "christian"
+  ]
+}
