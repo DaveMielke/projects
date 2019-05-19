@@ -2,6 +2,7 @@ package cc.mielke.dave.android.radio;
 
 import cc.mielke.dave.android.base.ApiTests;
 
+import cc.mielke.dave.android.base.CollectionHelper;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -118,7 +119,7 @@ public abstract class CollectionPlayer extends FilePlayer {
         if (collectionMembers.isEmpty()) return null;
       }
 
-      return removeRandomElement(collectionMembers);
+      return CollectionHelper.removeRandomElement(collectionMembers);
     }
   }
 

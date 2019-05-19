@@ -1,23 +1,15 @@
 package cc.mielke.dave.android.radio;
 
-import java.util.Arrays;
-import java.util.Collections;
-
+import cc.mielke.dave.android.base.CollectionHelper;
 import java.util.Set;
-import java.util.HashSet;
-
 import java.util.concurrent.TimeUnit;
 
 public abstract class RadioParameters {
   private RadioParameters () {
   }
 
-  private static <TYPE> Set<TYPE> toUnmodificableSet (TYPE... values) {
-    return Collections.unmodifiableSet(new HashSet<TYPE>(Arrays.asList(values)));
-  }
-
   public final static Set<String> AUDIO_EXTENSIONS =
-    toUnmodificableSet(
+    CollectionHelper.toUnmodificableSet(
       "mp3", "wav", "mid"
     );
 
