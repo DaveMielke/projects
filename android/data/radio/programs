@@ -1,25 +1,30 @@
 {
   "The Bible": {
+    "identifier": "bible",
     "book": "The Bible"
   },
 
   "Christian Music and Bible Reading": {
+    "identifier": "christian",
     "book": "The Bible",
     "music": "Christian Music",
     "hours": true
   },
 
   "Musical Portraits": {
+    "identifier": "portraits",
     "music": "Musical Portraits",
     "hours": true
   },
 
   "Guy Lombardo": {
+    "identifier": "lombardo",
     "music": "Guy Lombardo",
     "hours": true
   },
 
   "National Anthems": {
+    "identifier": "anthems",
     "music": "National Anthems",
     "hours": true
   }

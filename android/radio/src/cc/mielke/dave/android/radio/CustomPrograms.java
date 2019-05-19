@@ -13,6 +13,7 @@ public class CustomPrograms extends RadioComponent {
   private final static String LOG_TAG = CustomPrograms.class.getName();
 
   private final Map<String, RadioProgram> customPrograms = new HashMap<>();
+  private final Map<String, RadioProgram> identifiedPrograms = new HashMap<>();
 
   public final String[] getNames () {
     synchronized (this) {
@@ -27,6 +28,12 @@ public class CustomPrograms extends RadioComponent {
     }
   }
 
+  public final RadioProgram getProgramByIdentifier (String identifier) {
+    synchronized (this) {
+      return identifiedPrograms.get(identifier);
+    }
+  }
+
   private final void loadPrograms () {
     new JSONObjectLoader() {
       @Override
@@ -38,6 +45,8 @@ public class CustomPrograms extends RadioComponent {
           if (getProgram(name) != null) {
             Log.w(LOG_TAG, ("program already defined: " + name));
           } else {
+            String identifier = jsonGetString(properties, "identifier", name);
+
             RadioProgram program = new CustomProgramBuilder()
               .setProgramName(name)
               .setMusicCollection(jsonGetString(properties, "music", name))
@@ -47,7 +56,23 @@ public class CustomPrograms extends RadioComponent {
               .build();
 
             jsonLogUnhandledKeys(properties, name);
-            if (program != null) customPrograms.put(name, program);
+            if (program == null) continue;
+            customPrograms.put(name, program);
+
+            if ((identifier != null) && !identifier.isEmpty()) {
+              RadioProgram oldProgram = identifiedPrograms.get(identifier);
+
+              if (oldProgram == null) {
+                identifiedPrograms.put(identifier, program);
+              } else {
+                Log.w(LOG_TAG,
+                  String.format(
+                    "program identifier already defined: %s: %s & %s",
+                    identifier, name, oldProgram.getName()
+                  )
+                );
+              }
+            }
           }
         }
       }
