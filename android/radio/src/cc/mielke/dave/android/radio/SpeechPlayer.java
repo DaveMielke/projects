@@ -14,15 +14,15 @@ public abstract class SpeechPlayer extends RadioPlayer {
     super();
   }
 
-  private final static SpeechWatcher speechWatcher = new SpeechWatcher();
+  private final static SpeechPlayerWatcher watcher = new SpeechPlayerWatcher();
 
-  public static SpeechWatcher getWatcher () {
-    return speechWatcher;
+  public static SpeechPlayerWatcher getWatcher () {
+    return watcher;
   }
 
   private static void onSpeechPlayerFinished (SpeechPlayer player) {
     synchronized (AUDIO_LOCK) {
-      speechWatcher.onTextChange(null);
+      watcher.onTextChange(null);
       onRadioPlayerFinished(player);
     }
   }
@@ -44,7 +44,7 @@ public abstract class SpeechPlayer extends RadioPlayer {
 
       @Override
       protected void onStartSpeaking (String identifier, CharSequence text) {
-        speechWatcher.onTextChange(text);
+        watcher.onTextChange(text);
       }
 
       @Override

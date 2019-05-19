@@ -15,10 +15,10 @@ public abstract class UriPlayer extends RadioPlayer {
     super();
   }
 
-  private final static UriWatcher uriWatcher = new UriWatcher();;
+  private final static UriPlayerWatcher watcher = new UriPlayerWatcher();;
 
-  public static UriWatcher getWatcher () {
-    return uriWatcher;
+  public static UriPlayerWatcher getWatcher () {
+    return watcher;
   }
 
   private static void onUriPlayerFinished (UriPlayer player) {
@@ -26,10 +26,10 @@ public abstract class UriPlayer extends RadioPlayer {
       PositionMonitor.StopReason.INACTIVE.stop();
       PositionMonitor.StopReason.PAUSE.start();
 
-      uriWatcher.onUriChange(null);
-      uriWatcher.onPlayPauseChange(null);
-      uriWatcher.onDurationChange(0);
-      uriWatcher.onPositionChange(0);
+      watcher.onUriChange(null);
+      watcher.onPlayPauseChange(null);
+      watcher.onDurationChange(0);
+      watcher.onPositionChange(0);
 
       onRadioPlayerFinished(player);
     }
@@ -53,9 +53,9 @@ public abstract class UriPlayer extends RadioPlayer {
       @Override
       protected boolean onPlayerStart () {
         synchronized (AUDIO_LOCK) {
-          uriWatcher.onPlayPauseChange(true);
-          uriWatcher.onDurationChange(streamPlayer.getDuration());
-          uriWatcher.onPositionChange(0);
+          watcher.onPlayPauseChange(true);
+          watcher.onDurationChange(streamPlayer.getDuration());
+          watcher.onPositionChange(0);
 
           if (requestAudioFocus()) {
             PositionMonitor.StopReason.INACTIVE.start();
@@ -106,7 +106,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       onPlayStart();
-      uriWatcher.onUriChange(uri);
+      watcher.onUriChange(uri);
       streamPlayer.start();
       return true;
     }
@@ -135,7 +135,7 @@ public abstract class UriPlayer extends RadioPlayer {
     }
 
     if (pause) {
-      uriWatcher.onPlayPauseChange(false);
+      watcher.onPlayPauseChange(false);
       AudioFocus.abandonAudioFocus();
     }
   }
@@ -147,7 +147,7 @@ public abstract class UriPlayer extends RadioPlayer {
       }
 
       if (!requestAudioFocus()) return false;
-      uriWatcher.onPlayPauseChange(true);
+      watcher.onPlayPauseChange(true);
     }
 
     streamPlayer.resume();

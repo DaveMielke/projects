@@ -35,8 +35,8 @@ public class MainActivity extends BaseActivity {
   private TextView uriSeekCurrent = null;
   private TextView uriSeekRemaining = null;
 
-  private final UriWatcher.OnChangeListener uriChangeListener =
-    new UriWatcher.OnChangeListener() {
+  private final UriPlayerWatcher.OnChangeListener uriChangeListener =
+    new UriPlayerWatcher.OnChangeListener() {
       @Override
       public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist) {
         setVisible(uriMetadataView, visible);
@@ -135,8 +135,8 @@ public class MainActivity extends BaseActivity {
   private View speechView = null;
   private TextView speechText = null;
 
-  private final SpeechWatcher.OnChangeListener speechChangeListener =
-    new SpeechWatcher.OnChangeListener() {
+  private final SpeechPlayerWatcher.OnChangeListener speechChangeListener =
+    new SpeechPlayerWatcher.OnChangeListener() {
       @Override
       public void onTextChange (CharSequence text) {
         boolean visible = text != null;

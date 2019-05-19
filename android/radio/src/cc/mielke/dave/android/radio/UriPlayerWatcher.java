@@ -10,8 +10,8 @@ import android.net.Uri;
 
 import android.content.Context;
 
-public class UriWatcher extends RadioComponent {
-  private final static String LOG_TAG = UriWatcher.class.getName();
+public class UriPlayerWatcher extends RadioComponent {
+  private final static String LOG_TAG = UriPlayerWatcher.class.getName();
 
   public static interface OnChangeListener {
     public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
@@ -74,7 +74,7 @@ public class UriWatcher extends RadioComponent {
       new Runnable() {
         @Override
         public void run () {
-          synchronized (UriWatcher.this) {
+          synchronized (UriPlayerWatcher.this) {
             if (onChangeListener != null) onMetadataChange();
             updateNotification(metadataTitle, metadataArtist);
           }
@@ -160,7 +160,7 @@ public class UriWatcher extends RadioComponent {
     }
   }
 
-  public UriWatcher () {
+  public UriPlayerWatcher () {
     super();
 
     updateMetadata();
