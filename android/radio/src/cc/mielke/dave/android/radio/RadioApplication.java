@@ -7,6 +7,7 @@ public class RadioApplication extends BaseApplication {
   private static BookLibrary bookLibrary = null;
   private static CustomPrograms customPrograms = null;
   private static RadioStations radioStations = null;
+  private static RadioSchedules radioSchedules = null;
 
   public static void refreshData () {
     synchronized (APPLICATION_LOCK) {
@@ -14,6 +15,7 @@ public class RadioApplication extends BaseApplication {
       bookLibrary = null;
       customPrograms = null;
       radioStations = null;
+      radioSchedules = null;
     }
   }
 
@@ -47,6 +49,13 @@ public class RadioApplication extends BaseApplication {
     synchronized (APPLICATION_LOCK) {
       if (radioStations == null) radioStations = new RadioStations();
       return radioStations;
+    }
+  }
+
+  public static RadioSchedules getRadioSchedules () {
+    synchronized (APPLICATION_LOCK) {
+      if (radioSchedules == null) radioSchedules = new RadioSchedules();
+      return radioSchedules;
     }
   }
 }

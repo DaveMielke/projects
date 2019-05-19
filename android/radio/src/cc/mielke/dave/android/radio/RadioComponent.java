@@ -23,6 +23,10 @@ public abstract class RadioComponent extends BaseComponent {
     return RadioApplication.getRadioStations();
   }
 
+  protected static RadioSchedules getRadioSchedules () {
+    return RadioApplication.getRadioSchedules();
+  }
+
   protected static void updateNotification (CharSequence title, CharSequence text) {
     if (CurrentProgram.get() == null) {
       title = getString(R.string.state_noProgram);

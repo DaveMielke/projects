@@ -27,7 +27,7 @@ public class CustomPrograms extends RadioComponent {
     }
   }
 
-  private final void addPrograms () {
+  private final void loadPrograms () {
     new JSONObjectLoader() {
       @Override
       protected void load (JSONObject root, String path) {
@@ -56,6 +56,6 @@ public class CustomPrograms extends RadioComponent {
 
   public CustomPrograms () {
     super();
-    addPrograms();
+    loadPrograms();
   }
 }
