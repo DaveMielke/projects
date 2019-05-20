@@ -12,18 +12,6 @@
     android:layout_alignParentTop="true"
     >
 
-    <TextView
-      android:id="@+id/selection_schedule_name"
-      android:gravity="center_horizontal"
-      android:textAppearance="?android:attr/textAppearanceLarge"
-      android:textStyle="bold"
-     />
-
-    <TextView
-      android:id="@+id/selection_program_name"
-      android:gravity="center_horizontal"
-     />
-
     <TableRow>
       <Space android:layout_weight="1" />
 
@@ -34,6 +22,18 @@
 
       <Space android:layout_weight="1" />
     </TableRow>
+
+    <TextView
+      android:id="@+id/selection_title"
+      android:gravity="center_horizontal"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:textStyle="bold"
+     />
+
+    <TextView
+      android:id="@+id/selection_subtitle"
+      android:gravity="center_horizontal"
+     />
   </TableLayout>
 
   <TableLayout

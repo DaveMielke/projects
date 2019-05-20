@@ -23,19 +23,40 @@ public class MainActivity extends BaseActivity {
     setVisible(view, (text.length() > 0));
   }
 
-  private TextView selectionProgramName = null;
-  private TextView selectionScheduleName = null;
+  private TextView selectionTitle = null;
+  private TextView selectionSubtitle = null;
 
   private final CurrentSelectionWatcher.OnChangeListener selectionChangeListener =
     new CurrentSelectionWatcher.OnChangeListener() {
+      private String programName;
+      private String scheduleName;
+
+      private final void updateSelectionView () {
+        String title;
+        String subtitle;
+
+        if (scheduleName != null) {
+          title = scheduleName;
+          subtitle = programName;
+        } else {
+          title = programName;
+          subtitle = null;
+        }
+
+        updateText(selectionTitle, title);
+        updateText(selectionSubtitle, subtitle);
+      }
+
       @Override
       public void onProgramNameChange (String name) {
-        updateText(selectionProgramName, name);
+        programName = name;
+        updateSelectionView();
       }
 
       @Override
       public void onScheduleNameChange (String name) {
-        updateText(selectionScheduleName, name);
+        scheduleName = name;
+        updateSelectionView();
       }
     };
 
@@ -184,8 +205,8 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    selectionProgramName = findViewById(R.id.selection_program_name);
-    selectionScheduleName = findViewById(R.id.selection_schedule_name);
+    selectionTitle = findViewById(R.id.selection_title);
+    selectionSubtitle = findViewById(R.id.selection_subtitle);
 
     uriMetadataView = findViewById(R.id.uri_metadata_view);
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);

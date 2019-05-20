@@ -8,6 +8,7 @@ public class ProgramSelector extends ActivityComponent {
   private final static String LOG_TAG = ProgramSelector.class.getName();
 
   private final void setProgram (RadioProgram program) {
+    CurrentSchedule.setSchedule(null);
     CurrentProgram.setProgram(program);
   }
 
