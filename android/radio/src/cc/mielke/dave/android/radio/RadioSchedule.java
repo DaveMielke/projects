@@ -3,6 +3,9 @@ package cc.mielke.dave.android.radio;
 import java.util.List;
 import java.util.LinkedList;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -62,24 +65,44 @@ public class RadioSchedule extends RadioComponent {
     }
 
     private abstract static class Filter {
+      private static class Range {
+        public final int from;
+        public final int to;
+
+        public Range (int from, int to) {
+          this.from = from;
+          this.to = to;
+        }
+      }
+
+      private final String filterType;
+      private final List<Range> filterRanges = new LinkedList<>();
       protected abstract Integer toInteger (String text);
+
+      protected Filter (String type) {
+        filterType = type;
+      }
+
+      public final void addRange (int from, int to) {
+        filterRanges.add(new Range(from, to));
+      }
     }
 
     private static class TimeFilter extends Filter {
       public TimeFilter () {
-        super();
+        super("time");
       }
 
       private static class Time {
-        public long value = 0;
+        public int value = 0;
       }
 
       private final boolean add (Time time, Matcher matcher, int group, TimeUnit unit, int limit) {
         String text = matcher.group(group);
-        if (text == null) return false;
-        if (text.isEmpty()) return false;
+        if (text == null) return true;
+        if (text.isEmpty()) return true;
 
-        long value = Integer.valueOf(text, 10);
+        int value = Integer.valueOf(text, 10);
         if (value < 0) return false;
         if (value >= limit) return false;
 
@@ -104,13 +127,13 @@ public class RadioSchedule extends RadioComponent {
         if (!add(time, matcher, 2, TimeUnit.MINUTES, 60)) return null;
         if (!add(time, matcher, 3, TimeUnit.SECONDS, 60)) return null;
 
-        return (int)time.value;
+        return time.value;
       }
     }
 
     private static class DateFilter extends Filter {
       public DateFilter () {
-        super();
+        super("date");
       }
 
       private final static Pattern pattern = Pattern.compile(
@@ -131,7 +154,7 @@ public class RadioSchedule extends RadioComponent {
 
     private static class YearFilter extends Filter {
       public YearFilter () {
-        super();
+        super("year");
       }
 
       private final static Pattern pattern = Pattern.compile(
@@ -149,12 +172,65 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
+    private abstract static class EnumeratedFilter extends Filter {
+      private final Map<String, Integer> map = new HashMap<>();
+
+      private static String normalize (String name) {
+        return name.toLowerCase();
+      }
+
+      public EnumeratedFilter (String type, Enum[] values) {
+        super(type);
+        int count = values.length;
+
+        for (int index=0; index<count; index+=1) {
+          Enum value = values[index];
+          Integer ordinal = value.ordinal();
+          String name = normalize(value.name());
+          int length = name.length();
+
+          while (length >= 3) {
+            map.put(name.substring(0, length), ordinal);
+            length -= 1;
+          }
+        }
+      }
+
+      @Override
+      protected final Integer toInteger (String text) {
+        return map.get(normalize(text));
+      }
+    }
+
+    private static class DayFilter extends EnumeratedFilter {
+      private static enum DAYS {
+        SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
+      }
+
+      public DayFilter () {
+        super("day", DAYS.values());
+      }
+    }
+
+    private static class MonthFilter extends EnumeratedFilter {
+      private static enum MONTHS {
+        JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE,
+        JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER;
+      }
+
+      public MonthFilter () {
+        super("month", MONTHS.values());
+      }
+    }
+
     private final Filter timeFilter = new TimeFilter();
     private final Filter dateFilter = new DateFilter();
     private final Filter yearFilter = new YearFilter();
+    private final Filter dayFilter = new DayFilter();
+    private final Filter monthFilter = new MonthFilter();
 
     private final Filter[] allFilters = new Filter[] {
-      timeFilter, dateFilter, yearFilter
+      timeFilter, dateFilter, yearFilter, dayFilter, monthFilter
     };
 
     private final void addFilter (String operand) throws RuleException {
@@ -183,6 +259,7 @@ public class RadioSchedule extends RadioComponent {
           break;
         }
 
+        filter.addRange(from, to);
         return;
       }
 
