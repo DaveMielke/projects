@@ -2,37 +2,37 @@ package cc.mielke.dave.android.radio;
 
 import android.util.Log;
 
-public abstract class CurrentProgram extends RadioComponent {
+public abstract class CurrentProgram extends CurrentSelection {
   private final static String LOG_TAG = CurrentProgram.class.getName();
 
-  private CurrentProgram () {
+  protected CurrentProgram () {
+    super();
   }
 
   private final static Object CURRENT_PROGRAM_LOCK = new Object();
   private static RadioProgram currentProgram = null;
 
-  public static RadioProgram get () {
+  public static RadioProgram getProgram () {
     synchronized (CURRENT_PROGRAM_LOCK) {
       return currentProgram;
     }
   }
 
   private static String getName () {
-    return RadioProgram.getExternalName(get());
+    return RadioProgram.getExternalName(getProgram());
   }
 
-  public static void set (RadioProgram newProgram) {
+  public static void setProgram (RadioProgram newProgram) {
     synchronized (CURRENT_PROGRAM_LOCK) {
       if (newProgram != currentProgram) {
-        StringBuilder log = new StringBuilder("changing program: ");
-
-        log.append(getName());
         if (currentProgram != null) currentProgram.stop();
 
+        String oldName = getName();
         currentProgram = newProgram;
-        log.append(" -> ");
-        log.append(getName());
-        Log.i(LOG_TAG, log.toString());
+        String newName = getName();
+
+        logSelectionChange("program", oldName, newName);
+        watcher.onProgramChange(currentProgram);
 
         if (currentProgram != null) {
           currentProgram.start();

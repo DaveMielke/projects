@@ -23,6 +23,27 @@ public class MainActivity extends BaseActivity {
     setVisible(view, (text.length() > 0));
   }
 
+  private TextView programNameView = null;
+  private TextView scheduleNameView = null;
+
+  private final CurrentSelectionWatcher.OnChangeListener selectionChangeListener =
+    new CurrentSelectionWatcher.OnChangeListener() {
+      @Override
+      public void onProgramChange (RadioProgram program) {
+        TextView view = programNameView;
+
+        if (program != null) {
+          view.setText(program.getExternalName());
+        } else {
+          view.setText(R.string.message_noProgram);
+        }
+      }
+
+      @Override
+      public void onScheduleChange (RadioSchedule schedule) {
+      }
+    };
+
   private View uriMetadataView = null;
   private TextView uriMetadataTitle = null;
   private TextView uriMetadataArtist = null;
@@ -168,6 +189,8 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
+    programNameView = findViewById(R.id.button_selectProgram);
+
     uriMetadataView = findViewById(R.id.uri_metadata_view);
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);
     uriMetadataArtist = findViewById(R.id.uri_metadata_artist);
@@ -186,6 +209,7 @@ public class MainActivity extends BaseActivity {
     speechView = findViewById(R.id.view_speech);
     speechText = findViewById(R.id.speech_text);
 
+    CurrentSelection.getWatcher().setOnChangeListener(selectionChangeListener);
     UriPlayer.getWatcher().setOnChangeListener(uriChangeListener);
     SpeechPlayer.getWatcher().setOnChangeListener(speechChangeListener);
 
@@ -201,6 +225,7 @@ public class MainActivity extends BaseActivity {
   @Override
   protected void onDestroy () {
     try {
+      CurrentSelection.getWatcher().setOnChangeListener(null);
       UriPlayer.getWatcher().setOnChangeListener(null);
       SpeechPlayer.getWatcher().setOnChangeListener(null);
     } finally {

@@ -2,32 +2,13 @@ package cc.mielke.dave.android.radio;
 
 import android.util.Log;
 import android.os.AsyncTask;
-
-import android.widget.TextView;
 import android.content.DialogInterface;
 
 public class ProgramSelector extends ActivityComponent {
   private final static String LOG_TAG = ProgramSelector.class.getName();
 
-  private final TextView programNameView;
-
-  private final void showProgramName (RadioProgram program) {
-    TextView view = programNameView;
-
-    if (program != null) {
-      view.setText(program.getName());
-    } else {
-      view.setText(R.string.message_noProgram);
-    }
-  }
-
-  private final void showProgramName () {
-    showProgramName(CurrentProgram.get());
-  }
-
   private final void setProgram (RadioProgram program) {
-    CurrentProgram.set(program);
-    showProgramName(program);
+    CurrentProgram.setProgram(program);
   }
 
   private final void setProgram (String name) {
@@ -36,9 +17,6 @@ public class ProgramSelector extends ActivityComponent {
 
   public ProgramSelector (MainActivity activity) {
     super(activity);
-
-    programNameView = mainActivity.findViewById(R.id.button_selectProgram);
-    showProgramName();
   }
 
   private interface Action {
@@ -132,7 +110,7 @@ public class ProgramSelector extends ActivityComponent {
                 public void onClick (DialogInterface dialog, int position) {
                   String name = names[position];
                   RadioSchedule schedule = getRadioSchedules().getSchedule(name);
-                  CurrentSchedule.set(schedule);
+                  CurrentSchedule.setSchedule(schedule);
                 }
               }
             );

@@ -45,7 +45,7 @@ public abstract class RadioPlayer extends AudioComponent {
   }
 
   private static RadioPlayer getCurrentPlayer () {
-    RadioProgram program = CurrentProgram.get();
+    RadioProgram program = CurrentProgram.getProgram();
     if (program == null) return null;
     return program.getCurrentPlayer();
   }
