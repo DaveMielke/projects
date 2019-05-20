@@ -12,12 +12,58 @@ public class RadioService extends BaseService {
   private final static Object SERVICE_LOCK = new Object();
   private static RadioNotification radioNotification = null;
 
+  private static CharSequence notificationTitle = null;
+  private static CharSequence notificationText = null;
+  private static Boolean notificationPlayPause = null;
+
+  public static void updateNotification (CharSequence title, CharSequence text) {
+    synchronized (SERVICE_LOCK) {
+      notificationTitle = title;
+      notificationText = text;
+
+      if (radioNotification != null) {
+        radioNotification.setTitle(title);
+        radioNotification.setText(text);
+        radioNotification.showNotification();
+      }
+    }
+  }
+
+  public static void setPlayPause (Boolean isPlaying) {
+    synchronized (SERVICE_LOCK) {
+      notificationPlayPause = isPlaying;
+
+      if (radioNotification != null) {
+        radioNotification.setPlayPause(isPlaying);
+        radioNotification.showNotification();
+      }
+    }
+  }
+
   @Override
   public void onCreate () {
     super.onCreate();
 
     synchronized (SERVICE_LOCK) {
       radioNotification = new RadioNotification(this);
+      boolean show = false;
+
+      if (notificationTitle != null) {
+        radioNotification.setTitle(notificationTitle);
+        show = true;
+      }
+
+      if (notificationText != null) {
+        radioNotification.setText(notificationText);
+        show = true;
+      }
+
+      if (notificationPlayPause != null) {
+        radioNotification.setPlayPause(notificationPlayPause);
+        show = true;
+      }
+
+      if (show) radioNotification.showNotification();
     }
   }
 
@@ -52,24 +98,5 @@ public class RadioService extends BaseService {
 
   public static void stop () {
     RadioApplication.getContext().stopService(makeIntent());
-  }
-
-  public static void updateNotification (CharSequence title, CharSequence text) {
-    synchronized (SERVICE_LOCK) {
-      if (radioNotification != null) {
-        radioNotification.setTitle(title);
-        radioNotification.setText(text);
-        radioNotification.showNotification();
-      }
-    }
-  }
-
-  public static void setPlayPause (Boolean isPlaying) {
-    synchronized (SERVICE_LOCK) {
-      if (radioNotification != null) {
-        radioNotification.setPlayPause(isPlaying);
-        radioNotification.showNotification();
-      }
-    }
   }
 }

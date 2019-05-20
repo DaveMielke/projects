@@ -12,6 +12,8 @@ import android.util.Log;
 
 import android.content.Context;
 import android.content.res.Resources;
+
+import android.os.Looper;
 import android.os.Handler;
 
 import android.app.AlarmManager;
@@ -72,12 +74,30 @@ public abstract class BaseComponent {
     return toTimeString(getCurrentTime());
   }
 
-  protected static Handler getHandler () {
-    return BaseApplication.getHandler();
+  protected static Looper getMainLooper () {
+    return Looper.getMainLooper();
+  }
+
+  protected final static Handler mainHandler = new Handler(getMainLooper());
+
+  protected static Thread getMainThread () {
+    return getMainLooper().getThread();
+  }
+
+  protected static boolean amOnMainThread () {
+    return Thread.currentThread() == getMainThread();
+  }
+
+  protected static void runOnMainThread (Runnable task) {
+    if (amOnMainThread()) {
+      task.run();
+    } else {
+      mainHandler.post(task);
+    }
   }
 
   protected static void post (Runnable callback) {
-    getHandler().post(callback);
+    mainHandler.post(callback);
   }
 
   protected static void postAt (final long when, final Runnable callback) {
@@ -104,7 +124,7 @@ public abstract class BaseComponent {
     if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
       postAt((getCurrentTime() + delay), callback);
     } else {
-      getHandler().postDelayed(callback, delay);
+      mainHandler.postDelayed(callback, delay);
     }
   }
 

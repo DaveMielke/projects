@@ -229,9 +229,9 @@ public class MainActivity extends BaseActivity {
     speechView = findViewById(R.id.view_speech);
     speechText = findViewById(R.id.speech_text);
 
-    CurrentSelection.getWatcher().setOnChangeListener(selectionChangeListener);
     UriPlayer.getWatcher().setOnChangeListener(uriChangeListener);
     SpeechPlayer.getWatcher().setOnChangeListener(speechChangeListener);
+    CurrentSelection.getWatcher().setOnChangeListener(selectionChangeListener);
 
     programSelector = new ProgramSelector(this);
   }
@@ -243,9 +243,9 @@ public class MainActivity extends BaseActivity {
   @Override
   protected void onDestroy () {
     try {
-      CurrentSelection.getWatcher().setOnChangeListener(null);
       UriPlayer.getWatcher().setOnChangeListener(null);
       SpeechPlayer.getWatcher().setOnChangeListener(null);
+      CurrentSelection.getWatcher().setOnChangeListener(null);
     } finally {
       super.onDestroy();
     }

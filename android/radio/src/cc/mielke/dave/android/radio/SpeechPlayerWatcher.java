@@ -27,12 +27,12 @@ public class SpeechPlayerWatcher extends RadioComponent {
       speechText = text;
 
       if (onChangeListener != null) {
-        getHandler().post(
+        runOnMainThread(
           new Runnable() {
             @Override
             public void run () {
               synchronized (SpeechPlayerWatcher.this) {
-                onTextChange();
+                if (onChangeListener != null) onTextChange();
               }
             }
           }

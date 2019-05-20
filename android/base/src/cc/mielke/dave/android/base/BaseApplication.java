@@ -7,20 +7,15 @@ import android.app.Application;
 import android.content.pm.ApplicationInfo;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
 public class BaseApplication extends Application {
   protected final static Object APPLICATION_LOCK = new Object();
-
   private static Context applicationContext = null;
-  private static Handler applicationHandler = null;
 
   public static void setContext (Context context) {
     synchronized (APPLICATION_LOCK) {
       if (applicationContext == null) {
         applicationContext = context.getApplicationContext();
-        applicationHandler = new Handler(Looper.getMainLooper());
       }
     }
   }
@@ -34,12 +29,6 @@ public class BaseApplication extends Application {
   public static Context getContext () {
     synchronized (APPLICATION_LOCK) {
       return applicationContext;
-    }
-  }
-
-  public static Handler getHandler () {
-    synchronized (APPLICATION_LOCK) {
-      return applicationHandler;
     }
   }
 

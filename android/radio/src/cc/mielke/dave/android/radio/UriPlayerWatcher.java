@@ -68,19 +68,22 @@ public class UriPlayerWatcher extends RadioComponent {
         metadataTitle = arguments[0];
         metadataArtist = arguments[1];
       }
-    }
 
-    getHandler().post(
-      new Runnable() {
-        @Override
-        public void run () {
-          synchronized (UriPlayerWatcher.this) {
-            if (onChangeListener != null) onMetadataChange();
-            updateNotification(metadataTitle, metadataArtist);
+      if (onChangeListener != null) {
+        runOnMainThread(
+          new Runnable() {
+            @Override
+            public void run () {
+              synchronized (UriPlayerWatcher.this) {
+                if (onChangeListener != null) onMetadataChange();
+              }
+            }
           }
-        }
+        );
       }
-    );
+
+      updateNotification(metadataTitle, metadataArtist);
+    }
   }
 
   private final BlockingQueue<String> uriQueue = new LinkedBlockingQueue<>();

@@ -181,7 +181,7 @@ public class RadioProgram extends RadioComponent {
         logAction("stopping");
         isActive = false;
 
-        getHandler().removeCallbacks(retryCallback);
+        mainHandler.removeCallbacks(retryCallback);
         if (currentPlayer != null) currentPlayer.stop();
       }
     }
