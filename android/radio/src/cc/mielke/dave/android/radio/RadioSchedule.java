@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.LinkedList;
 
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
+import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
@@ -40,7 +43,7 @@ public class RadioSchedule extends RadioComponent {
     }
   }
 
-  private static class Component extends RadioComponent {
+  private static class Entry {
     private final RadioProgram radioProgram;
 
     private static RadioProgram getProgram (String identifier) throws RuleException {
@@ -58,7 +61,135 @@ public class RadioSchedule extends RadioComponent {
       throw new RuleException("program not defined");
     }
 
-    public Component (String... operands) throws RuleException {
+    private abstract static class Filter {
+      protected abstract Integer toInteger (String text);
+    }
+
+    private static class TimeFilter extends Filter {
+      public TimeFilter () {
+        super();
+      }
+
+      private static class Time {
+        public long value = 0;
+      }
+
+      private final boolean add (Time time, Matcher matcher, int group, TimeUnit unit, int limit) {
+        String text = matcher.group(group);
+        if (text == null) return false;
+        if (text.isEmpty()) return false;
+
+        long value = Integer.valueOf(text, 10);
+        if (value < 0) return false;
+        if (value >= limit) return false;
+
+        time.value += unit.toMillis(value);
+        return true;
+      }
+
+      private final static String VALUE = "([0-9]{2})";
+      private final static String SEPARATOR = ":";
+
+      private final static Pattern pattern = Pattern.compile(
+        VALUE + SEPARATOR + VALUE + "(?:" + SEPARATOR + VALUE + ")?"
+      );
+
+      @Override
+      protected final Integer toInteger (String text) {
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.matches()) return null;
+
+        Time time = new Time();
+        if (!add(time, matcher, 1, TimeUnit.HOURS, 24)) return null;
+        if (!add(time, matcher, 2, TimeUnit.MINUTES, 60)) return null;
+        if (!add(time, matcher, 3, TimeUnit.SECONDS, 60)) return null;
+
+        return (int)time.value;
+      }
+    }
+
+    private static class DateFilter extends Filter {
+      public DateFilter () {
+        super();
+      }
+
+      private final static Pattern pattern = Pattern.compile(
+        "[1-9][0-9]?"
+      );
+
+      @Override
+      protected final Integer toInteger (String text) {
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.matches()) return null;
+
+        int date = Integer.valueOf(matcher.group(), 10);
+        if (date < 0) return null;
+        if (date > 31) return null;
+        return date;
+      }
+    }
+
+    private static class YearFilter extends Filter {
+      public YearFilter () {
+        super();
+      }
+
+      private final static Pattern pattern = Pattern.compile(
+        "[0-9]{4}"
+      );
+
+      @Override
+      protected final Integer toInteger (String text) {
+        Matcher matcher = pattern.matcher(text);
+        if (!matcher.matches()) return null;
+
+        int year = Integer.valueOf(matcher.group(), 10);
+        if (year < 1) return null;
+        return year;
+      }
+    }
+
+    private final Filter timeFilter = new TimeFilter();
+    private final Filter dateFilter = new DateFilter();
+    private final Filter yearFilter = new YearFilter();
+
+    private final Filter[] allFilters = new Filter[] {
+      timeFilter, dateFilter, yearFilter
+    };
+
+    private final void addFilter (String operand) throws RuleException {
+      String start;
+      String end;
+
+      {
+        int index = operand.indexOf('-');
+
+        if (index < 0) {
+          end = start = operand;
+        } else {
+          start = operand.substring(0, index);
+          end = operand.substring(index+1);
+        }
+      }
+
+      for (Filter filter : allFilters) {
+        Integer from = filter.toInteger(start);
+        if (from == null) continue;
+        Integer to;
+
+        if (end == start) {
+          to = from;
+        } else if ((to = filter.toInteger(end)) == null) {
+          break;
+        }
+
+        return;
+      }
+
+      throw new RuleException("invalid filter operand: %s", operand);
+    }
+
+    public Entry (String... operands) throws RuleException {
       int count = operands.length;
       int index = 0;
 
@@ -67,16 +198,13 @@ public class RadioSchedule extends RadioComponent {
       }
 
       radioProgram = getProgram(operands[index++]);
-
-      while (index < count) {
-        index += 1;
-      }
+      while (index < count) addFilter(operands[index++]);
     }
   }
 
-  private final List<Component> scheduleComponents = new LinkedList<>();
+  private final List<Entry> scheduleEntries = new LinkedList<>();
   private final static char commentCharacter = '#';
-  private final static Pattern splitPattern = Pattern.compile("\\s+");
+  private final static Pattern operandSeparator = Pattern.compile("\\s+");
 
   public RadioSchedule (String name, String... rules) {
     super();
@@ -88,7 +216,7 @@ public class RadioSchedule extends RadioComponent {
         if (index >= 0) rule = rule.substring(0, index);
       }
 
-      String[] operands = splitPattern.split(rule);
+      String[] operands = operandSeparator.split(rule);
       int count = operands.length;
       int index = 0;
 
@@ -107,7 +235,7 @@ public class RadioSchedule extends RadioComponent {
         }
 
         try {
-          scheduleComponents.add(new Component(operands));
+          scheduleEntries.add(new Entry(operands));
         } catch (RuleException exception) {
           Log.w(LOG_TAG,
             String.format(
