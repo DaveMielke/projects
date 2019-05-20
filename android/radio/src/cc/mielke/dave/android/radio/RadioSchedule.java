@@ -65,6 +65,9 @@ public class RadioSchedule extends RadioComponent {
     }
 
     private abstract static class Filter {
+      protected abstract Integer toInteger (String text);
+      protected abstract String format (int value);
+
       private static class Range {
         public final int from;
         public final int to;
@@ -77,13 +80,37 @@ public class RadioSchedule extends RadioComponent {
 
       private final String filterType;
       private final List<Range> filterRanges = new LinkedList<>();
-      protected abstract Integer toInteger (String text);
 
       protected Filter (String type) {
         filterType = type;
       }
 
-      public final void addRange (int from, int to) {
+      private final String format (int from, int to) {
+        String string = format(from);
+        if (to != from) string += '-' + format(to);
+        return string;
+      }
+
+      private final String format (Range range) {
+        return format(range.from, range.to);
+      }
+
+      public final void addRange (int from, int to) throws RuleException {
+        if (to < from) {
+          throw new RuleException(
+            "inverse range: %s: %s", filterType, format(from, to)
+          );
+        }
+
+        for (Range range : filterRanges) {
+          if ((from <= range.to) && (to >= range.from)) {
+            throw new RuleException(
+              "overlapping ranges: %s: %s & %s",
+              filterType, format(range), format(from, to)
+            );
+          }
+        }
+
         filterRanges.add(new Range(from, to));
       }
     }
@@ -93,11 +120,16 @@ public class RadioSchedule extends RadioComponent {
         super("time");
       }
 
+      private final static long HOURS_PER_DAY = TimeUnit.DAYS.toHours(1);
+      private final static long MINUTES_PER_HOUR = TimeUnit.HOURS.toMinutes(1);
+      private final static long SECONDS_PER_MINUTE = TimeUnit.MINUTES.toSeconds(1);
+      private final static long MILLISECONDS_PER_SECOND = TimeUnit.SECONDS.toMillis(1);
+
       private static class Time {
         public int value = 0;
       }
 
-      private final boolean add (Time time, Matcher matcher, int group, TimeUnit unit, int limit) {
+      private final boolean add (Time time, Matcher matcher, int group, TimeUnit unit, long limit) {
         String text = matcher.group(group);
         if (text == null) return true;
         if (text.isEmpty()) return true;
@@ -123,11 +155,36 @@ public class RadioSchedule extends RadioComponent {
         if (!matcher.matches()) return null;
 
         Time time = new Time();
-        if (!add(time, matcher, 1, TimeUnit.HOURS, 24)) return null;
-        if (!add(time, matcher, 2, TimeUnit.MINUTES, 60)) return null;
-        if (!add(time, matcher, 3, TimeUnit.SECONDS, 60)) return null;
+        if (!add(time, matcher, 1, TimeUnit.HOURS, HOURS_PER_DAY)) return null;
+        if (!add(time, matcher, 2, TimeUnit.MINUTES, MINUTES_PER_HOUR)) return null;
+        if (!add(time, matcher, 3, TimeUnit.SECONDS, SECONDS_PER_MINUTE)) return null;
 
         return time.value;
+      }
+
+      @Override
+      protected final String format (int value) {
+        long milliseconds = value % MILLISECONDS_PER_SECOND;
+        value /= MILLISECONDS_PER_SECOND;
+
+        long seconds = value % SECONDS_PER_MINUTE;
+        value /= SECONDS_PER_MINUTE;
+
+        long minutes = value % MINUTES_PER_HOUR;
+        value /= MINUTES_PER_HOUR;
+
+        StringBuilder time = new StringBuilder();
+        time.append(String.format("%02d%s%02d", value, SEPARATOR, minutes));
+
+        if ((seconds != 0) || (milliseconds != 0)) {
+          time.append(String.format("%s%02d", SEPARATOR, seconds));
+
+          if (milliseconds != 0) {
+            time.append(String.format(".%03d", milliseconds));
+          }
+        }
+
+        return time.toString();
       }
     }
 
@@ -150,6 +207,11 @@ public class RadioSchedule extends RadioComponent {
         if (date > 31) return null;
         return date;
       }
+
+      @Override
+      protected final String format (int value) {
+        return String.format("%d", value);
+      }
     }
 
     private static class YearFilter extends Filter {
@@ -170,10 +232,16 @@ public class RadioSchedule extends RadioComponent {
         if (year < 1) return null;
         return year;
       }
+
+      @Override
+      protected final String format (int value) {
+        return String.format("%04d", value);
+      }
     }
 
     private abstract static class EnumeratedFilter extends Filter {
-      private final Map<String, Integer> map = new HashMap<>();
+      private final Enum[] enumerationValues;
+      private final Map<String, Integer> nameToValue = new HashMap<>();
 
       private static String normalize (String name) {
         return name.toLowerCase();
@@ -181,16 +249,18 @@ public class RadioSchedule extends RadioComponent {
 
       public EnumeratedFilter (String type, Enum[] values) {
         super(type);
+
+        enumerationValues = values;
         int count = values.length;
 
         for (int index=0; index<count; index+=1) {
           Enum value = values[index];
-          Integer ordinal = value.ordinal();
+          Integer ordinal = index;
           String name = normalize(value.name());
           int length = name.length();
 
           while (length >= 3) {
-            map.put(name.substring(0, length), ordinal);
+            nameToValue.put(name.substring(0, length), ordinal);
             length -= 1;
           }
         }
@@ -198,7 +268,12 @@ public class RadioSchedule extends RadioComponent {
 
       @Override
       protected final Integer toInteger (String text) {
-        return map.get(normalize(text));
+        return nameToValue.get(normalize(text));
+      }
+
+      @Override
+      protected final String format (int value) {
+        return normalize(enumerationValues[value].name()).substring(0, 3);
       }
     }
 
