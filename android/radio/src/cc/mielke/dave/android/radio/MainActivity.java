@@ -29,14 +29,12 @@ public class MainActivity extends BaseActivity {
   private final CurrentSelectionWatcher.OnChangeListener selectionChangeListener =
     new CurrentSelectionWatcher.OnChangeListener() {
       @Override
-      public void onProgramChange (RadioProgram program) {
-        String name = (program != null)? program.getExternalName(): null;
+      public void onProgramNameChange (String name) {
         updateText(selectionProgramName, name);
       }
 
       @Override
-      public void onScheduleChange (RadioSchedule schedule) {
-        String name = (schedule != null)? schedule.getExternalName(): null;
+      public void onScheduleNameChange (String name) {
         updateText(selectionScheduleName, name);
       }
     };

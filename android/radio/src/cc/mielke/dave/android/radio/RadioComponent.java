@@ -39,8 +39,4 @@ public abstract class RadioComponent extends BaseComponent {
   protected static void updateNotification (CharSequence title) {
     updateNotification(title, null);
   }
-
-  protected static void updateNotification () {
-    updateNotification(null);
-  }
 }

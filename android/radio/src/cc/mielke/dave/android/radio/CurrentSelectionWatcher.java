@@ -2,20 +2,20 @@ package cc.mielke.dave.android.radio;
 
 public class CurrentSelectionWatcher extends RadioComponent {
   public static interface OnChangeListener {
-    public void onProgramChange (RadioProgram program);
-    public void onScheduleChange (RadioSchedule schedule);
+    public void onProgramNameChange (String name);
+    public void onScheduleNameChange (String name);
   }
 
   private OnChangeListener onChangeListener = null;
-  private RadioProgram radioProgram;
-  private RadioSchedule radioSchedule;
+  private String programName;
+  private String scheduleName;
 
-  private final void onProgramChange () {
-    onChangeListener.onProgramChange(radioProgram);
+  private final void onProgramNameChange () {
+    onChangeListener.onProgramNameChange(programName);
   }
 
-  private final void onScheduleChange () {
-    onChangeListener.onScheduleChange(radioSchedule);
+  private final void onScheduleNameChange () {
+    onChangeListener.onScheduleNameChange(scheduleName);
   }
 
   public final void setOnChangeListener (OnChangeListener listener) {
@@ -23,23 +23,33 @@ public class CurrentSelectionWatcher extends RadioComponent {
       onChangeListener = listener;
 
       if (onChangeListener != null) {
-        onProgramChange();
-        onScheduleChange();
+        onProgramNameChange();
+        onScheduleNameChange();
       }
+    }
+  }
+
+  private final void updateNotification () {
+    if (scheduleName != null) {
+      updateNotification(scheduleName, programName);
+    } else {
+      updateNotification(programName);
     }
   }
 
   public final void onProgramChange (RadioProgram program) {
     synchronized (this) {
-      radioProgram = program;
-      if (onChangeListener != null) onProgramChange();
+      programName = (program != null)? program.getExternalName(): null;
+      if (onChangeListener != null) onProgramNameChange();
+      updateNotification();
     }
   }
 
   public final void onScheduleChange (RadioSchedule schedule) {
     synchronized (this) {
-      radioSchedule = schedule;
-      if (onChangeListener != null) onScheduleChange();
+      scheduleName = (schedule != null)? schedule.getExternalName(): null;
+      if (onChangeListener != null) onScheduleNameChange();
+      updateNotification();
     }
   }
 

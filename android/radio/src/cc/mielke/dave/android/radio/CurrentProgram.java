@@ -33,12 +33,7 @@ public abstract class CurrentProgram extends CurrentSelection {
 
         logSelectionChange("program", oldName, newName);
         watcher.onProgramChange(currentProgram);
-
-        if (currentProgram != null) {
-          currentProgram.start();
-        } else {
-          updateNotification();
-        }
+        if (currentProgram != null) currentProgram.start();
       }
     }
   }
