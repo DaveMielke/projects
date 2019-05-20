@@ -2,25 +2,25 @@
 
 <resources>
   <string name="app_name">DM Radio</string>
-  <string name="player_service_label">DM Radio Player Service</string>
 
   <string name="action_selectProgram">Select Program</string>
   <string name="action_selectSchedule">Select Schedule</string>
   <string name="action_selectStation">Select Station</string>
 
-  <string name="name_noProgram">Off</string>
-  <string name="name_anonymousProgram">Unnamed</string>
-
   <string name="name_noSchedule">None</string>
-  <string name="name_anonymousSchedule">Unnamed</string>
+  <string name="name_anonymousSchedule">Unnamed Schedule</string>
+
+  <string name="title_noProgram">program not selected</string>
+  <string name="name_noProgram">Off</string>
+  <string name="name_anonymousProgram">Unnamed Program</string>
+
+  <string name="state_noProgram">off</string>
+  <string name="state_waiting">waiting</string>
 
   <string name="action_uriPlay">Play</string>
   <string name="action_uriPause">Pause</string>
   <string name="action_uriNext">Next</string>
   <string name="action_uriPrevious">Previous</string>
-
-  <string name="state_noProgram">off</string>
-  <string name="state_waiting">waiting</string>
 
   <string name="state_playing">playing</string>
   <string name="state_paused">paused</string>

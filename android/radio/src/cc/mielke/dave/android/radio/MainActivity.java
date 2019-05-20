@@ -40,6 +40,7 @@ public class MainActivity extends BaseActivity {
           subtitle = programName;
         } else {
           title = programName;
+          if (title == null) title = getString(R.string.title_noProgram);
           subtitle = null;
         }
 
@@ -203,7 +204,9 @@ public class MainActivity extends BaseActivity {
   @Override
   protected void onCreate (Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     setContentView(R.layout.main);
+    RadioService.start();
 
     selectionTitle = findViewById(R.id.selection_title);
     selectionSubtitle = findViewById(R.id.selection_subtitle);
@@ -231,8 +234,6 @@ public class MainActivity extends BaseActivity {
     SpeechPlayer.getWatcher().setOnChangeListener(speechChangeListener);
 
     programSelector = new ProgramSelector(this);
-
-    RadioService.start();
   }
 
   @Override

@@ -32,8 +32,10 @@ public class CurrentSelectionWatcher extends RadioComponent {
   private final void updateNotification () {
     if (scheduleName != null) {
       updateNotification(scheduleName, programName);
-    } else {
+    } else if (programName != null) {
       updateNotification(programName);
+    } else {
+      updateNotification(getString(R.string.state_noProgram));
     }
   }
 

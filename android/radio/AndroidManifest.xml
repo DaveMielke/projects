@@ -34,7 +34,6 @@
 
     <service
       android:name=".RadioService"
-      android:label="@string/player_service_label"
       android:exported="false"
      />
 
