@@ -23,24 +23,21 @@ public class MainActivity extends BaseActivity {
     setVisible(view, (text.length() > 0));
   }
 
-  private TextView programNameView = null;
-  private TextView scheduleNameView = null;
+  private TextView selectionProgramName = null;
+  private TextView selectionScheduleName = null;
 
   private final CurrentSelectionWatcher.OnChangeListener selectionChangeListener =
     new CurrentSelectionWatcher.OnChangeListener() {
       @Override
       public void onProgramChange (RadioProgram program) {
-        TextView view = programNameView;
-
-        if (program != null) {
-          view.setText(program.getExternalName());
-        } else {
-          view.setText(R.string.message_noProgram);
-        }
+        String name = (program != null)? program.getExternalName(): null;
+        updateText(selectionProgramName, name);
       }
 
       @Override
       public void onScheduleChange (RadioSchedule schedule) {
+        String name = (schedule != null)? schedule.getExternalName(): null;
+        updateText(selectionScheduleName, name);
       }
     };
 
@@ -189,7 +186,8 @@ public class MainActivity extends BaseActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.main);
 
-    programNameView = findViewById(R.id.button_selectProgram);
+    selectionProgramName = findViewById(R.id.selection_program_name);
+    selectionScheduleName = findViewById(R.id.selection_schedule_name);
 
     uriMetadataView = findViewById(R.id.uri_metadata_view);
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);

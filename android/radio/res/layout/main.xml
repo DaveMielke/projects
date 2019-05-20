@@ -12,10 +12,28 @@
     android:layout_alignParentTop="true"
     >
 
-    <Button
-      android:id="@+id/button_selectProgram"
-      android:onClick="selectProgram"
+    <TextView
+      android:id="@+id/selection_schedule_name"
+      android:gravity="center_horizontal"
+      android:textAppearance="?android:attr/textAppearanceLarge"
+      android:textStyle="bold"
      />
+
+    <TextView
+      android:id="@+id/selection_program_name"
+      android:gravity="center_horizontal"
+     />
+
+    <TableRow>
+      <Space android:layout_weight="1" />
+
+      <Button
+        android:onClick="selectProgram"
+        android:text="@string/action_selectProgram"
+       />
+
+      <Space android:layout_weight="1" />
+    </TableRow>
   </TableLayout>
 
   <TableLayout
