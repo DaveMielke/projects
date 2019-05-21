@@ -219,9 +219,13 @@ public class RadioSchedule extends RadioComponent {
 
         private final static String VALUE = "([0-9]{2})";
         private final static String SEPARATOR = ":";
+        private final static String DECIMAL = ".";
 
         private final static Pattern pattern = Pattern.compile(
-          VALUE + SEPARATOR + VALUE + "(?:" + SEPARATOR + VALUE + ")?"
+          VALUE + SEPARATOR + VALUE
+        + "(?:" + SEPARATOR + VALUE
+          + "(" + DECIMAL + "[0-9]{1,}" + ")?"
+        + ")?"
         );
 
         @Override
@@ -233,6 +237,14 @@ public class RadioSchedule extends RadioComponent {
           if (!add(time, matcher, 1, TimeUnit.HOURS, HOURS_PER_DAY)) return null;
           if (!add(time, matcher, 2, TimeUnit.MINUTES, MINUTES_PER_HOUR)) return null;
           if (!add(time, matcher, 3, TimeUnit.SECONDS, SECONDS_PER_MINUTE)) return null;
+
+          {
+            String fraction = matcher.group(4);
+
+            if ((fraction != null) && !fraction.isEmpty()) {
+              time.value += Math.round(Double.valueOf((fraction)) * 1000d);
+            }
+          }
 
           return time.value;
         }
@@ -255,7 +267,13 @@ public class RadioSchedule extends RadioComponent {
             time.append(String.format("%s%02d", SEPARATOR, seconds));
 
             if (milliseconds != 0) {
-              time.append(String.format(".%03d", milliseconds));
+              time.append(String.format("%s%03d", DECIMAL, milliseconds));
+
+              while (true) {
+                int last = time.length() - 1;
+                if (time.charAt(last) != '0') break;
+                time.setLength(last);
+              }
             }
           }
 
