@@ -1,5 +1,8 @@
 package cc.mielke.dave.android.radio;
 
+import java.util.Collections;
+import java.util.Iterator;
+
 import java.util.List;
 import java.util.LinkedList;
 
@@ -75,7 +78,7 @@ public class RadioSchedule extends RadioComponent {
         return valueType;
       }
 
-      protected abstract Integer toInteger (String text);
+      protected abstract Integer toInteger (String string);
       protected abstract String format (int value);
     }
 
@@ -106,8 +109,8 @@ public class RadioSchedule extends RadioComponent {
       }
 
       @Override
-      protected final Integer toInteger (String text) {
-        return nameToValue.get(normalize(text));
+      protected final Integer toInteger (String string) {
+        return nameToValue.get(normalize(string));
       }
 
       @Override
@@ -116,18 +119,23 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
-    private abstract static class Filter {
-      private static class Range {
-        public final int from;
-        public final int to;
+    private static class FilterRange implements Comparable<FilterRange> {
+      public final int from;
+      public final int to;
 
-        public Range (int from, int to) {
-          this.from = from;
-          this.to = to;
-        }
+      public FilterRange (int from, int to) {
+        this.from = from;
+        this.to = to;
       }
 
-      private final List<Range> filterRanges = new LinkedList<>();
+      @Override
+      public int compareTo (FilterRange range) {
+        return from - range.from;
+      }
+    }
+
+    private abstract static class Filter {
+      private final List<FilterRange> rangeList = new LinkedList<>();
       private final OperandParser operandParser;
 
       protected Filter (OperandParser parser) {
@@ -142,6 +150,14 @@ public class RadioSchedule extends RadioComponent {
         return getOperandParser().getType();
       }
 
+      public final void sortRanges () {
+        Collections.sort(rangeList);
+      }
+
+      public final Iterator<FilterRange> getRangeIterator () {
+        return rangeList.iterator();
+      }
+
       public final String format (int from, int to) {
         OperandParser parser = getOperandParser();
         String string = parser.format(from);
@@ -149,7 +165,7 @@ public class RadioSchedule extends RadioComponent {
         return string;
       }
 
-      public final String format (Range range) {
+      public final String format (FilterRange range) {
         return format(range.from, range.to);
       }
 
@@ -160,7 +176,7 @@ public class RadioSchedule extends RadioComponent {
           );
         }
 
-        for (Range range : filterRanges) {
+        for (FilterRange range : rangeList) {
           if ((from <= range.to) && (to >= range.from)) {
             throw new RuleException(
               "overlapping ranges: %s: %s & %s",
@@ -169,7 +185,7 @@ public class RadioSchedule extends RadioComponent {
           }
         }
 
-        filterRanges.add(new Range(from, to));
+        rangeList.add(new FilterRange(from, to));
       }
     }
 
@@ -189,11 +205,11 @@ public class RadioSchedule extends RadioComponent {
         }
 
         private final boolean add (Time time, Matcher matcher, int group, TimeUnit unit, long limit) {
-          String text = matcher.group(group);
-          if (text == null) return true;
-          if (text.isEmpty()) return true;
+          String string = matcher.group(group);
+          if (string == null) return true;
+          if (string.isEmpty()) return true;
 
-          int value = Integer.valueOf(text, 10);
+          int value = Integer.valueOf(string, 10);
           if (value < 0) return false;
           if (value >= limit) return false;
 
@@ -209,8 +225,8 @@ public class RadioSchedule extends RadioComponent {
         );
 
         @Override
-        protected final Integer toInteger (String text) {
-          Matcher matcher = pattern.matcher(text);
+        protected final Integer toInteger (String string) {
+          Matcher matcher = pattern.matcher(string);
           if (!matcher.matches()) return null;
 
           Time time = new Time();
@@ -283,8 +299,8 @@ public class RadioSchedule extends RadioComponent {
         );
 
         @Override
-        protected final Integer toInteger (String text) {
-          Matcher matcher = pattern.matcher(text);
+        protected final Integer toInteger (String string) {
+          Matcher matcher = pattern.matcher(string);
           if (!matcher.matches()) return null;
 
           int date = Integer.valueOf(matcher.group(), 10);
@@ -336,8 +352,8 @@ public class RadioSchedule extends RadioComponent {
         );
 
         @Override
-        protected final Integer toInteger (String text) {
-          Matcher matcher = pattern.matcher(text);
+        protected final Integer toInteger (String string) {
+          Matcher matcher = pattern.matcher(string);
           if (!matcher.matches()) return null;
 
           int year = Integer.valueOf(matcher.group(), 10);
@@ -412,6 +428,7 @@ public class RadioSchedule extends RadioComponent {
 
       radioProgram = getProgram(operands[index++]);
       while (index < count) addRange(operands[index++]);
+      for (Filter filter : allFilters) filter.sortRanges();
     }
   }
 
