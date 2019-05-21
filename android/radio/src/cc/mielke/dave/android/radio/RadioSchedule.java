@@ -64,59 +64,23 @@ public class RadioSchedule extends RadioComponent {
       throw new RuleException("program not defined");
     }
 
-    private abstract static class Filter {
+    private abstract static class ValueParser {
+      private final String valueType;
+
+      protected ValueParser (String type) {
+        valueType = type;
+      }
+
+      public final String getType () {
+        return valueType;
+      }
+
       protected abstract Integer toInteger (String text);
       protected abstract String format (int value);
-
-      private static class Range {
-        public final int from;
-        public final int to;
-
-        public Range (int from, int to) {
-          this.from = from;
-          this.to = to;
-        }
-      }
-
-      private final String filterType;
-      private final List<Range> filterRanges = new LinkedList<>();
-
-      protected Filter (String type) {
-        filterType = type;
-      }
-
-      private final String format (int from, int to) {
-        String string = format(from);
-        if (to != from) string += '-' + format(to);
-        return string;
-      }
-
-      private final String format (Range range) {
-        return format(range.from, range.to);
-      }
-
-      public final void addRange (int from, int to) throws RuleException {
-        if (to < from) {
-          throw new RuleException(
-            "inverse range: %s: %s", filterType, format(from, to)
-          );
-        }
-
-        for (Range range : filterRanges) {
-          if ((from <= range.to) && (to >= range.from)) {
-            throw new RuleException(
-              "overlapping ranges: %s: %s & %s",
-              filterType, format(range), format(from, to)
-            );
-          }
-        }
-
-        filterRanges.add(new Range(from, to));
-      }
     }
 
-    private static class TimeFilter extends Filter {
-      public TimeFilter () {
+    private static class TimeParser extends ValueParser {
+      public TimeParser () {
         super("time");
       }
 
@@ -188,8 +152,8 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
-    private static class DateFilter extends Filter {
-      public DateFilter () {
+    private static class DateParser extends ValueParser {
+      public DateParser () {
         super("date");
       }
 
@@ -203,7 +167,7 @@ public class RadioSchedule extends RadioComponent {
         if (!matcher.matches()) return null;
 
         int date = Integer.valueOf(matcher.group(), 10);
-        if (date < 0) return null;
+        if (date < 1) return null;
         if (date > 31) return null;
         return date;
       }
@@ -214,8 +178,8 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
-    private static class YearFilter extends Filter {
-      public YearFilter () {
+    private static class YearParser extends ValueParser {
+      public YearParser () {
         super("year");
       }
 
@@ -239,7 +203,7 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
-    private abstract static class EnumeratedFilter extends Filter {
+    private abstract static class EnumerationParser extends ValueParser {
       private final Enum[] enumerationValues;
       private final Map<String, Integer> nameToValue = new HashMap<>();
 
@@ -247,15 +211,14 @@ public class RadioSchedule extends RadioComponent {
         return name.toLowerCase();
       }
 
-      public EnumeratedFilter (String type, Enum[] values) {
+      protected EnumerationParser (String type, Enum[] values) {
         super(type);
 
         enumerationValues = values;
         int count = values.length;
 
-        for (int index=0; index<count; index+=1) {
-          Enum value = values[index];
-          Integer ordinal = index;
+        for (Enum value : values) {
+          Integer ordinal = value.ordinal();
           String name = normalize(value.name());
           int length = name.length();
 
@@ -277,24 +240,117 @@ public class RadioSchedule extends RadioComponent {
       }
     }
 
-    private static class DayFilter extends EnumeratedFilter {
+    private static class DayParser extends EnumerationParser {
       private static enum DAYS {
         SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY;
       }
 
-      public DayFilter () {
+      public DayParser () {
         super("day", DAYS.values());
       }
     }
 
-    private static class MonthFilter extends EnumeratedFilter {
+    private static class MonthParser extends EnumerationParser {
       private static enum MONTHS {
         JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE,
         JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER;
       }
 
-      public MonthFilter () {
+      public MonthParser () {
         super("month", MONTHS.values());
+      }
+    }
+
+    private final static ValueParser timeParser = new TimeParser();
+    private final static ValueParser dateParser = new DateParser();
+    private final static ValueParser yearParser = new YearParser();
+    private final static ValueParser dayParser = new DayParser();
+    private final static ValueParser monthParser = new MonthParser();
+
+    private abstract static class Filter {
+      private static class Range {
+        public final int from;
+        public final int to;
+
+        public Range (int from, int to) {
+          this.from = from;
+          this.to = to;
+        }
+      }
+
+      private final List<Range> filterRanges = new LinkedList<>();
+      private final ValueParser valueParser;
+
+      protected Filter (ValueParser parser) {
+        valueParser = parser;
+      }
+
+      public final ValueParser getParser () {
+        return valueParser;
+      }
+
+      public final String getType () {
+        return getParser().getType();
+      }
+
+      public final String format (int from, int to) {
+        ValueParser parser = getParser();
+        String string = parser.format(from);
+        if (to != from) string += '-' + parser.format(to);
+        return string;
+      }
+
+      public final String format (Range range) {
+        return format(range.from, range.to);
+      }
+
+      public final void addRange (int from, int to) throws RuleException {
+        if (to < from) {
+          throw new RuleException(
+            "inverse range: %s: %s", getType(), format(from, to)
+          );
+        }
+
+        for (Range range : filterRanges) {
+          if ((from <= range.to) && (to >= range.from)) {
+            throw new RuleException(
+              "overlapping ranges: %s: %s & %s",
+              getType(), format(range), format(from, to)
+            );
+          }
+        }
+
+        filterRanges.add(new Range(from, to));
+      }
+    }
+
+    private static class TimeFilter extends Filter {
+      public TimeFilter () {
+        super(timeParser);
+      }
+    }
+
+    private static class DateFilter extends Filter {
+      public DateFilter () {
+        super(dateParser);
+      }
+    }
+
+    private static class YearFilter extends Filter {
+      public YearFilter () {
+        super(yearParser);
+      }
+    }
+
+    private static class DayFilter extends Filter {
+      public DayFilter () {
+        super(dayParser);
+      }
+    }
+
+    private static class MonthFilter extends Filter {
+      public MonthFilter () {
+        super(monthParser);
       }
     }
 
@@ -308,7 +364,7 @@ public class RadioSchedule extends RadioComponent {
       timeFilter, dateFilter, yearFilter, dayFilter, monthFilter
     };
 
-    private final void addFilter (String operand) throws RuleException {
+    private final void addRange (String operand) throws RuleException {
       String start;
       String end;
 
@@ -324,13 +380,14 @@ public class RadioSchedule extends RadioComponent {
       }
 
       for (Filter filter : allFilters) {
-        Integer from = filter.toInteger(start);
+        ValueParser parser = filter.getParser();
+        Integer from = parser.toInteger(start);
         if (from == null) continue;
         Integer to;
 
         if (end == start) {
           to = from;
-        } else if ((to = filter.toInteger(end)) == null) {
+        } else if ((to = parser.toInteger(end)) == null) {
           break;
         }
 
@@ -338,7 +395,7 @@ public class RadioSchedule extends RadioComponent {
         return;
       }
 
-      throw new RuleException("invalid filter operand: %s", operand);
+      throw new RuleException("invalid range operand: %s", operand);
     }
 
     public Entry (String... operands) throws RuleException {
@@ -350,7 +407,7 @@ public class RadioSchedule extends RadioComponent {
       }
 
       radioProgram = getProgram(operands[index++]);
-      while (index < count) addFilter(operands[index++]);
+      while (index < count) addRange(operands[index++]);
     }
   }
 
