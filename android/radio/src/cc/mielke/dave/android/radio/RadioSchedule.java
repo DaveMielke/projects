@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
@@ -168,6 +170,7 @@ public class RadioSchedule extends RadioComponent {
       }
 
       public final Iterator<FilterRange> getRangeIterator () {
+        if (rangeList.isEmpty()) return null;
         return rangeList.iterator();
       }
 
@@ -318,7 +321,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public DayFilter () {
-        super(parser, true);
+        super(parser, true, Calendar.SUNDAY);
       }
     }
 
@@ -371,7 +374,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public MonthFilter () {
-        super(parser, true, -1);
+        super(parser, true, Calendar.JANUARY);
       }
     }
 
