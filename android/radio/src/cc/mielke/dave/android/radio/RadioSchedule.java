@@ -137,9 +137,22 @@ public class RadioSchedule extends RadioComponent {
     private abstract static class Filter {
       private final List<FilterRange> rangeList = new LinkedList<>();
       private final OperandParser operandParser;
+      private final int fromAdjustment;
+      private final int toAdjustment;
+
+      protected Filter (OperandParser parser, boolean isInclusive, int adjustment) {
+        operandParser = parser;
+        fromAdjustment = adjustment;
+        if (isInclusive) adjustment += 1;
+        toAdjustment = adjustment;
+      }
+
+      protected Filter (OperandParser parser, boolean isInclusive) {
+        this(parser, isInclusive, 0);
+      }
 
       protected Filter (OperandParser parser) {
-        operandParser = parser;
+        this(parser, false);
       }
 
       public final OperandParser getOperandParser () {
@@ -160,8 +173,8 @@ public class RadioSchedule extends RadioComponent {
 
       public final String format (int from, int to) {
         OperandParser parser = getOperandParser();
-        String string = parser.format(from);
-        if (to != from) string += '-' + parser.format(to);
+        String string = parser.format(from - fromAdjustment);
+        if (to != (from + 1)) string += '-' + parser.format(to - toAdjustment);
         return string;
       }
 
@@ -170,14 +183,17 @@ public class RadioSchedule extends RadioComponent {
       }
 
       public final void addRange (int from, int to) throws RuleException {
-        if (to < from) {
+        from += fromAdjustment;
+        to += toAdjustment;
+
+        if (to <= from) {
           throw new RuleException(
             "inverse range: %s: %s", getOperandType(), format(from, to)
           );
         }
 
         for (FilterRange range : rangeList) {
-          if ((from <= range.to) && (to >= range.from)) {
+          if ((from < range.to) && (to > range.from)) {
             throw new RuleException(
               "overlapping ranges: %s: %s & %s",
               getOperandType(), format(range), format(from, to)
@@ -302,7 +318,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public DayFilter () {
-        super(parser);
+        super(parser, true);
       }
     }
 
@@ -336,7 +352,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public DateFilter () {
-        super(parser);
+        super(parser, true);
       }
     }
 
@@ -355,7 +371,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public MonthFilter () {
-        super(parser);
+        super(parser, true, -1);
       }
     }
 
@@ -388,7 +404,7 @@ public class RadioSchedule extends RadioComponent {
       private final static OperandParser parser = new Parser();
 
       public YearFilter () {
-        super(parser);
+        super(parser, true);
       }
     }
 
