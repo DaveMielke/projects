@@ -61,7 +61,6 @@ public class MainActivity extends BaseActivity {
       }
     };
 
-  private View uriMetadataView = null;
   private TextView uriMetadataTitle = null;
   private TextView uriMetadataArtist = null;
 
@@ -76,8 +75,7 @@ public class MainActivity extends BaseActivity {
   private final UriPlayerWatcher.OnChangeListener uriChangeListener =
     new UriPlayerWatcher.OnChangeListener() {
       @Override
-      public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist) {
-        setVisible(uriMetadataView, visible);
+      public void onMetadataChange (CharSequence title, CharSequence artist) {
         updateText(uriMetadataTitle, title);
         updateText(uriMetadataArtist, artist);
       }
@@ -170,15 +168,12 @@ public class MainActivity extends BaseActivity {
       }
     };
 
-  private View speechView = null;
   private TextView speechText = null;
 
   private final SpeechPlayerWatcher.OnChangeListener speechChangeListener =
     new SpeechPlayerWatcher.OnChangeListener() {
       @Override
       public void onTextChange (CharSequence text) {
-        boolean visible = text != null;
-        setVisible(speechView, visible);
         updateText(speechText, text);
       }
     };
@@ -211,7 +206,6 @@ public class MainActivity extends BaseActivity {
     selectionTitle = findViewById(R.id.selection_title);
     selectionSubtitle = findViewById(R.id.selection_subtitle);
 
-    uriMetadataView = findViewById(R.id.uri_metadata_view);
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);
     uriMetadataArtist = findViewById(R.id.uri_metadata_artist);
 
@@ -226,7 +220,6 @@ public class MainActivity extends BaseActivity {
     uriSeekBar.setKeyProgressIncrement((int)RadioParameters.USER_SEEK_INCREMENT);
     uriSeekBar.setOnSeekBarChangeListener(uriSeekBarChangeListener);
 
-    speechView = findViewById(R.id.view_speech);
     speechText = findViewById(R.id.speech_text);
 
     UriPlayer.getWatcher().setOnChangeListener(uriChangeListener);

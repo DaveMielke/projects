@@ -46,6 +46,6 @@
     <include layout="@layout/uri_buttons" />
     <include layout="@layout/uri_seek" />
 
-    <include layout="@layout/speech_view" />
+    <include layout="@layout/speech" />
   </TableLayout>
 </RelativeLayout>

@@ -14,14 +14,13 @@ public class UriPlayerWatcher extends RadioComponent {
   private final static String LOG_TAG = UriPlayerWatcher.class.getName();
 
   public static interface OnChangeListener {
-    public void onMetadataChange (boolean visible, CharSequence title, CharSequence artist);
+    public void onMetadataChange (CharSequence title, CharSequence artist);
     public void onPlayPauseChange (Boolean isPlaying);
     public void onDurationChange (int milliseconds);
     public void onPositionChange (int milliseconds);
   }
 
   private OnChangeListener onChangeListener = null;
-  private boolean metadataVisible;
   private CharSequence metadataTitle;
   private CharSequence metadataArtist;
   private Boolean playPause;
@@ -29,7 +28,7 @@ public class UriPlayerWatcher extends RadioComponent {
   private int seekPosition;
 
   private final void onMetadataChange () {
-    onChangeListener.onMetadataChange(metadataVisible, metadataTitle, metadataArtist);
+    onChangeListener.onMetadataChange(metadataTitle, metadataArtist);
   }
 
   private final void onPlayPauseChange () {
@@ -60,11 +59,9 @@ public class UriPlayerWatcher extends RadioComponent {
   private final void updateMetadata (String... arguments) {
     synchronized (this) {
       if (arguments.length == 0) {
-        metadataVisible = false;
         metadataTitle = null;
         metadataArtist = null;
       } else {
-        metadataVisible = true;
         metadataTitle = arguments[0];
         metadataArtist = arguments[1];
       }
@@ -87,13 +84,9 @@ public class UriPlayerWatcher extends RadioComponent {
   }
 
   private final BlockingQueue<String> uriQueue = new LinkedBlockingQueue<>();
-  private Thread dequeueThread = null;
+  private final Thread uriDequeueThread;
 
-  public final void onUriChange (Uri uri) {
-    uriQueue.offer((uri != null)? uri.toString(): "");
-  }
-
-  public final String dequeueUri () {
+  private final String uriDequeueNext () {
     while (true) {
       try {
         return uriQueue.take();
@@ -102,14 +95,14 @@ public class UriPlayerWatcher extends RadioComponent {
     }
   }
 
-  private final Runnable uriDequeuer =
+  private final Runnable uriDequeueTask =
     new Runnable() {
       @Override
       public void run () {
         Context context = getContext();
 
         while (true) {
-          String uri = dequeueUri();
+          String uri = uriDequeueNext();
 
           if (uri.isEmpty()) {
             updateMetadata();
@@ -134,6 +127,10 @@ public class UriPlayerWatcher extends RadioComponent {
         }
       }
     };
+
+  public final void onUriChange (Uri uri) {
+    uriQueue.offer((uri != null)? uri.toString(): "");
+  }
 
   public final void onPlayPauseChange (Boolean isPlaying) {
     synchronized (this) {
@@ -171,7 +168,7 @@ public class UriPlayerWatcher extends RadioComponent {
     onDurationChange(0);
     onPositionChange(0);
 
-    dequeueThread = new Thread(uriDequeuer);
-    dequeueThread.start();
+    uriDequeueThread = new Thread(uriDequeueTask);
+    uriDequeueThread.start();
   }
 }
