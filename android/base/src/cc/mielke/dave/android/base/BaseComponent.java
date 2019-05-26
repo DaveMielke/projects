@@ -3,6 +3,9 @@ package cc.mielke.dave.android.base;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import cc.mielke.dave.android.base.TimeHelper;
 import java.text.SimpleDateFormat;
 
@@ -79,6 +82,76 @@ public abstract class BaseComponent {
   }
 
   protected final static Handler mainHandler = new Handler(getMainLooper());
+  private final static Map<Runnable, AlarmManager.OnAlarmListener> callbackAlarms;
+
+  static {
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
+      callbackAlarms = new HashMap<>();
+    } else {
+      callbackAlarms = null;
+    }
+  }
+
+  protected static void unpost (Runnable callback) {
+    mainHandler.removeCallbacks(callback);
+
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
+      synchronized (callbackAlarms) {
+        AlarmManager.OnAlarmListener listener = callbackAlarms.remove(callback);
+        if (listener != null) getAlarmManager().cancel(listener);
+      }
+    }
+  }
+
+  protected static void postAt (final long when, final Runnable callback) {
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
+      AlarmManager.OnAlarmListener listener =
+        new AlarmManager.OnAlarmListener() {
+          @Override
+          public void onAlarm () {
+            synchronized (callbackAlarms) {
+              AlarmManager.OnAlarmListener listener = callbackAlarms.remove(callback);
+
+              if (listener == null) {
+                throw new IllegalStateException("callback not mapped");
+              }
+
+              if (listener != this) {
+                throw new IllegalStateException("callback mapped to different alarm");
+              }
+            }
+
+            callback.run();
+          }
+        };
+
+      synchronized (callbackAlarms) {
+        if (callbackAlarms.get(callback) != null) {
+          throw new IllegalStateException("callback already mapped");
+        }
+
+        callbackAlarms.put(callback, listener);
+
+        getAlarmManager().setExact(
+          AlarmManager.RTC_WAKEUP, when, "delayed-post", listener, null
+        );
+      }
+    } else {
+      postIn((when - getCurrentTime()), callback);
+    }
+  }
+
+  protected static void postIn (final long delay, final Runnable callback) {
+    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
+      postAt((getCurrentTime() + delay), callback);
+    } else {
+      mainHandler.postDelayed(callback, delay);
+    }
+  }
+
+  protected static void post (Runnable callback) {
+    mainHandler.post(callback);
+  }
 
   protected static Thread getMainThread () {
     return getMainLooper().getThread();
@@ -92,39 +165,7 @@ public abstract class BaseComponent {
     if (amOnMainThread()) {
       task.run();
     } else {
-      mainHandler.post(task);
-    }
-  }
-
-  protected static void post (Runnable callback) {
-    mainHandler.post(callback);
-  }
-
-  protected static void postAt (final long when, final Runnable callback) {
-    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
-      AlarmManager am = getAlarmManager();
-
-      AlarmManager.OnAlarmListener listener =
-        new AlarmManager.OnAlarmListener() {
-          @Override
-          public void onAlarm () {
-            callback.run();
-          }
-        };
-
-      am.setExact(
-        AlarmManager.RTC_WAKEUP, when, "delayed-post", listener, null
-      );
-    } else {
-      postIn((when - getCurrentTime()), callback);
-    }
-  }
-
-  protected static void postIn (final long delay, final Runnable callback) {
-    if (ApiTests.HAVE_AlarmManager_OnAlarmListener) {
-      postAt((getCurrentTime() + delay), callback);
-    } else {
-      mainHandler.postDelayed(callback, delay);
+      post(task);
     }
   }
 
