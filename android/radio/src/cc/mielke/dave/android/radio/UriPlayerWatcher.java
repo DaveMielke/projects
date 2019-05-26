@@ -56,15 +56,10 @@ public class UriPlayerWatcher extends RadioComponent {
     }
   }
 
-  private final void updateMetadata (String... arguments) {
+  private final void onMetadataChange (CharSequence title, CharSequence artist) {
     synchronized (this) {
-      if (arguments.length == 0) {
-        metadataTitle = null;
-        metadataArtist = null;
-      } else {
-        metadataTitle = arguments[0];
-        metadataArtist = arguments[1];
-      }
+      metadataTitle = title;
+      metadataArtist = artist;
 
       if (onChangeListener != null) {
         runOnMainThread(
@@ -103,27 +98,25 @@ public class UriPlayerWatcher extends RadioComponent {
 
         while (true) {
           String uri = uriDequeueNext();
+          CharSequence title = null;
+          CharSequence artist = null;
 
-          if (uri.isEmpty()) {
-            updateMetadata();
-          } else {
+          if (!uri.isEmpty()) {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             try {
               try {
                 retriever.setDataSource(context, Uri.parse(uri));
+                title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
               } catch (IllegalArgumentException exception) {
-                updateMetadata();
-                continue;
+                Log.w(LOG_TAG, ("can't retrieve metadata: " + uri));
               }
-
-              updateMetadata(
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
-                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-              );
             } finally {
               retriever.release();
             }
           }
+
+          onMetadataChange(title, artist);
         }
       }
     };
@@ -163,7 +156,7 @@ public class UriPlayerWatcher extends RadioComponent {
   public UriPlayerWatcher () {
     super();
 
-    updateMetadata();
+    onMetadataChange(null, null);
     onPlayPauseChange(null);
     onDurationChange(0);
     onPositionChange(0);
