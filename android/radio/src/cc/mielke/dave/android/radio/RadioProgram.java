@@ -156,7 +156,7 @@ public class RadioProgram extends RadioComponent {
 
     synchronized (this) {
       currentPlayer = null;
-      post(retryCallback);
+      postNow(retryCallback);
     }
   }
 

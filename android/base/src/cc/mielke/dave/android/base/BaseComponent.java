@@ -149,8 +149,8 @@ public abstract class BaseComponent {
     }
   }
 
-  protected static void post (Runnable callback) {
-    mainHandler.post(callback);
+  protected static void postNow (Runnable callback) {
+    postIn(0, callback);
   }
 
   protected static Thread getMainThread () {
@@ -165,7 +165,7 @@ public abstract class BaseComponent {
     if (amOnMainThread()) {
       task.run();
     } else {
-      post(task);
+      postNow(task);
     }
   }
 

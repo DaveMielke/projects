@@ -25,7 +25,7 @@ public abstract class PositionMonitor extends AudioComponent {
             boolean stop = false;
 
             while (true) {
-              post(
+              postNow(
                 new Runnable() {
                   @Override
                   public void run () {
