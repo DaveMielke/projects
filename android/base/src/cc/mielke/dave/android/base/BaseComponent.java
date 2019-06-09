@@ -21,6 +21,7 @@ import android.os.Handler;
 
 import android.app.AlarmManager;
 import android.media.AudioManager;
+import android.os.PowerManager;
 
 public abstract class BaseComponent {
   private final static String LOG_TAG = BaseComponent.class.getName();
@@ -47,6 +48,10 @@ public abstract class BaseComponent {
 
   protected static AudioManager getAudioManager () {
     return (AudioManager)getContext().getSystemService(Context.AUDIO_SERVICE);
+  }
+
+  protected static PowerManager getPowerManager () {
+    return (PowerManager)getContext().getSystemService(Context.POWER_SERVICE);
   }
 
   protected static long getCurrentTime () {

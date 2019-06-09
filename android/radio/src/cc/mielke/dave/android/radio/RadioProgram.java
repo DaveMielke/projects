@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.LinkedList;
 
 import android.util.Log;
+import android.os.PowerManager;
 
 public class RadioProgram extends RadioComponent {
   private final static String LOG_TAG = RadioProgram.class.getName();
@@ -81,12 +82,23 @@ public class RadioProgram extends RadioComponent {
     return hasPlayers;
   }
 
-  private final Runnable retryCallback =
+  private final static PowerManager.WakeLock PLAY_CALLBACK_WAKE_LOCK =
+    getPowerManager().newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOG_TAG);
+
+  static {
+    PLAY_CALLBACK_WAKE_LOCK.setReferenceCounted(false);
+  }
+
+  private final Runnable playCallback =
     new Runnable() {
       @Override
       public void run () {
         if (RadioParameters.LOG_PLAYER_SCHEDULING) {
           Log.d(LOG_TAG, ("asynchronous player start: " + getExternalName()));
+        }
+
+        if (PLAY_CALLBACK_WAKE_LOCK.isHeld()) {
+          PLAY_CALLBACK_WAKE_LOCK.release();
         }
 
         play();
@@ -145,7 +157,7 @@ public class RadioProgram extends RadioComponent {
         updateNotification(getString(R.string.state_waiting), till);
       }
 
-      postAt(next, retryCallback);
+      postAt(next, playCallback);
     }
   }
 
@@ -156,7 +168,8 @@ public class RadioProgram extends RadioComponent {
 
     synchronized (this) {
       currentPlayer = null;
-      postNow(retryCallback);
+      postNow(playCallback);
+      PLAY_CALLBACK_WAKE_LOCK.acquire(1000);
     }
   }
 
@@ -181,7 +194,7 @@ public class RadioProgram extends RadioComponent {
         logAction("stopping");
         isActive = false;
 
-        unpost(retryCallback);
+        unpost(playCallback);
         if (currentPlayer != null) currentPlayer.stop();
       }
     }

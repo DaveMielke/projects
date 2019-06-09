@@ -295,12 +295,12 @@ public abstract class RadioPlayer extends AudioComponent {
       delay = Math.min(delay, getMaximumDelay());
       setEarliestTime(now + delay);
 
-      for (OnFinishedListener listener : onFinishedListeners) {
-        listener.onFinished(this);
-      }
-
       if (RadioParameters.LOG_PLAYER_SCHEDULING) {
         Log.d(LOG_TAG, ("playing ended: " + getName()));
+      }
+
+      for (OnFinishedListener listener : onFinishedListeners) {
+        listener.onFinished(this);
       }
 
       getProgram().onPlayerFinished(this);
