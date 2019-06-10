@@ -71,92 +71,108 @@ public abstract class MediaButton extends AudioComponent {
     return session;
   }
 
-  private static interface Model {
+  private abstract static class Model {
+    public abstract boolean isClaimed ();
     public abstract void claim ();
     public abstract void release ();
+
+    protected Model (String name) {
+      Log.d(LOG_TAG, ("using model: " + name));
+    }
   }
 
-  private static class MediaSessionModel implements Model {
+  private static class MediaSessionModel extends Model {
     private MediaSession mediaSession = null;
 
     @Override
-    public void claim () {
-      if (mediaSession != null) {
-        throw new IllegalStateException("media session already active");
-      }
+    public boolean isClaimed () {
+      return mediaSession != null;
+    }
 
+    @Override
+    public void claim () {
       mediaSession = newMediaSession();
     }
 
     @Override
     public void release () {
-      if (mediaSession == null) {
-        throw new IllegalStateException("media session not active");
-      }
-
       mediaSession.release();
       mediaSession = null;
     }
+
+    public MediaSessionModel () {
+      super("media session");
+    }
   }
 
-  private static class PendingIntentModel implements Model {
+  private static class PendingIntentModel extends Model {
     private PendingIntent pendingIntent = null;
 
     @Override
-    public void claim () {
-      if (pendingIntent != null) {
-        throw new IllegalStateException("pending intent already registered");
-      }
+    public boolean isClaimed () {
+      return pendingIntent != null;
+    }
 
+    @Override
+    public void claim () {
       pendingIntent = newPendingIntent();
       audioManager.registerMediaButtonEventReceiver(pendingIntent);
     }
 
     @Override
     public void release () {
-      if (pendingIntent == null) {
-        throw new IllegalStateException("pending intent not registered");
-      }
-
       audioManager.unregisterMediaButtonEventReceiver(pendingIntent);
       pendingIntent = null;
     }
+
+    public PendingIntentModel () {
+      super("pending intent");
+    }
   }
 
-  private static class BroadcastReceiverModel implements Model {
+  private static class BroadcastReceiverModel extends Model {
     private ComponentName receiverComponent = null;
 
     @Override
-    public void claim () {
-      if (receiverComponent != null) {
-        throw new IllegalStateException("receiver component already registered");
-      }
+    public boolean isClaimed () {
+      return receiverComponent != null;
+    }
 
+    @Override
+    public void claim () {
       receiverComponent = new ComponentName(getContext(), MediaButtonReceiver.class);
       audioManager.registerMediaButtonEventReceiver(receiverComponent);
     }
 
     @Override
     public void release () {
-      if (receiverComponent == null) {
-        throw new IllegalStateException("receiver component not registered");
-      }
-
       audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
       receiverComponent = null;
     }
+
+    public BroadcastReceiverModel () {
+      super("broadcast receiver");
+    }
   }
 
-  private final static Model model =
+  private final static Model mediaButtonModel =
     ApiTests.haveLollipop? new MediaSessionModel():
     ApiTests.haveJellyBeanMR2? new PendingIntentModel():
     new BroadcastReceiverModel();
 
   public static void claim () {
-    model.claim();
+    if (mediaButtonModel.isClaimed()) {
+      throw new IllegalStateException("already claimed");
+    }
+
+    mediaButtonModel.claim();
   }
 
   public static void release () {
-    model.release();
+    if (!mediaButtonModel.isClaimed()) {
+      throw new IllegalStateException("not claimed");
+    }
+
+    mediaButtonModel.release();
   }
 }
