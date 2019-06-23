@@ -66,8 +66,6 @@ public abstract class MediaButton extends AudioComponent {
 
     session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS);
     session.setMediaButtonReceiver(newPendingIntent());
-
-    session.setActive(true);
     return session;
   }
 
@@ -82,22 +80,21 @@ public abstract class MediaButton extends AudioComponent {
   }
 
   private static class MediaSessionModel extends Model {
-    private MediaSession mediaSession = null;
+    private final MediaSession mediaSession = newMediaSession();
 
     @Override
     public boolean isClaimed () {
-      return mediaSession != null;
+      return mediaSession.isActive();
     }
 
     @Override
     public void claim () {
-      mediaSession = newMediaSession();
+      mediaSession.setActive(true);
     }
 
     @Override
     public void release () {
-      mediaSession.release();
-      mediaSession = null;
+      mediaSession.setActive(false);
     }
 
     public MediaSessionModel () {
@@ -106,23 +103,24 @@ public abstract class MediaButton extends AudioComponent {
   }
 
   private static class PendingIntentModel extends Model {
-    private PendingIntent pendingIntent = null;
+    private final PendingIntent pendingIntent = newPendingIntent();
+    private boolean isRegistered = false;
 
     @Override
     public boolean isClaimed () {
-      return pendingIntent != null;
+      return isRegistered;
     }
 
     @Override
     public void claim () {
-      pendingIntent = newPendingIntent();
       audioManager.registerMediaButtonEventReceiver(pendingIntent);
+      isRegistered = true;
     }
 
     @Override
     public void release () {
       audioManager.unregisterMediaButtonEventReceiver(pendingIntent);
-      pendingIntent = null;
+      isRegistered = false;
     }
 
     public PendingIntentModel () {
@@ -131,23 +129,24 @@ public abstract class MediaButton extends AudioComponent {
   }
 
   private static class BroadcastReceiverModel extends Model {
-    private ComponentName receiverComponent = null;
+    private final ComponentName receiverComponent = new ComponentName(getContext(), MediaButtonReceiver.class);
+    private boolean isRegistered = false;
 
     @Override
     public boolean isClaimed () {
-      return receiverComponent != null;
+      return isRegistered;
     }
 
     @Override
     public void claim () {
-      receiverComponent = new ComponentName(getContext(), MediaButtonReceiver.class);
       audioManager.registerMediaButtonEventReceiver(receiverComponent);
+      isRegistered = true;
     }
 
     @Override
     public void release () {
       audioManager.unregisterMediaButtonEventReceiver(receiverComponent);
-      receiverComponent = null;
+      isRegistered = false;
     }
 
     public BroadcastReceiverModel () {
