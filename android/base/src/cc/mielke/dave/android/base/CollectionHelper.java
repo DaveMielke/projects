@@ -14,14 +14,22 @@ public abstract class CollectionHelper {
   private CollectionHelper () {
   }
 
-  public static <TYPE> Set<TYPE> toUnmodificableSet (TYPE... values) {
-    return Collections.unmodifiableSet(new HashSet<TYPE>(Arrays.asList(values)));
+  public static <ElementType> Set<ElementType> toUnmodificableSet (ElementType... elements) {
+    return Collections.unmodifiableSet(new HashSet<ElementType>(Arrays.asList(elements)));
   }
 
-  public static <TYPE> TYPE removeRandomElement (ArrayList<TYPE> list) {
+  public static <ElementType> ElementType removeRandomElement (ArrayList<ElementType> list) {
     if (list.isEmpty()) return null;
-    int index = (int)Math.round(Math.floor((double)list.size() * Math.random()));
-    return list.remove(index);
+
+    int size = list.size();
+    int index = (int)Math.round(Math.floor((double)size * Math.random()));
+    ElementType element = list.get(index);
+
+    int last = size - 1;
+    if (index < size) list.set(index, list.get(last));
+    list.remove(last);
+
+    return element;
   }
 
   public static void sortByPath (ArrayList<File> files) {
