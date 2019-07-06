@@ -64,10 +64,8 @@ public class MainActivity extends BaseActivity {
   private TextView uriMetadataTitle = null;
   private TextView uriMetadataArtist = null;
 
-  private View uriButtonsView = null;
   private Button uriPlayPauseButton = null;
 
-  private View uriSeekView = null;
   private SeekBar uriSeekBar = null;
   private TextView uriSeekCurrent = null;
   private TextView uriSeekRemaining = null;
@@ -82,8 +80,7 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onPlayPauseChange (Boolean isPlaying) {
-        boolean visible = isPlaying != null;
-        if (!visible) isPlaying = false;
+        if (isPlaying == null) isPlaying = false;
 
         int label;
         int image;
@@ -96,7 +93,6 @@ public class MainActivity extends BaseActivity {
           image = android.R.drawable.ic_media_play;
         }
 
-        setVisible(uriButtonsView, visible);
         uriPlayPauseButton.setContentDescription(getString(label));
         uriPlayPauseButton.setBackgroundResource(image);
       }
@@ -123,9 +119,6 @@ public class MainActivity extends BaseActivity {
 
       @Override
       public void onPositionChange (int milliseconds) {
-        boolean visible = milliseconds > 0;
-        setVisible(uriSeekView, visible);
-
         if (ApiTests.haveNougat) {
           uriSeekBar.setProgress(milliseconds, true);
         } else {
@@ -141,10 +134,9 @@ public class MainActivity extends BaseActivity {
         if (milliseconds < 0) milliseconds = 0;
         uriSeekBar.setMax(milliseconds);
 
-        boolean visible = milliseconds > 0;
-        setVisible(uriSeekBar, visible);
-        setVisible(uriSeekRemaining, visible);
-        if (!visible) uriSeekBar.setProgress(0);
+        boolean enabled = milliseconds > 0;
+        uriSeekBar.setEnabled(enabled);
+        if (!enabled) uriSeekBar.setProgress(0);
       }
     };
 
@@ -209,10 +201,8 @@ public class MainActivity extends BaseActivity {
     uriMetadataTitle = findViewById(R.id.uri_metadata_title);
     uriMetadataArtist = findViewById(R.id.uri_metadata_artist);
 
-    uriButtonsView = findViewById(R.id.uri_buttons_view);
     uriPlayPauseButton = findViewById(R.id.uri_button_PlayPause);
 
-    uriSeekView = findViewById(R.id.uri_seek_view);
     uriSeekBar = findViewById(R.id.uri_seek_bar);
     uriSeekCurrent = findViewById(R.id.uri_seek_current);
     uriSeekRemaining = findViewById(R.id.uri_seek_remaining);

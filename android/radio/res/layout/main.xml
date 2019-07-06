@@ -42,10 +42,9 @@
     android:layout_alignParentBottom="true"
     >
 
+    <include layout="@layout/speech" />
     <include layout="@layout/uri_metadata" />
     <include layout="@layout/uri_buttons" />
     <include layout="@layout/uri_seek" />
-
-    <include layout="@layout/speech" />
   </TableLayout>
 </RelativeLayout>

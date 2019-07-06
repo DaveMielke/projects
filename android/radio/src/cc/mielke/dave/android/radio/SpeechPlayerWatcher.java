@@ -38,8 +38,6 @@ public class SpeechPlayerWatcher extends RadioComponent {
           }
         );
       }
-
-      updateNotification(speechText);
     }
   }
 

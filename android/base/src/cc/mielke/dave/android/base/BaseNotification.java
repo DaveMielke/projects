@@ -98,7 +98,7 @@ public abstract class BaseNotification extends BaseComponent {
     }
 
     if (ApiTests.haveJellyBeanMR1) {
-      builder.setShowWhen(true);
+      builder.setShowWhen(false);
     }
 
     if (ApiTests.haveLollipop) {
