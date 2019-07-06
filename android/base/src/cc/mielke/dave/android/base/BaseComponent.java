@@ -155,7 +155,7 @@ public abstract class BaseComponent {
   }
 
   protected static void postNow (Runnable callback) {
-    postIn(0, callback);
+    mainHandler.post(callback);
   }
 
   protected static Thread getMainThread () {
