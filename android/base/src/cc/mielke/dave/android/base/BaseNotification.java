@@ -115,6 +115,7 @@ public abstract class BaseNotification extends BaseComponent {
 
   public final void showNotification (boolean foreground) {
     synchronized (this) {
+      notificationBuilder.setWhen(System.currentTimeMillis());
       Notification notification = buildNotification();
 
       if (foreground) {
