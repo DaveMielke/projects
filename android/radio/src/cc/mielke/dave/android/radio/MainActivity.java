@@ -126,7 +126,8 @@ public class MainActivity extends BaseActivity {
         }
 
         uriSeekCurrent.setText(toTime(milliseconds));
-        uriSeekRemaining.setText("-" + toTime(uriSeekBar.getMax() - milliseconds));
+        int max = uriSeekBar.getMax();
+        uriSeekRemaining.setText((max > 0)? ("-" + toTime(max - milliseconds)): "");
       }
 
       @Override
