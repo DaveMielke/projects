@@ -82,11 +82,11 @@ public class RadioProgram extends RadioComponent {
     return hasPlayers;
   }
 
-  private final static PowerManager.WakeLock PLAY_CALLBACK_WAKE_LOCK =
+  private final static PowerManager.WakeLock PLAY_CALLBACK_WAKELOCK =
     getPowerManager().newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOG_TAG);
 
   static {
-    PLAY_CALLBACK_WAKE_LOCK.setReferenceCounted(false);
+    PLAY_CALLBACK_WAKELOCK.setReferenceCounted(false);
   }
 
   private final Runnable playCallback =
@@ -97,8 +97,8 @@ public class RadioProgram extends RadioComponent {
           Log.d(LOG_TAG, ("asynchronous player start: " + getExternalName()));
         }
 
-        if (PLAY_CALLBACK_WAKE_LOCK.isHeld()) {
-          PLAY_CALLBACK_WAKE_LOCK.release();
+        if (PLAY_CALLBACK_WAKELOCK.isHeld()) {
+          PLAY_CALLBACK_WAKELOCK.release();
         }
 
         play();
@@ -168,8 +168,8 @@ public class RadioProgram extends RadioComponent {
 
     synchronized (this) {
       currentPlayer = null;
+      PLAY_CALLBACK_WAKELOCK.acquire();
       postNow(playCallback);
-      PLAY_CALLBACK_WAKE_LOCK.acquire(1000);
     }
   }
 
