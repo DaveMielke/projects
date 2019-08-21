@@ -13,13 +13,13 @@
 #cbc1-ottawa  mon-fri 20:00-20:59 # The Current Review
 #cbc1-ottawa  mon-fri 21:00-21:59 # Ideas
 
-cbc1-winnipeg dec 25 01:00-06:59
+#cbc1-winnipeg dec 25 01:00-06:59
 christian     dec 25 05:30-11:59
-cbc1-halifax  dec 25 12:00-14:59 # Messiah, Queen's Message
+#cbc1-halifax  dec 25 12:00-14:59 # Messiah, Queen's Message
 christian     dec 25 20:00-23:59
-cbc1-halifax  dec 26 14:00-14:59 # Quirks and Quarks
-cbc1-ottawa   dec 26 16:00-16:59 # Giving Back
-cbc1-ottawa   dec 26 17:00-17:59 # The Longing for Belonging
+#cbc1-halifax  dec 26 14:00-14:59 # Quirks and Quarks
+#cbc1-ottawa   dec 26 16:00-16:59 # Giving Back
+#cbc1-ottawa   dec 26 17:00-17:59 # The Longing for Belonging
 bbc-world     dec 29 15:00-15:59 # The New Year International Comedy Show
 christian     dec 31 20:00-23:59
 
@@ -54,8 +54,10 @@ bbc-world fri 15:30-15:59 # Crowd Science
 cbc1-ottawa mon-fri 18:00-18:29 # The World at Six
 cbc1-ottawa mon-fri 18:30-19:59 # As It Happens
 
+cbc1-ottawa fri 20:00-20:59 # Someone Knows Something
+
 cbc1-ottawa    mon 23:00-23:59 # Quirks and Quarks
-cbc1-ottawa    tue 23:32-23:59 # BBC - The Documentary
+cbc1-ottawa    tue 23:00-23:59 # The Moth Radio Hour
 bbc-world      fri 23:00-23:59 # The Real Story
 bbc-world      sat 23:00-23:59 # From Our Own Correspondant, Boston Calling
 
@@ -93,8 +95,9 @@ bbc-world      sat 14:00-14:59 # From the Ground Up, Heart and Soul, World Quest
 portraits      sat 15:00-16:59
 cbc1-calgary   sat 17:00-17:59 # Now or Never
 cbc1-ottawa    sat 18:00-18:29 # The World This Weekend
-cbc1-ottawa  sun 00:00-00:59 # The House
-cbc1-halifax sun 01:00-01:59 # BBC - The Science Hour (Science in Action, Crowd Science)
+bbc-world      sat 18:30-18:59 # Outlook Weekend
+cbc1-ottawa    sun 00:00-00:59 # The House
+cbc1-halifax   sun 01:00-01:59 # BBC - The Science Hour (Science in Action, Crowd Science)
 
 cbc1-winnipeg mon 00:00-00:59 # PRI - This American Life
 cbc1-winnipeg mon 01:00-01:59 # The Sunday Edition - Round Midnight
