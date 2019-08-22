@@ -26,7 +26,7 @@ cbc1-thunderbay http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_tba
 cbc1-toronto http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_tor
 cbc1-windsor http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_wdr
 cbc1-montreal http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_mtl
-cbc1-nordquebec n_mtl
+cbc1-nordquebec http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_n_mtl
 cbc1-quebeccity http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_qqu
 cbc1-fredericton http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_frd
 cbc1-moncton http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_mct

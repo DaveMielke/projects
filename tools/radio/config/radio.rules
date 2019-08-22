@@ -39,11 +39,11 @@ bbc-world   fri     13:00-13:59 # The Fifth Floor
 cbc1-ottawa   mon 14:00-14:59 # Ideas in the Afternoon
 cbc1-winnipeg thu 14:00-14:59 # Out in the Open
 
-bbc-world mon 15:00-15:29 # The Why Factor/Hard Talk
-bbc-world tue 15:00-15:29 # The Documentary/World Hacks
-bbc-world wed 15:00-15:29 # The Compass/Hard Talk
-bbc-world thu 15:00-15:29 # Assignment/The Inquiry
-bbc-world fri 15:00-15:29 # Trending/Hard Talk
+bbc-world mon 15:00-15:29 # Hard Talk
+bbc-world tue 15:00-15:29 # People Fixing the World
+bbc-world wed 15:00-15:29 # Hard Talk
+bbc-world thu 15:00-15:29 # The Inquiry
+bbc-world fri 15:00-15:29 # Hard Talk
 
 bbc-world mon 15:30-15:59 # Discovery
 bbc-world tue 15:30-15:59 # Digital Planet
@@ -71,7 +71,7 @@ cbc1-ottawa   tue-sat 01:00-01:59 # PRI - The World
 
 cbc1-halifax tue 02:00-02:30 # BBC - Discovery
 cbc1-halifax wed 02:00-02:30 # BBC - In the Studio
-cbc1-halifax thu 02:00-02:30 # BBC - World Hacks
+cbc1-halifax thu 02:00-02:30 # BBC - People Fixing the World
 cbc1-halifax fri 02:00-02:30 # BBC - The Inquiry
 cbc1-halifax sat 02:00-02:30 # BBC - The Compass
 
