@@ -827,8 +827,20 @@ proc selectStation {} {
    if {[file exists $holdFile]} {
       if {[catch [list open $holdFile {RDONLY}] holdStream] == 0} {
          set station [gets $holdStream]
+         set until [gets $holdStream]
          close $holdStream
-         return $station
+
+         if {[string length $until] > 0} {
+            if {[isInteger $until]} {
+               if {[clock seconds] >= $until} {
+                  set station ""
+               }
+            }
+         }
+
+         if {[string length $station] > 0} {
+            return $station
+         }
       } else {
          logWarning $holdStream
       }
@@ -935,14 +947,26 @@ proc changedStation {} {
    signalDaemon usr1
 }
 
-proc setStation {station} {
-   global holdFile
+proc setStation {station {until ""}} {
+   global holdFile noStation
 
    if {[catch [list open $holdFile {WRONLY TRUNC CREAT}] stream] != 0} {
       systemError $stream
    }
 
    puts $stream $station
+
+   if {[string length $until] > 0} {
+      if {[string length $station] > 0} {
+         set action "playing $station"
+      } else {
+         set action $noStation
+      }
+
+      writeOutput "$action until [clock format $until]"
+      puts $stream $until
+   }
+
    close $stream; unset stream
    changedStation
 }
@@ -1098,6 +1122,24 @@ proc processRadioOptions {operandsList} {
    }
 }
 
+proc parseStationOperand {operandsLsit} {
+   upvar 1 $operandsList operands
+}
+
+proc parseUntilOperand {operandsList} {
+   upvar 1 $operandsList operands
+
+   if {![nextOperand operands operand]} {
+      return ""
+   }
+
+   if {[catch [list clock scan $operand] value] != 0} {
+      syntaxError $value
+   }
+
+   return $value
+}
+
 proc actionHandler->automatic {operands} {
    global holdFile
 
@@ -1161,9 +1203,10 @@ proc actionHandler->daemon {operands} {
 }
 
 proc actionHandler->hold {operands} {
+   set until [parseUntilOperand operands]
    operandsDone operands
 
-   setStation [selectStation]
+   setStation [selectStation] $until
 }
 
 proc actionHandler->kill {operands} {
@@ -1194,8 +1237,10 @@ proc actionHandler->listen {operands} {
 }
 
 proc actionHandler->off {operands} {
+   set until [parseUntilOperand operands]
    operandsDone operands
-   setStation ""
+
+   setStation "" $until
 }
 
 proc actionHandler->reconnect {operands} {
@@ -1208,9 +1253,11 @@ proc actionHandler->set {operands} {
       syntaxError "missing station name"
    }
 
+   set until [parseUntilOperand operands]
    operandsDone operands
+
    verifyStation $station
-   setStation $station
+   setStation $station $until
 }
 
 proc actionHandler->which {operands} {
