@@ -821,6 +821,20 @@ proc testRule {rule time date month day} {
    return 1
 }
 
+proc removeHoldFile {} {
+   global holdFile
+
+   if {![file exists $holdFile]} {
+      return 0
+   }
+
+   if {[catch [list file delete -- $holdFile] response] != 0} {
+      logWarning $response
+   }
+
+   return 1
+}
+
 proc selectStation {} {
    global holdFile rulesList
 
@@ -834,6 +848,7 @@ proc selectStation {} {
             if {[isInteger $until]} {
                if {[clock seconds] >= $until} {
                   set station ""
+                  removeHoldFile
                }
             }
          }
@@ -1141,14 +1156,11 @@ proc parseUntilOperand {operandsList} {
 }
 
 proc actionHandler->automatic {operands} {
-   global holdFile
-
    operandsDone operands
 
-   if {[catch [list file delete -- $holdFile] response] != 0} {
-      systemError $response
+   if {[removeHoldFile]} {
+      changedStation
    }
-   changedStation
 }
 
 proc actionHandler->daemon {operands} {
