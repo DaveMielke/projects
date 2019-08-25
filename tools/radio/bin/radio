@@ -849,10 +849,11 @@ proc selectStation {} {
          set hasExpired 0
 
          if {[string length $until] > 0} {
-            if {[isInteger $until]} {
-               if {[clock seconds] >= $until} {
-                  set hasExpired 1
-               }
+            if {![isInteger $until]} {
+               logWarning "invalid until time: $until"
+               set hasExpired 1
+            } elseif {[clock seconds] >= $until} {
+               set hasExpired 1
             }
          }
 
