@@ -835,6 +835,7 @@ proc removeHoldFile {} {
       return 0
    }
 
+   logInformation "hold file removed"
    return 1
 }
 
@@ -853,6 +854,7 @@ proc selectStation {} {
                logWarning "invalid until time: $until"
                set hasExpired 1
             } elseif {[clock seconds] >= $until} {
+               logInformation "hold file expired"
                set hasExpired 1
             }
          }
@@ -984,7 +986,7 @@ proc setStation {station {until ""}} {
          set action $noStation
       }
 
-      writeOutput "$action until [clock format $until]"
+      logNotice "$action until [clock format $until]"
       puts $stream $until
    }
 
