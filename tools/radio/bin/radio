@@ -821,15 +821,18 @@ proc testRule {rule time date month day} {
    return 1
 }
 
+proc haveHoldFile {} {
+   global holdFile
+
+   return [file exists $holdFile]
+}
+
 proc removeHoldFile {} {
    global holdFile
 
-   if {![file exists $holdFile]} {
-      return 0
-   }
-
    if {[catch [list file delete -- $holdFile] response] != 0} {
       logWarning $response
+      return 0
    }
 
    return 1
@@ -838,22 +841,22 @@ proc removeHoldFile {} {
 proc selectStation {} {
    global holdFile rulesList
 
-   if {[file exists $holdFile]} {
+   if {[haveHoldFile]} {
       if {[catch [list open $holdFile {RDONLY}] holdStream] == 0} {
          set station [gets $holdStream]
          set until [gets $holdStream]
          close $holdStream
+         set hasExpired 0
 
          if {[string length $until] > 0} {
             if {[isInteger $until]} {
                if {[clock seconds] >= $until} {
-                  set station ""
-                  removeHoldFile
+                  set hasExpired 1
                }
             }
          }
 
-         if {[string length $station] > 0} {
+         if {!$hasExpired} {
             return $station
          }
       } else {
@@ -861,6 +864,7 @@ proc selectStation {} {
       }
 
       unset holdStream
+      removeHoldFile
    }
 
    foreach variable {minute hour date month day} value [split [clock format [clock seconds] -format "%M.%H.%d.%m.%w"] .] {
@@ -963,7 +967,7 @@ proc changedStation {} {
 }
 
 proc setStation {station {until ""}} {
-   global holdFile noStation
+   global holdFile
 
    if {[catch [list open $holdFile {WRONLY TRUNC CREAT}] stream] != 0} {
       systemError $stream
@@ -975,6 +979,7 @@ proc setStation {station {until ""}} {
       if {[string length $station] > 0} {
          set action "playing $station"
       } else {
+         global noStation
          set action $noStation
       }
 
@@ -1158,8 +1163,10 @@ proc parseUntilOperand {operandsList} {
 proc actionHandler->automatic {operands} {
    operandsDone operands
 
-   if {[removeHoldFile]} {
-      changedStation
+   if {[haveHoldFile]} {
+      if {[removeHoldFile]} {
+         changedStation
+      }
    }
 }
 
