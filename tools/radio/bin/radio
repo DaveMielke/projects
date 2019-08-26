@@ -737,7 +737,9 @@ proc defineRule {rulesList fields} {
             return 0
          }
 
+         set isTime [string equal $unit time]
          set validator "${unit}Validator"
+
          if {!$validated} {
             if {![$validator first]} {
                return 0
@@ -746,11 +748,19 @@ proc defineRule {rulesList fields} {
 
          if {[string length $last] == 0} {
             set last $first
-         } elseif {![$validator last]} {
-            return 0
+         } else {
+            if {![$validator last]} {
+               return 0
+            }
+
+            if ($isTime) {
+               if {$last == 0} {
+                  set last [expr {60 * 60 * 24}]
+               }
+            }
          }
 
-         if {[string equal $unit time]} {
+         if {$isTime} {
             incr last -1
          }
 
