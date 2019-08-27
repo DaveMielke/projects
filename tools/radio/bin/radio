@@ -791,7 +791,7 @@ proc defineRule {rulesList fields} {
          lappend $unit [list $first $last]
       }
 
-      foreach unit {time day date month} {
+      foreach unit {time day date month year} {
          if {[info exists $unit]} {
             keylset rule $unit [set $unit]
          }
@@ -819,8 +819,8 @@ proc updateRules {} {
    }
 }
 
-proc testRule {rule time date month day year} {
-   foreach unit {time date month day year} {
+proc testRule {rule time day date month year} {
+   foreach unit {time day date month year} {
       if {[keylget rule $unit ranges]} {
          set value [set $unit]
          set found 0
@@ -846,7 +846,7 @@ proc testRule {rule time date month day year} {
 proc chooseStation {when} {
    global rulesList
 
-   foreach variable {second minute hour date month day year} value [split [clock format $when -format "%S.%M.%H.%d.%m.%w.%Y"] .] {
+   foreach variable {second minute hour day date month year} value [split [clock format $when -format "%S.%M.%H.%w.%d.%m.%Y"] .] {
       set $variable [regsub {^0*(\d+?)$} $value {\1}]
    }
 
@@ -856,7 +856,7 @@ proc chooseStation {when} {
    updateRules
 
    foreach rule $rulesList {
-      if {[testRule $rule $time $date $month $day $year]} {
+      if {[testRule $rule $time $day $date $month $year]} {
          return [keylget rule station]
       }
    }
