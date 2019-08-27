@@ -851,8 +851,29 @@ proc removeHoldFile {} {
    return 1
 }
 
+proc chooseStation {when} {
+   global rulesList
+
+   foreach variable {second minute hour date month day} value [split [clock format $when -format "%S.%M.%H.%d.%m.%w"] .] {
+      set $variable [regsub {^0*(\d+?)$} $value {\1}]
+   }
+
+   set time [timeValue $hour $minute $second]
+   incr date -1
+   incr month -1
+
+   updateRules
+   foreach rule $rulesList {
+      if {[testRule $rule $time $date $month $day]} {
+         return [keylget rule station]
+      }
+   }
+
+   return ""
+}
+
 proc selectStation {} {
-   global holdFile rulesList
+   global holdFile
 
    if {[haveHoldFile]} {
       if {[catch [list open $holdFile {RDONLY}] holdStream] == 0} {
@@ -882,22 +903,7 @@ proc selectStation {} {
       removeHoldFile
    }
 
-   foreach variable {second minute hour date month day} value [split [clock format [clock seconds] -format "%S.%M.%H.%d.%m.%w"] .] {
-      set $variable [regsub {^0*(\d+?)$} $value {\1}]
-   }
-
-   set time [timeValue $hour $minute $second]
-   incr date -1
-   incr month -1
-
-   updateRules
-   foreach rule $rulesList {
-      if {[testRule $rule $time $date $month $day]} {
-         return [keylget rule station]
-      }
-   }
-
-   return ""
+   return [chooseStation [clock seconds]]
 }
 
 proc changeStation {} {
@@ -1161,7 +1167,7 @@ proc parseStationOperand {operandsLsit} {
    upvar 1 $operandsList operands
 }
 
-proc parseUntilOperand {operandsList} {
+proc parseTimeOperand {operandsList} {
    upvar 1 $operandsList operands
 
    if {![nextOperand operands operand]} {
@@ -1237,7 +1243,7 @@ proc actionHandler->daemon {operands} {
 }
 
 proc actionHandler->hold {operands} {
-   set until [parseUntilOperand operands]
+   set until [parseTimeOperand operands]
    operandsDone operands
 
    setStation [selectStation] $until
@@ -1271,7 +1277,7 @@ proc actionHandler->listen {operands} {
 }
 
 proc actionHandler->off {operands} {
-   set until [parseUntilOperand operands]
+   set until [parseTimeOperand operands]
    operandsDone operands
 
    setStation "" $until
@@ -1287,7 +1293,7 @@ proc actionHandler->set {operands} {
       syntaxError "missing station name"
    }
 
-   set until [parseUntilOperand operands]
+   set until [parseTimeOperand operands]
    operandsDone operands
 
    verifyStation $station
@@ -1297,12 +1303,19 @@ proc actionHandler->set {operands} {
 proc actionHandler->which {operands} {
    global noStation
 
+   set when [parseTimeOperand operands]
    operandsDone operands
 
-   updateRules
-   if {[string length [set station [selectStation]]] == 0} {
+   if {[string length $when] == 0} {
+      set station [selectStation]
+   } else {
+      set station [chooseStation $when]
+   }
+
+   if {[string length $station] == 0} {
       set station $noStation
    }
+
    writeOutput $station
 }
 
