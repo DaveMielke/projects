@@ -622,12 +622,12 @@ proc isInteger {value} {
    return [expr {[string is digit -strict $value] && (([string length $value] == 1) || ![string equal [string index $value 0] 0])}]
 }
 
-proc checkInteger {value name minimum maximum} {
+proc checkInteger {value name {minimum ""} {maximum ""}} {
    if {![isInteger $value]} {
       logWarning "invalid $name: $value"
-   } elseif {$value < $minimum} {
+   } elseif {([string length $minimum] > 0) && ($value < $minimum)} {
       logWarning "$name less than $minimum: $value"
-   } elseif {$value > $maximum} {
+   } elseif {([string length $maximum] > 0) && ($value > $maximum)} {
       logWarning "$name greater than $maximum: $value"
    } else {
       return 1
@@ -675,6 +675,12 @@ proc dateValidator {valueVariable} {
    }
 
    return 0
+}
+
+proc yearValidator {valueVariable} {
+   upvar 1 $valueVariable value
+
+   return [checkInteger $value year 1970]
 }
 
 proc timeValidator {valueVariable} {
@@ -727,7 +733,11 @@ proc defineRule {rulesList fields} {
                set validated 1
             }
          } elseif {[string is digit $first]} {
-            set unit date
+            if {[string length $first] < 3} {
+               set unit date
+            } else {
+               set unit year
+            }
          } elseif {[string first : $first] >= 0} {
             set unit time
          }
@@ -809,8 +819,8 @@ proc updateRules {} {
    }
 }
 
-proc testRule {rule time date month day} {
-   foreach unit {time date month day} {
+proc testRule {rule time date month day year} {
+   foreach unit {time date month day year} {
       if {[keylget rule $unit ranges]} {
          set value [set $unit]
          set found 0
@@ -833,6 +843,27 @@ proc testRule {rule time date month day} {
    return 1
 }
 
+proc chooseStation {when} {
+   global rulesList
+
+   foreach variable {second minute hour date month day year} value [split [clock format $when -format "%S.%M.%H.%d.%m.%w.%Y"] .] {
+      set $variable [regsub {^0*(\d+?)$} $value {\1}]
+   }
+
+   set time [timeValue $hour $minute $second]
+   incr date -1
+   incr month -1
+   updateRules
+
+   foreach rule $rulesList {
+      if {[testRule $rule $time $date $month $day $year]} {
+         return [keylget rule station]
+      }
+   }
+
+   return ""
+}
+
 proc haveHoldFile {} {
    global holdFile
 
@@ -851,31 +882,10 @@ proc removeHoldFile {} {
    return 1
 }
 
-proc chooseStation {when} {
-   global rulesList
-
-   foreach variable {second minute hour date month day} value [split [clock format $when -format "%S.%M.%H.%d.%m.%w"] .] {
-      set $variable [regsub {^0*(\d+?)$} $value {\1}]
-   }
-
-   set time [timeValue $hour $minute $second]
-   incr date -1
-   incr month -1
-
-   updateRules
-   foreach rule $rulesList {
-      if {[testRule $rule $time $date $month $day]} {
-         return [keylget rule station]
-      }
-   }
-
-   return ""
-}
-
 proc selectStation {} {
-   global holdFile
-
    if {[haveHoldFile]} {
+      global holdFile
+
       if {[catch [list open $holdFile {RDONLY}] holdStream] == 0} {
          set station [gets $holdStream]
          set until [gets $holdStream]
@@ -987,6 +997,10 @@ proc changedStation {} {
    signalDaemon usr1
 }
 
+proc formatTime {time} {
+   return [clock format $time]
+}
+
 proc setStation {station {until ""}} {
    global holdFile
 
@@ -1004,7 +1018,7 @@ proc setStation {station {until ""}} {
          set action $noStation
       }
 
-      logNotice "$action until [clock format $until]"
+      logNotice "$action until [formatTime $until]"
       puts $stream $until
    }
 
@@ -1301,22 +1315,23 @@ proc actionHandler->set {operands} {
 }
 
 proc actionHandler->which {operands} {
-   global noStation
-
    set when [parseTimeOperand operands]
    operandsDone operands
 
    if {[string length $when] == 0} {
       set station [selectStation]
+      set suffix ""
    } else {
       set station [chooseStation $when]
+      set suffix " - [formatTime $when]"
    }
 
    if {[string length $station] == 0} {
+      global noStation
       set station $noStation
    }
 
-   writeOutput $station
+   writeOutput "$station$suffix"
 }
 
 proc processOperands {operands} {
