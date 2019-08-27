@@ -636,7 +636,7 @@ proc checkInteger {value name minimum maximum} {
    return 0
 }
 
-proc timeValue {hour minute second} {
+proc timeValue {hour {minute 0} {second 0}} {
    return [expr {((($hour * 60) + $minute) * 60) + $second}]
 }
 
@@ -755,7 +755,7 @@ proc defineRule {rulesList fields} {
 
             if ($isTime) {
                if {$last == 0} {
-                  set last [expr {60 * 60 * 24}]
+                  set last [timeValue 24]
                }
             }
          }
