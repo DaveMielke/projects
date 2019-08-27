@@ -998,7 +998,7 @@ proc changedStation {} {
 }
 
 proc formatTime {time} {
-   return [clock format $time]
+   return [clock format $time -format "%T %a %Y %b %e %Z %z"]
 }
 
 proc setStation {station {until ""}} {
@@ -1323,7 +1323,7 @@ proc actionHandler->which {operands} {
       set suffix ""
    } else {
       set station [chooseStation $when]
-      set suffix " - [formatTime $when]"
+      set suffix " [formatTime $when]"
    }
 
    if {[string length $station] == 0} {
