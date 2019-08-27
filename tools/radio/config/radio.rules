@@ -1,5 +1,10 @@
 cbc1-ottawa 2019 mar 25-28 11:00-12:00 # Canada Reads
 
+# for when we're on daylight time but Europe is on standard time
+#portraits mon-fri 15:00-16:00
+#bbc-world mon-fri 16:00-17:00
+#bbc-world sat     15:00-16:00
+
 cbc1-winnipeg 2018 dec 25 01:00-07:00 #
 christian     2018 dec 25 05:30-12:00 #
 cbc1-halifax  2018 dec 25 12:00-15:00 # Messiah, Queen's Message
@@ -19,18 +24,6 @@ cbc1-ottawa mon     aug  1-7  16:00-18:00 # Civic Holiday
 cbc1-ottawa mon     sep  1-7  16:00-18:00 # Labour Day
 cbc1-ottawa mon     oct  8-14 16:00-18:00 # Thanksgiving
 christian   mon-fri dec 31    20:00-00:00 # New Year's Eve
-
-# for when we're on daylight time but Europe is on standard time
-#portraits mon-fri 15:00-16:00
-#bbc-world mon-fri 16:00-17:00
-#bbc-world sat     15:00-16:00
-
-#cbc1-ottawa  mon-fri 10:00-11:30 # q
-#bbc-world    mon-fri 12:00-13:00 # OS
-#cbc1-ottawa  thu     14:00-15:00 # Now or Never
-#cbc1-halifax mon-fri 20:00-21:00 # Ideas
-#cbc1-ottawa  mon-fri 20:00-21:00 # The Current Review
-#cbc1-ottawa  mon-fri 21:00-22:00 # Ideas
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
 cbc1-ottawa mon-fri 08:37-10:00 # The Current
