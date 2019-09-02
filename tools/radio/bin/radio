@@ -998,7 +998,7 @@ proc changedStation {} {
 }
 
 proc formatTime {time} {
-   return [clock format $time -format "%T %a %Y %b %e %Z %z"]
+   return [clock format $time -format "%T %a %e %b %Y %Z %z"]
 }
 
 proc setStation {station {until ""}} {
@@ -1195,6 +1195,18 @@ proc parseTimeOperand {operandsList} {
    return $value
 }
 
+proc parseUntilOperand {operandsList} {
+   upvar 1 $operandsList operands
+
+   if {[string length [set until [parseTimeOperand operands]]] > 0} {
+      if {$until <= [clock seconds]} {
+         semanticError "until not in the future: [formatTime $until]"
+      }
+   }
+
+   return $until
+}
+
 proc actionHandler->automatic {operands} {
    operandsDone operands
 
@@ -1257,7 +1269,7 @@ proc actionHandler->daemon {operands} {
 }
 
 proc actionHandler->hold {operands} {
-   set until [parseTimeOperand operands]
+   set until [parseUntilOperand operands]
    operandsDone operands
 
    setStation [selectStation] $until
@@ -1291,7 +1303,7 @@ proc actionHandler->listen {operands} {
 }
 
 proc actionHandler->off {operands} {
-   set until [parseTimeOperand operands]
+   set until [parseUntilOperand operands]
    operandsDone operands
 
    setStation "" $until
@@ -1307,7 +1319,7 @@ proc actionHandler->set {operands} {
       syntaxError "missing station name"
    }
 
-   set until [parseTimeOperand operands]
+   set until [parseUntilOperand operands]
    operandsDone operands
 
    verifyStation $station
