@@ -8,7 +8,7 @@ exec vlc \
   --logfile "${TMPDIR:-/tmp}/${programName}.log" --logmode text --log-verbose -1 \
   --one-instance-when-started-from-file --started-from-file --no-playlist-enqueue \
   --play-and-exit --sout-keep \
-  --audio --no-video --album-art 0 \
+  --audio --no-video \
   --audio-replay-gain-mode track --audio-replay-gain-peak-protection \
   "${@}"
 
