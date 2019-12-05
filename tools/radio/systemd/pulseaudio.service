@@ -1,13 +1,15 @@
 [Unit]
-Description=Sound Service
+Description=Pulse Audio Sound Service
 
 #Requires=pulseaudio.socket
+Before=sound.target
 
 [Service]
 # Note that notify will only work if --daemonize=no
-Type=simple
-ExecStart=/usr/bin/pulseaudio --daemonize=no --system --disallow-exit --disable-shm --high-priority --realtime
+Type=notify
+ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --high-priority --disallow-exit --exit-idle-time=-1 --disable-shm --disallow-module-loading
 Restart=on-failure
+RestartSec=10
 
 [Install]
 #Also=pulseaudio.socket
