@@ -1,9 +1,8 @@
 cbc1-ottawa 2019 mar 25-28 11:00-12:00 # Canada Reads
 
-# for when we're on daylight time but Europe is on standard time
+# For when we're on Daylight Time but Europe is on Standard Time.
 #portraits mon-fri 15:00-16:00
 #bbc-world mon-fri 16:00-17:00
-#bbc-world sat     15:00-16:00
 
 cbc1-winnipeg 2018 dec 25 01:00-07:00 #
 christian     2018 dec 25 05:30-12:00 #
@@ -23,6 +22,7 @@ cbc1-ottawa mon     jul  2    16:00-18:00 # Canada Day
 cbc1-ottawa mon     aug  1-7  16:00-18:00 # Civic Holiday
 cbc1-ottawa mon     sep  1-7  16:00-18:00 # Labour Day
 cbc1-ottawa mon     oct  8-14 16:00-18:00 # Thanksgiving
+cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
 christian   mon-fri dec 31    20:00-00:00 # New Year's Eve
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
@@ -55,6 +55,7 @@ bbc-world fri 15:30-16:00 # Crowd Science
 
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
+cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
 cbc1-ottawa    mon 23:00-00:00 # Quirks and Quarks
 cbc1-ottawa    tue 23:32-00:00 # BBC - The Documentary
@@ -95,6 +96,9 @@ bbc-world      sat 14:00-15:00 # From the Ground Up, Heart and Soul, World Quest
 portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
 bbc-world      sat 18:30-19:00 # Outlook Weekend
+bbc-world      sat 19:00-19:30 # Hard Talk
+bbc-world      sat 19:30-20:00 # Crowd Science
+bbc-world      sat 20:00-20:30 # The World This Week
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
