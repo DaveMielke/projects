@@ -16,7 +16,7 @@ declare -A prefixMap=(
    ["radio"]="/home/radio/"
    ["radio/config"]="/home/radio/."
    ["radio/systemd"]="/etc/systemd/system/"
-   ["tcl/lib"]="/opt/dave/lib/tcl/"
+   ["tcl/lib"]="/mnt/opt/dave/lib/tcl/"
 )
 
 while read file

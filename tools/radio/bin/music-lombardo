@@ -1,4 +1,4 @@
 #!/bin/sh
 directory="$(dirname "${0}")"
-exec "${directory}/music" -H -m /opt/dave/Music/Bands/GuyLombardo "${@}"
+exec "${directory}/music" -H -m /mnt/opt/dave/Music/Bands/GuyLombardo "${@}"
 exit "${?}"

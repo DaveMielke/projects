@@ -9,8 +9,7 @@ After=syslog.target network.target remote-fs.target autofs.service
 [Service]
 
 Type=simple
-#ExecStart=/opt/dave/bin/radio daemon syslog rtp 230.4.1.13:8554
-ExecStart=/opt/dave/bin/radio daemon syslog
+ExecStart=/mnt/opt/dave/bin/radio daemon syslog
 
 User=radio
 WorkingDirectory=/home/radio
