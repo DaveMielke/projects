@@ -4,14 +4,14 @@ cbc1-ottawa 2019 mar 25-28 11:00-12:00 # Canada Reads
 #portraits mon-fri 15:00-16:00
 #bbc-world mon-fri 16:00-17:00
 
-cbc1-winnipeg 2018 dec 25 01:00-07:00 #
-christian     2018 dec 25 05:30-12:00 #
-cbc1-halifax  2018 dec 25 12:00-15:00 # Messiah, Queen's Message
-christian     2018 dec 25 20:00-00:00 #
-cbc1-halifax  2018 dec 26 14:00-15:00 # Quirks and Quarks
-cbc1-ottawa   2018 dec 26 16:00-17:00 # Giving Back
-cbc1-ottawa   2018 dec 26 17:00-18:00 # The Longing for Belonging
-bbc-world     2018 dec 29 15:00-16:00 # The New Year International Comedy Show
+christian     2019 dec 24 20:00-00:00 #
+cbc1-winnipeg 2019 dec 25 01:00-07:00 # Christmas Night
+christian     2019 dec 25 07:00-11:00 #
+cbc1-winnipeg 2019 dec 25 11:00-12:00 # Noël with Florence K
+cbc1-ottawa   2019 dec 25 12:00-14:50 # Handel's Messiah
+cbc1-ottawa   2019 dec 25 14:50-15:00 # The Queen's Christmas Message
+christian     2019 dec 25 16:00-00:00 #
+christian     2019 dec 31 20:00-00:00 #
 
 cbc1-ottawa mon-fri jan 1     16:00-18:00 # New Year's Day
 cbc1-ottawa mon     feb 15-21 16:00-18:00 # Family Day
@@ -31,7 +31,8 @@ cbc1-ottawa mon-fri 08:37-10:00 # The Current
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # The Doc Project
 cbc1-ottawa wed 11:32-12:00 # The Debaters
-cbc1-ottawa thu 11:32-12:00 # The Cost of Living
+cbc1-ottawa thu 11:32-12:00 # Under the Influence
+cbc1-ottawa fri 11:32-12:00 # The Cost of Living
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
@@ -58,7 +59,7 @@ cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
 cbc1-ottawa    mon 23:00-00:00 # Quirks and Quarks
-cbc1-ottawa    tue 23:32-00:00 # BBC - The Documentary
+cbc1-ottawa    tue 23:32-00:00 # The Cost of Living
 bbc-world      fri 23:00-00:00 # The Real Story
 bbc-world      sat 23:00-00:00 # From Our Own Correspondant, Boston Calling
 
@@ -88,11 +89,11 @@ cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
 cbc1-ottawa    sat 09:00-10:00 # The House
 cbc1-ottawa    sat 10:00-11:00 # Day 6
 cbc1-ottawa    sat 11:00-11:32 # Because News
-cbc1-ottawa    sat 11:32-12:00 # The Cost of Living
+cbc1-ottawa    sat 11:32-12:00 # Under the Influence
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
-bbc-world      sat 14:00-15:00 # From the Ground Up, Heart and Soul, World Questions, The Documentary
+bbc-world      sat 14:00-15:00 # The History Hour
 portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
 bbc-world      sat 18:30-19:00 # Outlook Weekend
