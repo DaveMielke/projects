@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+currentFile="${HOME}/contacts"
+newFile="${currentFile}.new"
+oldFile="${currentFile}.old"
+
+rm -f "${oldFile}"
+goobook dquery . >"${newFile}"
+[ -f "${currentFile}" ] && mv "${currentFile}" "${oldFile}"
+mv "${newFile}" "${currentFile}"
+
+exit "${?}"
