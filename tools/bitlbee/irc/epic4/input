@@ -1,0 +1,40 @@
+package input
+
+assign input.timeout 2
+
+on #-keybinding 10 '*' (name, length, key, void) {
+   defer ^input.update
+}
+
+alias input.update (void) {
+   if (Q != input.name) {
+      input.stop
+      @ input.name = Q
+   } else if (@input.name) {
+      if (@L) {
+         input.start
+      } else {
+         input.stop
+      }
+   }
+}
+
+alias input.start (void) {
+   local now $time()
+
+   if (!@input.time || ((now - input.time) >= input.timeout)) {
+      assign input.time $now
+      input.send 1
+   }
+}
+
+alias input.stop (void) {
+   if (@input.time) {
+      assign -input.time
+      input.send 0
+   }
+}
+
+alias input.send (state, void) {
+   ctcp $input.name TYPING $state
+}

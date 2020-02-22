@@ -1,0 +1,22 @@
+package messages
+
+alias messages.window (target, void) {
+   local window ${ischannel($target)? chanwin($target): querywin($target)}
+   if (!#window) return 0
+   if (window < 0) return 0
+   return $window
+}
+
+alias messages.write (target, announce, message) {
+   local window $messages.window($target)
+   window $window echo $Z $message
+   if (announce && (window == windowctl(refnum 0))) sounds.play message
+}
+
+on ^msg '*' (sender, message) {
+   messages.write $sender 1 $sender> $message
+}
+
+on ^send_msg '*' (receiver, message) {
+   messages.write $receiver 0 $receiver< $message
+}

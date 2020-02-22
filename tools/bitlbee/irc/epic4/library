@@ -1,0 +1,10 @@
+package library
+
+alias make_directory (directory, ...) {
+   if (fexist($directory) == 1) return 1
+   if (mkdir($directory) == 0) return 1
+   return 0
+}
+
+assign timestamp_format %Y-%m-%d@%H:%M:%S
+alias timestamp return $strftime($timestamp_format)

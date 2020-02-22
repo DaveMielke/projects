@@ -1,0 +1,25 @@
+package status
+
+set status_does_expandos on
+
+set status_clock %T
+
+set status_server @%S
+set status_umode (%#)
+set status_oper *
+
+set status_channel %C
+set status_mode (%+)
+set status_chanop *
+set status_halfop %
+
+set status_query >%Q
+
+set status_insert ins
+set status_overwrite ovw
+set status_away  awy
+set status_hold  hld
+set status_hold_lines :%B
+set status_scrollback  sbk
+
+set status_format %T %{1}R: %N%S%#%* %C%+%@%Q [%8] %>%I%O%A%H%B%K

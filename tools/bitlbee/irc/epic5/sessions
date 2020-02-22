@@ -1,0 +1,145 @@
+package sessions
+
+alias sessions.names {
+   return $sar(gi/session.//$sessions.window_names)
+}
+
+alias sessions.index (window, ...) {
+   return ${isnumber(b10 $window)? findw($window $sessions.window_numbers): findw($window $sessions.window_names)}
+}
+
+alias sessions.window_name (target, ...) {
+   return session.$tolower($target)
+}
+
+alias sessions.update {
+   local setting status_user8
+   local names
+   @names = [$sessions.names()]
+
+   if (!#names) @setting = [-$setting]
+   set $setting $names
+}
+
+alias sessions.create (target, announce, ...) {
+   local name $sessions.window_name($target)
+   local number $windowctl(refnum $name)
+   local time $strftime(%a %b %d %H:%M:%S %Y)
+   local date $notw(3 $time)
+
+   if (number > 0) {
+      if ([$sessions[date][$target]] != [$date]) window $number echo IRC log continued $time
+   } else {
+      window new
+      @number = windowctl(refnum 0)
+      window hide
+
+      window $number name $name
+
+      local original_hold_mode $hold_mode
+      window $number hold_mode off
+
+      if (ischannel($target)) {
+         window $number channel $target
+      } else {
+         window $number query $target
+      }
+
+      local sessions_directory $user_directory/sessions
+      if (make_directory($sessions_directory)) {
+         local target_directory $sessions_directory/$tolower($target)
+
+         if (make_directory($target_directory)) {
+            local log_file $target_directory/$strftime(%Y%m)
+
+            if (fexist($log_file) == 1) {
+               local stream $open($log_file R)
+               if (#stream) {
+                  while (1) {
+                     local line $read($stream)
+                     if (!@line) break
+                     window $number echo $line
+                  }
+                  @close($stream)
+                  window $number echo $repeat(${word(0 $geom()) - 1} -)
+               }
+            }
+
+            window $number logfile $log_file
+            window $number log on
+         }
+      }
+
+      assign sessions.window_numbers $sessions.window_numbers $number
+      assign sessions.window_names $sessions.window_names $name
+      sessions.update
+
+      window $number hold_mode $original_hold_mode
+      if (announce) sounds.play session
+   }
+
+   assign sessions.date.$target $date
+   return $number
+}
+
+alias sessions.remove (window, ...) {
+   local index $sessions.index($window)
+   if (index < 0) return 0
+
+   @sessions.window_numbers = [$notw($index $sessions.window_numbers)]
+   @sessions.window_names = [$notw($index $sessions.window_names)]
+   sessions.update
+   return 1
+}
+
+alias sessions.report (nickname, message) {
+   local name $sessions.window_name($nickname)
+   local index $sessions.index($name)
+   if (index >= 0) {
+      local number $windowctl(refnum $name)
+      if (number > 0) {
+         window $number echo $Z $nickname: $message
+         return 1
+      }
+   }
+   return 0
+}
+
+on #-msg -100 '*' (sender, message) {
+   sessions.create $sender 1
+}
+
+on #-send_msg -100 '*' (receiver, message) {
+   window swap $sessions.create($receiver 0)
+}
+
+on #-public -100 '*' (sender, channel, message) {
+#  sessions.create $channel 1
+}
+
+on #-send_public -100 '*' (channel, message) {
+#  window swap $sessions.create($channel 0)
+}
+
+on #-window_kill -100 '*' (number, name, void) {
+   sessions.remove $number
+}
+
+on #?join -100 '*' (name, channel, address, status, void) {
+   if (name == N) return 0
+   return $sessions.report($name online \($address\))
+}
+
+on #?channel_signoff -100 '*' (channel, name, message) {
+   return $sessions.report($name offline \($message\))
+}
+
+# away
+on ?301 '*' (name, message) {
+   return $sessions.report($name away \($message\))
+}
+
+# no such nickname
+on ?401 '*' (server, name, message) {
+   return $sessions.report($name unknown \($message\))
+}

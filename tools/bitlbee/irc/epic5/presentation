@@ -1,0 +1,27 @@
+package presentation
+
+set suppress_server_motd on
+set notify_on_termination off
+set eight_bit_characters on
+set beep on
+
+alias make_input_prompt (void) {
+   if (@T) return $T
+   @:number = windowctl(refnum 0)
+   @:name = windowctl(get $number name)
+   if (@name) return $name
+   return $number
+}
+set input_prompt $make_input_prompt()> 
+
+set continued_line +
+set indent on
+
+set hold_mode on
+
+set clock on
+set clock_24hour on
+set clock_format %H:%M
+
+set mail 0
+set auto_whowas off

@@ -1,0 +1,38 @@
+package bitlbee
+
+on #^join 100 '$N &bitlbee *' (name, channel, address, status, void) {
+   timer 1 ^bitlbee.identify $name
+}
+
+alias bitlbee.identify (user, ...) {
+   local file $user_directory/bitlbee/password.$user
+   local stream $open($file R)
+   if (#stream && (stream >= 0)) {
+      ^local password $read($stream)
+      if (#password) ^msg &bitlbee identify $password
+      @close($stream)
+   }
+}
+
+on ^join '% &bitlbee *' (name, channel, address, status, void) {
+   echo $Z *online: $name \($address\)
+}
+
+on ^channel_signoff '&bitlbee *' (channel, name, message) {
+   echo $Z *offline: $name \($message\)
+}
+
+on ^public '% &bitlbee *' (sender, channel, message) {
+   shook msg $sender $message
+}
+
+on ^send_public "&bitlbee %\[: ,\]*" (channel, message) {
+   local i $index(:, $message)
+   local name $left($i $message)
+   local message $rest(${i+1} $message)
+   shook send_msg $name $message
+}
+
+on ^send_public '&bitlbee *' (channel, message) {
+   shook send_msg root $message
+}

@@ -1,0 +1,13 @@
+assign user_directory ~/.irc
+assign scripts_directory epic5
+
+load history
+
+if ((fexist($user_directory) == 1) || (mkdir($user_directory) == 0)) {
+   cd $user_directory
+
+   fe ($glob($scripts_directory/*)) script {
+      echo Loading script $script
+      load $script
+   }
+}

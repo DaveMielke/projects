@@ -1,0 +1,5 @@
+package speak
+
+exec -name speak -direct say -N irc -P message  -w
+
+alias speak exec -in %speak

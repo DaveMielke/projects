@@ -1,0 +1,20 @@
+package sounds
+
+assign sounds.extension.wav.command.play play -q
+assign sounds.extension.ogg.command.play play -q
+
+assign sounds.process.play 0
+alias sounds.play (event, ...) {
+   local extension
+   foreach sounds.extension extension {
+      local command $sounds[extension][$extension][command][play]
+      if (@command) {
+         local file $twiddle($user_directory/sounds/${event}.$tolower($extension))
+         if (fexist($file) == 1) {
+            local process sounds.play.${++sounds.play.process}
+            exec -name $process -direct $command $file
+            return $process
+         }
+      }
+   }
+}

@@ -1,0 +1,36 @@
+package windows
+
+bind ^I parse_command window next
+bind ^Wb parse_command window back
+bind ^Wc parse_command window new
+bind ^Wg parse_command {
+   input "Go to which window (name or number)> " {
+      if ([$#] == 0) {
+         xecho -current -banner Cancelled
+      } else if ([$#] > 1) {
+         xecho -current -banner Invalid window name: $*
+      } else if ((number = windowctl(refnum $0)) < 0) {
+         xecho -current -banner No such window: $0
+      } else {
+         ^window refnum_or_swap $number
+      }
+   }
+}
+bind ^Wk parse_command {
+   ^window log off
+   window kill
+}
+bind ^Wl parse_command window list
+bind ^Wn parse_command window next
+bind ^Wp parse_command window previous
+
+bind ^W1 parse_command window refnum_or_swap 1
+bind ^W2 parse_command window refnum_or_swap 2
+bind ^W3 parse_command window refnum_or_swap 3
+bind ^W4 parse_command window refnum_or_swap 4
+bind ^W5 parse_command window refnum_or_swap 5
+bind ^W6 parse_command window refnum_or_swap 6
+bind ^W7 parse_command window refnum_or_swap 7
+bind ^W8 parse_command window refnum_or_swap 8
+bind ^W9 parse_command window refnum_or_swap 9
+bind ^W0 parse_command window refnum_or_swap 10

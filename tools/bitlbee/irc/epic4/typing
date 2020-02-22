@@ -1,0 +1,55 @@
+package typing
+
+assign typing.timeout 2
+
+on #-channel_signoff 20 '*' (channel, name, message) {
+   typing.end $name
+}
+
+on #-msg 20 '*' (sender, message) {
+   typing.end $sender
+}
+
+on ^ctcp '% $N TYPING *' (sender, receiver, action, arg, void) {
+   if (arg) {
+      typing.begin $sender
+   } else {
+      typing.end $sender
+   }
+}
+
+alias typing.begin (name, void) {
+   local playing $typing.playing($name)
+   assign typing[time][$name] $time()
+   if (!playing) typing.play $name
+}
+
+alias typing.end (name, void) {
+   assign -typing[time][$name]
+}
+
+alias typing.playing (name, void) {
+   return $@typing[time][$name]
+}
+
+alias typing.play (name, void) {
+   if (typing.playing($name)) {
+      if ((time() - [$typing[time][$name]]) < typing.timeout) {
+         if (sessions.create($name 1) == windowctl(refnum 0)) {
+            local process $sounds.play(typing)
+
+            if (#process) {
+               on ^exec_exit "$process *" queue -do $process
+
+               queue -expand_now $process {
+                  on ^exec_exit -"$process *"
+                  typing.play $name
+               }
+               return
+            }
+         }
+      }
+
+      typing.end $name
+   }
+}
