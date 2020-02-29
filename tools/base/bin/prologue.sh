@@ -44,7 +44,7 @@ function wordifyString() {
 
          case "${word}"
          in
-            A|After|An|And|At|Before|Behind|Beside|Between|Beyond|By|For|From|In|Into|Of|On|Or|Out|Over|The|Through|Till|To|Under|Until|Unto|Upon|With|Within|Without)
+            A|After|An|And|Around|At|Before|Behind|Beside|Between|Beyond|By|For|From|In|Into|Of|On|Or|Out|Over|The|Through|Till|To|Under|Until|Unto|Upon|With|Within|Without)
                word="$(echo "${word}" | sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/')"
                ;;
          esac
