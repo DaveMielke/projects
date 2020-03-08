@@ -1,8 +1,11 @@
 cbc1-ottawa 2019 mar 25-28 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
-#portraits mon-fri 15:00-16:00
-#bbc-world mon-fri 16:00-17:00
+#cbc1-sydney mon-wed 13:00-14:00
+#cbc1-ottawa thu-fri 13:00-14:00
+#bbc-world   mon-fri 14:00-15:00
+#portraits   mon-fri 15:00-16:00
+#bbc-world   mon-fri 16:00-17:00
 
 christian     2019 dec 24 20:00-00:00 #
 cbc1-winnipeg 2019 dec 25 01:00-07:00 # Christmas Night
