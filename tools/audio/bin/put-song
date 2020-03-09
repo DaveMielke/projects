@@ -6,10 +6,24 @@ shopt -s nullglob
 
 defaultAudioExtension="mp3"
 
+showUsage() {
+cat <<END-OF-USAGE
+Syntax: ${programName} [-option ...] [file ...]
+These options may be specified:
+-a            edit the artist's name
+-d path       the album's directory (required)
+-h            show a usage summary (this one) and then exit
+-n string     the album's name (required)
+-r            replace an existing song
+-x extension  the audio file extension (default is ${defaultAudioExtension})
+END-OF-USAGE
+exit 0
+}
+
 programMessage() {
    local message="${1}"
 
-   echo >&2 "${0##*/}: ${message}"
+   echo >&2 "${programName}: ${message}"
 }
 
 syntaxError() {
@@ -45,13 +59,15 @@ albumDirectory=""
 audioExtension=""
 isReplacement=false
 editArtistName=false
+showUsage=false
 
-while getopts ":ad:n:rx:" option
+while getopts ":ad:hn:rx:" option
 do
    case "${option}"
    in
       a) editArtistName=true;;
       d) albumDirectory="${OPTARG}";;
+      h) showUsage=true;;
       n) albumName="${OPTARG}";;
       r) isReplacement=true;;
       x) audioExtension="${OPTARG}";;
@@ -61,10 +77,12 @@ do
       *) syntaxError "unimplemented option: -${option}";;
    esac
 done
-shift $((OPTIND - 1))
 
-[ -n "${albumName}" ] || syntaxError "album name not specified"
+shift $((OPTIND - 1))
+"${showUsage}" && showUsage
+
 [ -n "${albumDirectory}" ] || syntaxError "album directory not specified"
+[ -n "${albumName}" ] || syntaxError "album name not specified"
 
 [ -e "${albumDirectory}" ] || semanticError "directory not found: ${albumDirectory}"
 [ -d "${albumDirectory}" ] || semanticError "not a directory: ${albumDirectory}"
@@ -101,7 +119,7 @@ do
 
    if [ -e "${songPath}" ]
    then
-      "${isReplacement}" || updateProblem "song already exists: ${songReference}"
+      "${isReplacement}" || updateProblem "song exists: ${songReference}"
       updateVerb="replacing"
    else
       "${isReplacement}" && updateProblem "song not found: ${songReference}"
@@ -139,12 +157,13 @@ do
       "${editArtistName}" && editString artistName "Artist Name"
 
       [ -n "${artistName}" ] && {
+         programMessage "${updateVerb}: ${songReference}"
+
          id3v2 --delete-all "${file}"
          id3v2 --album "${albumName}" "${file}"
          id3v2 --artist "${artistName}" "${file}"
          id3v2 --song "${songName}" "${file}"
 
-         programMessage "${updateVerb}: ${songReference}"
          [ -d "${artistDirectory}" ] || mkdir -- "${artistDirectory}"
          mv -- "${file}" "${songPath}"
          continue
