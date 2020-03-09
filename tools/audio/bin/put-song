@@ -1,0 +1,157 @@
+#!/bin/bash
+. "$(dirname "${0}")/prologue.sh"
+
+set -e
+shopt -s nullglob
+
+defaultAudioExtension="mp3"
+
+programMessage() {
+   local message="${1}"
+
+   echo >&2 "${0##*/}: ${message}"
+}
+
+syntaxError() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 2
+}
+
+semanticError() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 3
+}
+
+namingProblem() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 4
+}
+
+updateProblem() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 5
+}
+
+albumName=""
+albumDirectory=""
+audioExtension=""
+isReplacement=false
+editArtistName=false
+
+while getopts ":ad:n:rx:" option
+do
+   case "${option}"
+   in
+      a) editArtistName=true;;
+      d) albumDirectory="${OPTARG}";;
+      n) albumName="${OPTARG}";;
+      r) isReplacement=true;;
+      x) audioExtension="${OPTARG}";;
+
+      :) syntaxError "missing operand: -${OPTARG}";;
+     \?) syntaxError "unrecognized option: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+[ -n "${albumName}" ] || syntaxError "album name not specified"
+[ -n "${albumDirectory}" ] || syntaxError "album directory not specified"
+
+[ -e "${albumDirectory}" ] || semanticError "directory not found: ${albumDirectory}"
+[ -d "${albumDirectory}" ] || semanticError "not a directory: ${albumDirectory}"
+
+[ -n "${audioExtension}" ] || audioExtension="${defaultAudioExtension}"
+[ "${#}" -eq 0 ] && set -- *".${audioExtension}"
+files=( "${@}" )
+
+for file in "${files[@]}"
+do
+   fileName="${file%.*}"
+   fileExtension="${file##*.}"
+
+   [ "${fileExtension}" = "${fileName}" ] && {
+      fileExtension="${audioExtension}"
+      file="${file}.${fileExtension}"
+   }
+
+   [ -e "${file}" ] || semanticError "file not found: ${file}"
+   [ -f "${file}" ] || semanticError "not a file: ${file}"
+   [ -n "${fileName}" ] || namingProblem "missing file name: ${file}"
+
+   artistName="${fileName%%-*}"
+   songName="${fileName#*-}"
+   [ "${songName}" = "${artistName}" ] && artistName=""
+
+   [ -n "${songName}" ] || namingProblem "missing song name: ${file}"
+   [ -n "${artistName}" ] || namingProblem "missing artist name prefix: ${file}"
+
+   artistDirectory="${albumDirectory}/${artistName}"
+   songFile="${songName}.${fileExtension}"
+   songPath="${artistDirectory}/${songFile}"
+   songReference="${songName} by ${artistName}"
+
+   if [ -e "${songPath}" ]
+   then
+      "${isReplacement}" || updateProblem "song already exists: ${songReference}"
+      updateVerb="replacing"
+   else
+      "${isReplacement}" && updateProblem "song not found: ${songReference}"
+      updateVerb="adding"
+   fi
+
+   otherFiles=( "${albumDirectory}/"*"/${songFile}" )
+   [ "${#otherFiles[*]}" -eq 0 ] || {
+      problem=""
+
+      for path in "${otherFiles[@]}"
+      do
+         artist="${path%/*}"
+         artist="${artist##*/}"
+         [ "${artist}" = "${artistName}" ] && continue
+
+         if [ -n "${problem}" ]
+         then
+            problem+=","
+         else
+            problem="other artists: ${songName}:"
+         fi
+
+         problem+=" ${artist}"
+      done
+
+      [ -n "${problem}" ] && updateProblem "${problem}"
+   }
+
+   wordifyString songName
+   editString songName "Song Name"
+
+   [ -n "${songName}" ] && {
+      wordifyString artistName
+      "${editArtistName}" && editString artistName "Artist Name"
+
+      [ -n "${artistName}" ] && {
+         id3v2 --delete-all "${file}"
+         id3v2 --album "${albumName}" "${file}"
+         id3v2 --artist "${artistName}" "${file}"
+         id3v2 --song "${songName}" "${file}"
+
+         programMessage "${updateVerb}: ${songReference}"
+         [ -d "${artistDirectory}" ] || mkdir -- "${artistDirectory}"
+         mv -- "${file}" "${songPath}"
+         continue
+      }
+   }
+
+   programMessage "update cancelled: ${songReference}"
+done
+
+exit 0

@@ -1,0 +1,8 @@
+#!/bin/bash
+. "$(dirname "${0}")/prologue.sh"
+
+put-song \
+   -d "/mnt/opt/dave/Music/Portraits" \
+   -n "Dave Mielke's Musical Portraits Collection" \
+   "${@}"
+exit "${?}"
