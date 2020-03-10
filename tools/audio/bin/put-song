@@ -89,28 +89,30 @@ shift $((OPTIND - 1))
 
 [ -n "${audioExtension}" ] || audioExtension="${defaultAudioExtension}"
 [ "${#}" -eq 0 ] && set -- *".${audioExtension}"
-files=( "${@}" )
+filePaths=( "${@}" )
 
-for file in "${files[@]}"
+for filePath in "${filePaths[@]}"
 do
-   fileName="${file%.*}"
-   fileExtension="${file##*.}"
+   fileName="${filePath##*/}"
+   fileExtension="${fileName##*.}"
+   songName="${fileName%.*}"
 
-   [ "${fileExtension}" = "${fileName}" ] && {
+   [ "${fileExtension}" = "${songName}" ] && {
       fileExtension="${audioExtension}"
-      file="${file}.${fileExtension}"
+      filePath+=".${fileExtension}"
+      fileName+=".${fileExtension}"
    }
 
-   [ -e "${file}" ] || semanticError "file not found: ${file}"
-   [ -f "${file}" ] || semanticError "not a file: ${file}"
-   [ -n "${fileName}" ] || namingProblem "missing file name: ${file}"
+   [ -e "${filePath}" ] || semanticError "file not found: ${filePath}"
+   [ -f "${filePath}" ] || semanticError "not a file: ${filePath}"
+   [ -n "${songName}" ] || namingProblem "missing song name: ${filePath}"
 
-   artistName="${fileName%%-*}"
-   songName="${fileName#*-}"
+   artistName="${songName%%-*}"
+   songName="${songName#*-}"
    [ "${songName}" = "${artistName}" ] && artistName=""
 
-   [ -n "${songName}" ] || namingProblem "missing song name: ${file}"
-   [ -n "${artistName}" ] || namingProblem "missing artist name prefix: ${file}"
+   [ -n "${songName}" ] || namingProblem "missing song name (suffix): ${filePath}"
+   [ -n "${artistName}" ] || namingProblem "missing artist name (prefix): ${filePath}"
 
    artistDirectory="${albumDirectory}/${artistName}"
    songFile="${songName}.${fileExtension}"
@@ -126,11 +128,11 @@ do
       updateVerb="adding"
    fi
 
-   otherFiles=( "${albumDirectory}/"*"/${songFile}" )
-   [ "${#otherFiles[*]}" -eq 0 ] || {
+   otherPaths=( "${albumDirectory}/"*"/${songFile}" )
+   [ "${#otherPaths[*]}" -eq 0 ] || {
       problem=""
 
-      for path in "${otherFiles[@]}"
+      for path in "${otherPaths[@]}"
       do
          artist="${path%/*}"
          artist="${artist##*/}"
@@ -157,15 +159,23 @@ do
       "${editArtistName}" && editString artistName "Artist Name"
 
       [ -n "${artistName}" ] && {
-         programMessage "${updateVerb}: ${songReference}"
+         programMessage "${updateVerb} song: ${songReference}"
 
-         id3v2 --delete-all "${file}"
-         id3v2 --album "${albumName}" "${file}"
-         id3v2 --artist "${artistName}" "${file}"
-         id3v2 --song "${songName}" "${file}"
+         id3v2 --delete-all "${filePath}"
+         id3v2 --album "${albumName}" "${filePath}"
+         id3v2 --artist "${artistName}" "${filePath}"
+         id3v2 --song "${songName}" "${filePath}"
 
-         [ -d "${artistDirectory}" ] || mkdir -- "${artistDirectory}"
-         mv -- "${file}" "${songPath}"
+         if [ ! -e "${artistDirectory}" ]
+         then
+            programMessage "adding artist: ${artistName}"
+            mkdir -- "${artistDirectory}"
+         elif [ ! -d "${artistDirectory}" ]
+         then
+            updateProblem "not a directory: ${artistDirectory}"
+         fi
+
+         mv -- "${filePath}" "${songPath}"
          continue
       }
    }
