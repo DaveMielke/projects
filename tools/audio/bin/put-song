@@ -10,6 +10,7 @@ showUsage() {
 cat <<END-OF-USAGE
 Syntax: ${programName} [-option ...] [file ...]
 These options may be specified:
+-A            add a new artist
 -a            edit the artist's name
 -d path       the album's directory (required)
 -h            show a usage summary (this one) and then exit
@@ -58,14 +59,16 @@ albumName=""
 albumDirectory=""
 audioExtension=""
 isReplacement=false
-editArtistName=false
+newArtist=false
+editArtist=false
 showUsage=false
 
-while getopts ":ad:hn:rx:" option
+while getopts ":Aad:hn:rx:" option
 do
    case "${option}"
    in
-      a) editArtistName=true;;
+      A) newArtist=true;;
+      a) editArtist=true;;
       d) albumDirectory="${OPTARG}";;
       h) showUsage=true;;
       n) albumName="${OPTARG}";;
@@ -119,6 +122,15 @@ do
    songPath="${artistDirectory}/${songFile}"
    songReference="${songName} by ${artistName}"
 
+   if [ -e "${artistDirectory}" ]
+   then
+      [ -d "${artistDirectory}" ] || updateProblem "not a directory: ${artistDirectory}"
+      artistDirectoryExists=true
+   else
+      "${newArtist}" || updateProblem "new artist: ${artistName}"
+      artistDirectoryExists=false
+   fi
+
    if [ -e "${songPath}" ]
    then
       "${isReplacement}" || updateProblem "song exists: ${songReference}"
@@ -156,7 +168,7 @@ do
 
    [ -n "${songName}" ] && {
       wordifyString artistName
-      "${editArtistName}" && editString artistName "Artist Name"
+      "${editArtist}" && editString artistName "Artist Name"
 
       [ -n "${artistName}" ] && {
          programMessage "${updateVerb} song: ${songReference}"
@@ -166,15 +178,7 @@ do
          id3v2 --artist "${artistName}" "${filePath}"
          id3v2 --song "${songName}" "${filePath}"
 
-         if [ ! -e "${artistDirectory}" ]
-         then
-            programMessage "adding artist: ${artistName}"
-            mkdir -- "${artistDirectory}"
-         elif [ ! -d "${artistDirectory}" ]
-         then
-            updateProblem "not a directory: ${artistDirectory}"
-         fi
-
+         "${artistDirectoryExists}" || mkdir -- "${artistDirectory}"
          mv -- "${filePath}" "${songPath}"
          continue
       }
