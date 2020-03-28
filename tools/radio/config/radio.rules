@@ -1,11 +1,17 @@
-cbc1-ottawa 2019 mar 25-28 11:00-12:00 # Canada Reads
+# COVID-19 programming
+cbc1-ottawa        11:00-12:00 # Federal Update
+cbc1-vancouver sat 14:00-14:32 # Because News
+cbc1-vancouver sat 14:32-15:00 # Under the Influence
+
+cbc1-ottawa 2020 mar 16-20 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
-#cbc1-sydney mon-wed 13:00-14:00
-#cbc1-ottawa thu-fri 13:00-14:00
-#bbc-world   mon-fri 14:00-15:00
-#portraits   mon-fri 15:00-16:00
-#bbc-world   mon-fri 16:00-17:00
+cbc1-sydney 2020 mar 8-28 mon-wed 13:00-14:00
+cbc1-ottawa 2020 mar 8-28 thu-fri 13:00-14:00
+bbc-world   2020 mar 8-28 mon-fri 14:00-15:00
+portraits   2020 mar 8-28 mon-fri 15:00-16:00
+bbc-world   2020 mar 8-28 mon-fri 16:00-17:00
+bbc-world   2020 mar 8-28 sat     18:30-22:00
 
 christian     2019 dec 24 20:00-00:00 #
 cbc1-winnipeg 2019 dec 25 01:00-07:00 # Christmas Night
@@ -29,7 +35,7 @@ cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
 christian   mon-fri dec 31    20:00-00:00 # New Year's Eve
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
-cbc1-ottawa mon-fri 08:37-10:00 # The Current
+cbc1-ottawa mon-fri 08:37-12:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # The Doc Project
@@ -64,7 +70,6 @@ cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 cbc1-ottawa    mon 23:00-00:00 # Quirks and Quarks
 cbc1-ottawa    tue 23:32-00:00 # The Cost of Living
 bbc-world      fri 23:00-00:00 # The Real Story
-bbc-world      sat 23:00-00:00 # From Our Own Correspondant, Boston Calling
 
 aljazeera     tue-sat 00:00-00:33 # News
 aljazeera     tue     00:33-01:00 # Counting the Cost/The Stream
@@ -99,10 +104,15 @@ cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
 portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
-bbc-world      sat 18:30-19:00 # Outlook Weekend
+bbc-world      sat 18:30-19:00 # Boston Calling
 bbc-world      sat 19:00-19:30 # Hard Talk
-bbc-world      sat 19:30-20:00 # Crowd Science
-bbc-world      sat 20:00-20:30 # The World This Week
+bbc-world      sat 19:30-20:00 # Health Check
+bbc-world      sat 20:00-20:30 # Togetherness
+bbc-world      sat 20:30-21:00 # The Compass
+bbc-world      sat 21:00-21:30 # Tech Tent
+bbc-world      sat 21:30-22:00 # Tunnel 29
+bbc-world      sat 23:00-23:30 # From Our Own Correspondant
+bbc-world      sat 23:30-00:00 # Boston Calling
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
