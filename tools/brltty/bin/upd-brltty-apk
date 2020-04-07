@@ -1,0 +1,16 @@
+#!/bin/bash -p
+set -e
+
+repositoryDirectory=~dave/brltty/git/main
+buildDirectory=~android/brltty/git/Android/Application
+archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android"
+cd "${archiveDirectory}"
+
+rst2html \
+   --config "${repositoryDirectory}/docutils.conf" \
+   "${repositoryDirectory}/Documents/README.Android" \
+   "brltty-on-android.html"
+
+cp -a "${buildDirectory}/bin/BRLTTY_App-debug.apk" brltty-latest.apk
+cp -a "${repositoryDirectory}/Android/STRINGS" android-strings.txt
+exit 0

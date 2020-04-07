@@ -1,0 +1,129 @@
+#!/bin/bash
+set -e
+shopt -s nullglob
+
+sourceRoot="/home/android/B2G/Repositories/NBP"
+targetRoot="/opt/dave/web/brltty/archive/B2G"
+updatesDirectory="/net/nbpdev/vol/dave/home/pub/B2G/Updates"
+
+fileSize() {
+   local file="${1}"
+
+   stat -c "%s" -- "${file}"
+}
+
+compareFiles() {
+   local file1="${1}"
+   local file2="${2}"
+
+   local size1="$(fileSize "${file1}")"
+   local size2="$(fileSize "${file2}")"
+
+   [ "${size1}" -eq "${size2}" ] && {
+      cmp -s "${file1}" "${file2}" && {
+         return 0
+      }
+   }
+
+   return 1
+}
+
+putFile() {
+   local oldName="${1}"
+   local newName="${2}"
+
+   [ "${oldName:0:1}" = "/" ] || oldName="${sourceRoot}/${oldName}"
+   cp "${oldName}" "${targetRoot}/${newName}"
+}
+
+putFiles() {
+   local sourceDirectory="${1}"
+   shift 1
+   local extensions=( "${@}" )
+
+   [ "${sourceDirectory:0:1}" = "/" ] || sourceDirectory="${sourceRoot}/${sourceDirectory}"
+   local extension
+
+   for extension in "${extensions[@]}"
+   do
+      local -A files
+      local file
+
+      for file in "${targetRoot}/"*".${extension}"
+      do
+         local name="${file##*/}"
+         files["${name}"]=remove
+      done
+
+      for file in "${sourceDirectory}/"*".${extension}"
+      do
+         local name="${file##*/}"
+
+         if [ -z "${files["${name}"]}" ]
+         then
+            files["${name}"]=add
+         elif compareFiles "${sourceDirectory}/${name}" "${targetRoot}/${name}"
+         then
+            files["${name}"]=skip
+         else
+            files["${name}"]=replace
+         fi
+      done
+
+      for file in "${!files[@]}"
+      do
+         local action="${files[$file]}"
+
+         case "${action}"
+         in
+           add | replace) cp -- "${sourceDirectory}/${file}" "${targetRoot}/";;
+           remove) rm -- "${targetRoot}/${file}";;
+           skip) true;;
+           *) echo $action;;
+         esac
+      done
+   done
+}
+
+updateComponent_ui() {
+   putFile b2g/ui/bin/B2G_UI-release.apk B2G_UI.apk
+   putFiles b2g/ui/assets keys chars inc
+}
+
+updateComponent_doc() {
+   putFiles b2g/doc txt html
+   putFiles b2g/doc/UserInterface/Physical jpg
+}
+
+updateComponent_calculator() {
+   putFile calculator/bin/NBP_Calculator-release.apk NBP_Calculator.apk
+}
+
+updateComponent_editor() {
+   putFile editor/bin/NBP_Editor-release.apk NBP_Editor.apk
+}
+
+updateComponent_ipaws() {
+   putFile ipaws/client//bin/NBP_IPAWS-release.apk NBP_IPAWS.apk
+}
+
+updateComponent_navigator() {
+   putFile navigator/bin/NBP_Navigator-release.apk NBP_Navigator.apk
+}
+
+updateComponent_phone() {
+   putFile phone/bin/NBP_Phone-release.apk NBP_Phone.apk
+}
+
+updateComponent_updates() {
+   putFiles "${updatesDirectory}" zip
+}
+
+[ "${#}" -gt 0 ] || set -- ui doc calculator editor ipaws navigator phone
+
+for component
+do
+   "updateComponent_${component}"
+done
+
+exit 0

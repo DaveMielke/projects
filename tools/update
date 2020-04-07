@@ -15,6 +15,7 @@ declare -A prefixMap=(
    ["base"]="/home/dave/"
    ["bitlbee/irc"]="/home/dave/.irc/"
    ["bitlbee"]="/home/dave/."
+   ["brltty"]="/home/dave/"
    ["radio"]="/home/radio/"
    ["radio/config"]="/home/radio/."
    ["radio/systemd"]="/etc/systemd/system/"

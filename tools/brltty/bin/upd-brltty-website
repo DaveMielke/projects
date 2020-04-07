@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+ssh brltty.app "bin/${0##*/}" "${@}"
+exit 0
