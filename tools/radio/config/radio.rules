@@ -1,9 +1,4 @@
-# COVID-19 programming
-cbc1-ottawa        11:00-12:00 # Federal Update
-cbc1-vancouver sat 14:00-14:32 # Because News
-cbc1-vancouver sat 14:32-15:00 # Under the Influence
-
-cbc1-ottawa 2020 mar 16-20 11:00-12:00 # Canada Reads
+cbc1-ottawa 2020 jul 20-23 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
 cbc1-sydney 2020 mar 8-28 mon-wed 13:00-14:00
@@ -35,7 +30,7 @@ cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
 christian   mon-fri dec 31    20:00-00:00 # New Year's Eve
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
-cbc1-ottawa mon-fri 08:37-12:00 # The Current
+cbc1-ottawa mon-fri 08:37-10:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # The Doc Project
@@ -45,17 +40,17 @@ cbc1-ottawa fri 11:32-12:00 # The Cost of Living
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
-bbc-world   mon-thu 13:00-14:00 # Outlook
-bbc-world   fri     13:00-14:00 # The Fifth Floor
+bbc-world   mon-thu 13:00-13:50 # Outlook
+bbc-world   fri     13:00-13:50 # The Fifth Floor
+bbc-world   mon-fri 13:50-14:00 # Witness History
 
 cbc1-ottawa   mon 14:00-15:00 # Ideas in the Afternoon
-cbc1-winnipeg thu 14:00-15:00 # Out in the Open
 
-bbc-world mon 15:00-15:30 # Hard Talk
-bbc-world tue 15:00-15:30 # People Fixing the World
-bbc-world wed 15:00-15:30 # Hard Talk
-bbc-world thu 15:00-15:30 # The Inquiry
-bbc-world fri 15:00-15:30 # Hard Talk
+bbc-world mon 15:00-15:30 # The Why Factor
+bbc-world tue 15:00-15:30 # The Documentary
+bbc-world wed 15:00-15:30 # The Compass
+bbc-world thu 15:00-15:30 # Assignment
+bbc-world fri 15:00-15:30 # Tech Tent
 
 bbc-world mon 15:30-16:00 # Discovery
 bbc-world tue 15:30-16:00 # Digital Planet
@@ -67,17 +62,15 @@ cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
-cbc1-ottawa    mon 23:00-00:00 # Quirks and Quarks
-cbc1-ottawa    tue 23:32-00:00 # The Cost of Living
-bbc-world      fri 23:00-00:00 # The Real Story
+cbc1-ottawa mon 23:00-00:00 # Quirks and Quarks
+cbc1-ottawa tue 23:32-00:00 # What on Earth?
+bbc-world   fri 23:00-00:00 # The Real Story
 
-aljazeera     tue-sat 00:00-00:33 # News
-aljazeera     tue     00:33-01:00 # Counting the Cost/The Stream
-aljazeera     wed     00:33-01:00 # The Listening Post/The Stream
-aljazeera     thu     00:33-01:00 # Witness/The Stream
-aljazeera     fri     00:33-01:00 # AJ Selects/The Stream
-aljazeera     sat     00:33-01:00 # Science in a Golden Age/Talk to Al-Jazeera
-cbc1-ottawa   tue-sat 01:00-02:00 # PRI - The World
+bbc-world   tue-fri 00:00-01:00 # Newsday
+bbc-world   sat     00:00-00:30 # The Newsroom
+bbc-world   sat     00:30-00:50 # Trending
+bbc-world   sat     00:50-01:00 # The Big Idea
+cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
 cbc1-halifax tue 02:00-02:31 # BBC - Discovery
 cbc1-halifax wed 02:00-02:31 # BBC - In the Studio
@@ -87,7 +80,7 @@ cbc1-halifax sat 02:00-02:31 # BBC - The Compass
 
 cbc1-halifax tue 02:31-03:00 # BBC - The Food Chain
 cbc1-halifax wed 02:31-03:00 # BBC - Heart and Soul
-cbc1-halifax thu 02:31-03:00 # ABC - Off Track/Science Friction
+cbc1-halifax thu 02:31-03:00 # ABC - Off Track
 cbc1-halifax fri 02:31-03:00 # DW - World in Progress
 cbc1-halifax sat 02:31-03:00 # ABC - The Health Report
 
@@ -104,22 +97,25 @@ cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
 portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
-bbc-world      sat 18:30-19:00 # Boston Calling
-bbc-world      sat 19:00-19:30 # Hard Talk
-bbc-world      sat 19:30-20:00 # Health Check
-bbc-world      sat 20:00-20:30 # Togetherness
-bbc-world      sat 20:30-21:00 # The Compass
-bbc-world      sat 21:00-21:30 # Tech Tent
-bbc-world      sat 21:30-22:00 # Tunnel 29
+cbc1-ottawa    sat 18:30-19:00 # Laugh Out Loud
+bbc-world      sat 19:00-20:00 # The Science Hour
+bbc-world      sat 20:00-20:30 # Tech Tent
+bbc-world      sat 20:30-20:50 # My Indian Life
+bbc-world      sat 20:50-21:00 # Resolves
+bbc-world      sat 21:00-21:30 # News Room
+bbc-world      sat 21:30-21:50 # Trending
+bbc-world      sat 21:50-22:00 # Over to You
+bbc-world      sat 22:00-23:00 # The Documentary
 bbc-world      sat 23:00-23:30 # From Our Own Correspondant
-bbc-world      sat 23:30-00:00 # Boston Calling
+bbc-world      sat 23:30-23:50 # United Zingdom
+bbc-world      sat 23:50-00:00 # The Big Idea
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
 cbc1-winnipeg mon 00:00-01:00 # PRI - This American Life
 cbc1-winnipeg mon 01:00-02:00 # The Sunday Edition - Round Midnight
 cbc1-halifax  mon 02:00-02:35 # DW - Living Planet
-cbc1-halifax  mon 02:35-03:00 # BBC - The Why Factor
+cbc1-halifax  mon 02:35-03:00 # BBC - The Documentary
 
 portraits mon-fri 13:00-15:00
 christian
