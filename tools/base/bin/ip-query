@@ -1,0 +1,216 @@
+#!/bin/bash
+
+set -e
+shopt -s extglob
+. "$(dirname "${0}")/prologue.sh"
+
+show() {
+   local label="${1}"
+   local value="${2}"
+
+   [ -z "${value}" ] || echo "${label}: ${value}"
+}
+
+showField() {
+   local label="${1}"
+   local field="${2}"
+
+   local variable="fieldValues[${field}]"
+   local value="${!variable}"
+   unset "${variable}"
+
+   show "${label}" "${value}"
+}
+
+showPair() {
+   local label="${1}"
+   local field1="${2}"
+   local field2="${3}"
+   local separator="${4}"
+
+   local variable1="fieldValues[${field1}]"
+   local value1="${!variable1}"
+   unset "${variable1}"
+
+   local variable2="fieldValues[${field2}]"
+   local value2="${!variable2}"
+   unset "${variable2}"
+
+   local value="${value1}"
+   if [ -z "${value}" ]
+   then
+      value="${value2}"
+   elif [ -n "${value2}" ]
+   then
+      [ -n "${separator}" ] || separator=" - "
+      value+="${separator}${value2}"
+   fi
+
+   show "${label}" "${value}"
+}
+
+showOptions() {
+   local label="${1}"
+   shift 1
+
+   local fields=""
+   local field
+
+   for field
+   do
+      local variable="fieldValues[${field}]"
+      local value="${!variable}"
+
+      [ "${value}" = "false" ] || {
+         [ "${value}" = "true" ] || continue
+         [ "${#fields}" -eq 0 ] || fields+=" "
+         fields+="${field}"
+      }
+
+      unset "${variable}"
+   done
+
+   show "${label}" "${fields}"
+}
+
+formatCoordinate() {
+   local field="${1}"
+   local positive="${2}"
+   local negative="${3}"
+
+   local variable="fieldValues[${field}]"
+   local value="${!variable}"
+
+   [ -n "${value}" ] && {
+      if [ "${value:0:1}" = "-" ]
+      then
+         value="${value:1}"
+         value+="${negative}"
+      else
+         value+="${positive}"
+      fi
+
+      setVariable "${variable}" "${value}"
+   }
+}
+
+formatOffset() {
+   local field="${1}"
+
+   local variable="fieldValues[${field}]"
+   local value="${!variable}"
+
+   [ -n "${value}" ] && {
+      local sign
+
+      if [ "${value:0:1}" = "-" ]
+      then
+         value="${value:1}"
+         sign="-"
+      else
+         sign="+"
+      fi
+
+      local seconds=$((value % 60))
+      value=$((value / 60))
+
+      local minutes=$((value % 60))
+      value=$((value / 60))
+      local unit
+
+      for unit in minutes seconds
+      do
+         local number="${!unit}"
+         [ "${number}" -lt 10 ] && number="0${number}"
+         value+=":${number}"
+      done
+
+      value="${value%%*(:00)}"
+      value="UTC${sign}${value}"
+      setVariable "${variable}" "${value}"
+   }
+}
+
+cleanup() {
+   set +e
+
+   [ -n "${sleepProcess}" ] && {
+      kill -TERM "${sleepProcess}"
+      sleepProcess=""
+   }
+}
+trap cleanup EXIT
+
+readonly fieldNames=(
+   status message
+   continent continentCode country countryCode region regionName
+   city district zip lat lon timezone offset currency
+   isp org as asname
+   reverse mobile proxy hosting query
+)
+
+fieldList="${fieldNames[*]}"
+readonly fieldList="${fieldList// /,}"
+
+readonly query="${1}"
+readonly url="http://ip-api.com/line/${query}?fields=${fieldList}"
+declare -A fieldValues
+readonly status="fieldValues["status"]"
+
+( sleep 1.5 ) &
+sleepProcess="${!}"
+
+for name in "${fieldNames[@]}"
+do
+   if [ "${!status}" = "success" ]
+   then
+      [ "${name}" = "message" ] && continue
+   elif [ -n "${!status}" ]
+   then
+      [ "${name}" = "message" -o "${name}" = "query" ] || continue
+   fi
+
+   read value || break
+   fieldValues[${name}]="${value}"
+done < <( curl --silent --show-error --get -- "${url}")
+
+[ -n "${!status}" ] || {
+   fieldValues["status"]="fail"
+   fieldValues["message"]="empty response"
+   fieldValues["query"]="${query}"
+}
+
+[ "${!status}" = "fail" ] && semanticError "${fieldValues["message"]}: ${fieldValues["query"]}"
+[ "${!status}" = "success" ] || internalError "unsupported status: ${!status}: ${query}"
+unset "${status}"
+
+formatCoordinate lat N S
+formatCoordinate lon E W
+formatOffset offset
+
+showField "IP Address" query
+showField "Host Name" reverse
+showOptions "Attributes" hosting mobile proxy
+showField "Service Provider" isp
+showPair "Autonomous System" asname as
+showField "Organization" org
+showPair "Continent" continentCode continent
+showPair "Country" countryCode country
+showPair "Region" region regionName
+showPair "City" city district
+showPair "Coordinates" lat lon " "
+showPair "Timezone" timezone offset
+showField "Postal Code" zip
+showField "Currency" currency
+
+for name in "${!fieldValues[@]}"
+do
+   showField "${name}" "${name}"
+done
+
+[ -n "${sleepProcess}" ] && {
+   wait "${sleepProcess}"
+   sleepProcess=""
+}
+
+exit 0

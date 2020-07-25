@@ -1,0 +1,34 @@
+#!/bin/bash
+set -e
+shopt -s extglob
+
+readonly tab=$'\t'
+
+while read line
+do
+  [[ "${line}" =~ ^\ *\<tr\>\ *\<th\>\ *(.*?)\ *\</th\>\ *\<td\>\ *(.*)$ ]] && {
+    name="${BASH_REMATCH[1]}"
+    tail="${BASH_REMATCH[2]}"
+
+    [[ "${tail}" =~ ^.*\</td\>.*$ ]] || {
+      read next || break
+      tail="${tail}${next}"
+    }
+
+    [[ "${tail}" =~ ^\ *(.*?)\ *\</td\>\ *\</tr\>\ *$ ]] && {
+      value="${BASH_REMATCH[1]}"
+      value="${value%%&*}"
+      [[ "${value}" =~ ^\ *\<a\ .*?\>(.*?)\</a\> ]] && value="${BASH_REMATCH[1]}"
+      value="${value%%<*}"
+      value="${value/%+( |${tab})}"
+      [ -n "${value}" ] || continue
+
+      name="${name%%/*}"
+      name="${name// /}"
+
+      echo "${name}=${value}"
+    }
+  }
+done < <(wget -q -O - "http://db-ip.com/${1}")
+
+exit 0

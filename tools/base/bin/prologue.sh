@@ -23,6 +23,13 @@ function semanticError() {
    exit 3
 }
 
+function internalError() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 4
+}
+
 function setVariable() {
    eval "${1}="'"${2}"'
 }
