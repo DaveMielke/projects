@@ -33,10 +33,10 @@ cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
 cbc1-ottawa mon-fri 08:37-10:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
-cbc1-ottawa tue 11:32-12:00 # The Doc Project
-cbc1-ottawa wed 11:32-12:00 # The Debaters
-cbc1-ottawa thu 11:32-12:00 # Under the Influence
-cbc1-ottawa fri 11:32-12:00 # The Cost of Living
+cbc1-ottawa tue 11:32-12:00 # Cost of Living
+cbc1-ottawa wed 11:32-12:00 # The Doc Project
+cbc1-ottawa thu 11:32-12:00 # CBC Podcast Showcase
+cbc1-ottawa fri 11:32-12:00 # The Debaters
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
@@ -62,14 +62,14 @@ cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
-cbc1-ottawa mon 23:00-00:00 # Quirks and Quarks
+cbc1-ottawa mon 23:00-00:00 # Snap Judgment
+cbc1-ottawa tue 23:00-23:32 # Front Burner
 cbc1-ottawa tue 23:32-00:00 # What on Earth?
 bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # Trending
-bbc-world   sat     00:50-01:00 # The Big Idea
+bbc-world   sat     00:30-01:00 # Comedians vs the News
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
 cbc1-halifax tue 02:00-02:31 # BBC - Discovery
@@ -90,7 +90,7 @@ cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
 cbc1-ottawa    sat 09:00-10:00 # The House
 cbc1-ottawa    sat 10:00-11:00 # Day 6
 cbc1-ottawa    sat 11:00-11:32 # Because News
-cbc1-ottawa    sat 11:32-12:00 # Under the Influence
+cbc1-ottawa    sat 11:32-12:00 # Short Cuts
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
@@ -99,13 +99,11 @@ portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
 cbc1-ottawa    sat 18:30-19:00 # Laugh Out Loud
 bbc-world      sat 19:00-20:00 # The Science Hour
-bbc-world      sat 20:00-20:30 # Tech Tent
-bbc-world      sat 20:30-20:50 # My Indian Life
-bbc-world      sat 20:50-21:00 # Resolves
+bbc-world      sat 20:00-21:00 # Business Weekly
 bbc-world      sat 21:00-21:30 # News Room
 bbc-world      sat 21:30-21:50 # Trending
 bbc-world      sat 21:50-22:00 # Over to You
-bbc-world      sat 22:00-23:00 # The Documentary
+bbc-world      sat 22:00-23:00 # World Wise Web
 bbc-world      sat 23:00-23:30 # From Our Own Correspondant
 bbc-world      sat 23:30-23:50 # United Zingdom
 bbc-world      sat 23:50-00:00 # The Big Idea
@@ -113,7 +111,7 @@ cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
 cbc1-winnipeg mon 00:00-01:00 # PRI - This American Life
-cbc1-winnipeg mon 01:00-02:00 # The Sunday Edition - Round Midnight
+cbc1-winnipeg mon 01:00-02:00 # The Sunday Midnight Magazine
 cbc1-halifax  mon 02:00-02:35 # DW - Living Planet
 cbc1-halifax  mon 02:35-03:00 # BBC - The Documentary
 
