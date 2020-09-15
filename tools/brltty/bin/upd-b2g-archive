@@ -3,7 +3,7 @@ set -e
 shopt -s nullglob
 
 sourceRoot="/home/android/B2G/Repositories/NBP"
-targetRoot="/opt/dave/web/brltty/archive/B2G"
+targetRoot="/mnt/opt/dave/web/brltty/archive/B2G"
 updatesDirectory="/net/nbpdev/vol/dave/home/pub/B2G/Updates"
 
 fileSize() {
