@@ -92,6 +92,13 @@ proc systemError {message} {
    exit 3
 }
 
+proc removeExcessSpace {string} {
+   regsub -all "\[ \t\]+" $string " " string
+   regsub {^ } $string {} string
+   regsub { $} $string {} string
+   return $string
+}
+
 proc updateData {dataVariable timeVariable extension define} {
    global userPrefix systemPrefix
    upvar 1 $dataVariable data
@@ -111,19 +118,18 @@ proc updateData {dataVariable timeVariable extension define} {
                         incr line
 
                         if {[set index [string first # $record]] >= 0} {
+                           set comment [string range $record [expr {$index + 1}] end]
                            set record [string range $record 0 [expr {$index - 1}]]
+                        } else {
+                           set comment ""
                         }
 
-                        regsub -all "\[ \t\]+" $record " " record
-                        regsub {^ } $record {} record
-                        regsub { $} $record {} record
+                        if {[string length [set record [removeExcessSpace $record]]] > 0} {
+                           set comment [removeExcessSpace $comment]
 
-                        if {[string length $record] == 0} {
-                           continue
-                        }
-
-                        if {![$define data [split $record " "]]} {
-                           logWarning "error on $file\[$line\]: $record"
+                           if {![$define data [split $record " "] $comment]} {
+                              logWarning "error on $file\[$line\]: $record"
+                           }
                         }
                      }
 
@@ -555,7 +561,7 @@ proc getStationDefinition {definitionVariable reference} {
    return 0
 }
 
-proc defineStation {stationsArray fields} {
+proc defineStation {stationsArray fields {comment ""}} {
    upvar 1 $stationsArray stations
 
    if {[llength $fields] == 0} {
@@ -706,7 +712,7 @@ proc timeValidator {valueVariable} {
    return 0
 }
 
-proc defineRule {rulesList fields} {
+proc defineRule {rulesList fields {comment ""}} {
    global rulesKeywords
    upvar 1 $rulesList rules
 
@@ -714,6 +720,10 @@ proc defineRule {rulesList fields} {
       logWarning "missing station name"
    } else {
       keylset rule station [lvarpop fields]
+
+      if {[string length $comment] > 0} {
+         keylset rule program $comment
+      }
 
       foreach field $fields {
          if {[set index [string first - $field]] < 0} {
@@ -843,7 +853,7 @@ proc testRule {rule time day date month year} {
    return 1
 }
 
-proc chooseStation {when} {
+proc chooseStation {when {programVariable ""}} {
    global rulesList
 
    foreach variable {second minute hour day date month year} value [split [clock format $when -format "%S.%M.%H.%w.%d.%m.%Y"] .] {
@@ -857,6 +867,14 @@ proc chooseStation {when} {
 
    foreach rule $rulesList {
       if {[testRule $rule $time $day $date $month $year]} {
+         if {[string length $programVariable] > 0} {
+            upvar 1 $programVariable program
+
+            if {![keylget rule program program]} {
+               set program ""
+            }
+         }
+
          return [keylget rule station]
       }
    }
@@ -882,7 +900,11 @@ proc removeHoldFile {} {
    return 1
 }
 
-proc selectStation {} {
+proc selectStation {{programVariable ""}} {
+   if {[string length $programVariable] > 0} {
+      upvar 1 $programVariable program
+   }
+
    if {[haveHoldFile]} {
       global holdFile
 
@@ -903,6 +925,7 @@ proc selectStation {} {
          }
 
          if {!$hasExpired} {
+            set program ""
             return $station
          }
       } else {
@@ -913,7 +936,7 @@ proc selectStation {} {
       removeHoldFile
    }
 
-   return [chooseStation [clock seconds]]
+   return [chooseStation [clock seconds] program]
 }
 
 proc changeStation {} {
@@ -1331,19 +1354,24 @@ proc actionHandler->which {operands} {
    operandsDone operands
 
    if {[string length $when] == 0} {
-      set station [selectStation]
-      set suffix ""
+      set station [selectStation program]
+      set time ""
    } else {
-      set station [chooseStation $when]
-      set suffix " [formatTime $when]"
+      set station [chooseStation $when program]
+      set time " [formatTime $when]"
    }
 
    if {[string length $station] == 0} {
       global noStation
       set station $noStation
+      set program ""
    }
 
-   writeOutput "$station$suffix"
+   if {[string length $program] > 0} {
+      set program " - $program"
+   }
+
+   writeOutput "$station$time$program"
 }
 
 proc processOperands {operands} {
