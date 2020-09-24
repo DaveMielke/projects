@@ -10,6 +10,9 @@ Type=notify
 ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --high-priority --disallow-exit --exit-idle-time=-1 --disable-shm --disallow-module-loading
 Restart=on-failure
 RestartSec=10
+SupplementaryGroups=pulse-access
+#User=pulse
+#Group=pulse
 
 [Install]
 #Also=pulseaudio.socket
