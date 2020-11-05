@@ -70,31 +70,31 @@ public abstract class ApiTests {
   public final static boolean haveIceCreamSandwichMR1 =
     haveLevel(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1);
 
-  // API level 16 - Android 4.1
+  // API level 16 - Android 4.1.2
   public final static boolean haveJellyBean =
     haveLevel(Build.VERSION_CODES.JELLY_BEAN);
 
-  // API level 17 - Android 4.2
+  // API level 17 - Android 4.2.2
   public final static boolean haveJellyBeanMR1 =
     haveLevel(Build.VERSION_CODES.JELLY_BEAN_MR1);
 
-  // API level 18 - Android 4.3
+  // API level 18 - Android 4.3.1
   public final static boolean haveJellyBeanMR2 =
     haveLevel(Build.VERSION_CODES.JELLY_BEAN_MR2);
 
-  // API level 19 - Android 4.4
+  // API level 19 - Android 4.4.2
   public final static boolean haveKitkat =
     haveLevel(Build.VERSION_CODES.KITKAT);
 
-  // API level 20 - Android 4.4W
+  // API level 20 - Android 4.4W.2
   public final static boolean haveKitkatWatch =
     haveLevel(Build.VERSION_CODES.KITKAT_WATCH);
 
-  // API level 21 - Android 5.0
+  // API level 21 - Android 5.0.1
   public final static boolean haveLollipop =
     haveLevel(Build.VERSION_CODES.LOLLIPOP);
 
-  // API level 22 - Android 5.1
+  // API level 22 - Android 5.1.1
   public final static boolean haveLollipopMR1 =
     haveLevel(Build.VERSION_CODES.LOLLIPOP_MR1);
 
@@ -106,19 +106,19 @@ public abstract class ApiTests {
   public final static boolean haveNougat =
     haveLevel(Build.VERSION_CODES.N);
 
-  // API level 25 - Android 7.1
+  // API level 25 - Android 7.1.1
   public final static boolean haveNougatMR1 =
     haveLevel(Build.VERSION_CODES.N_MR1);
 
-  // API level 26 - Android 8.0
+  // API level 26 - Android 8.0.0
   public final static boolean haveOreo =
     haveLevel(Build.VERSION_CODES.O);
 
-  // API level 27 - Android 8.1
+  // API level 27 - Android 8.1.0
   public final static boolean haveOreoMR1 =
     haveLevel(Build.VERSION_CODES.O_MR1);
 
-  // API level 28 - Android 9.0
+  // API level 28 - Android 9
   public final static boolean havePie =
     haveLevel(Build.VERSION_CODES.P);
 
