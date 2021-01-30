@@ -1,21 +1,19 @@
+cbc1-ottawa 2021 jan 20 11:00-12:30 # US Presidential Inauguration - Joe Biden
 cbc1-ottawa 2020 jul 20-23 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
-cbc1-sydney 2020 mar 8-28 mon-wed 13:00-14:00
-cbc1-ottawa 2020 mar 8-28 thu-fri 13:00-14:00
-bbc-world   2020 mar 8-28 mon-fri 14:00-15:00
-portraits   2020 mar 8-28 mon-fri 15:00-16:00
-bbc-world   2020 mar 8-28 mon-fri 16:00-17:00
-bbc-world   2020 mar 8-28 sat     18:30-22:00
+portraits   2021 mar 14-27 mon-fri 13:00-16:00
+bbc-world   2021 mar 14-27 mon-fri 16:00-18:00
+bbc-world   2021 mar 14-27 sat     15:00-16:00
 
-christian     2019 dec 24 20:00-00:00 #
-cbc1-winnipeg 2019 dec 25 01:00-07:00 # Christmas Night
-christian     2019 dec 25 07:00-11:00 #
-cbc1-winnipeg 2019 dec 25 11:00-12:00 # Noël with Florence K
-cbc1-ottawa   2019 dec 25 12:00-14:50 # Handel's Messiah
-cbc1-ottawa   2019 dec 25 14:50-15:00 # The Queen's Christmas Message
-christian     2019 dec 25 16:00-00:00 #
-christian     2019 dec 31 20:00-00:00 #
+cbc1-winnipeg 2020 dec 24 23:00-00:00 # Noël with Florence K
+cbc1-winnipeg 2020 dec 25 01:00-07:00 # Christmas Night
+cbc1-ottawa   2020 dec 25 09:00-11:50 # Handel's Messiah
+cbc1-ottawa   2020 dec 25 11:50-12:00 # The Queen's Christmas Message
+cbc1-goosebay 2020 dec 25 12:00-13:00 # Noël with Florence K
+christian          dec 24 20:00-00:00 # Christmas Eve
+christian          dec 25 01:00-00:00 # Christmas Day
+christian          dec 31 20:00-00:00 # New Year's Eve
 
 cbc1-ottawa mon-fri jan 1     16:00-18:00 # New Year's Day
 cbc1-ottawa mon     feb 15-21 16:00-18:00 # Family Day
@@ -34,8 +32,8 @@ cbc1-ottawa mon-fri 08:37-10:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # Cost of Living
-cbc1-ottawa wed 11:32-12:00 # The Doc Project
-cbc1-ottawa thu 11:32-12:00 # CBC Podcast Showcase
+cbc1-ottawa wed 11:32-12:00 # What on Earth!
+cbc1-ottawa thu 11:32-12:00 # Under the Influence
 cbc1-ottawa fri 11:32-12:00 # The Debaters
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
@@ -44,7 +42,7 @@ bbc-world   mon-thu 13:00-13:50 # Outlook
 bbc-world   fri     13:00-13:50 # The Fifth Floor
 bbc-world   mon-fri 13:50-14:00 # Witness History
 
-bbc-world mon 15:00-15:30 # The Why Factor
+bbc-world mon 15:00-15:30 # The Climate Question
 bbc-world tue 15:00-15:30 # The Documentary
 bbc-world wed 15:00-15:30 # The Compass
 bbc-world thu 15:00-15:30 # Assignment
@@ -56,18 +54,19 @@ bbc-world wed 15:30-16:00 # Health Check
 bbc-world thu 15:30-16:00 # Science in Action
 bbc-world fri 15:30-16:00 # Crowd Science
 
+portraits   mon-fri 13:00-16:00 # weekday afternoon music
+bbc-world   mon-fri 16:00-17:00 # Newshour
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
 cbc1-ottawa mon 23:00-00:00 # Snap Judgment
-cbc1-ottawa tue 23:00-23:32 # Front Burner
-cbc1-ottawa tue 23:32-00:00 # What on Earth?
+cbc1-ottawa tue 23:00-00:00 # The Doc Project
 bbc-world   fri 23:00-00:00 # The Real Story
 
-bbc-world   tue-fri 00:00-01:00 # Newsday
+bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-01:00 # Comedians vs the News
+bbc-world   sat     00:30-01:00 # The Cultural Frontline
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
 cbc1-halifax tue 02:00-02:31 # BBC - Discovery
@@ -88,23 +87,24 @@ cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
 cbc1-ottawa    sat 09:00-10:00 # The House
 cbc1-ottawa    sat 10:00-11:00 # Day 6
 cbc1-ottawa    sat 11:00-11:32 # Because News
-cbc1-ottawa    sat 11:32-12:00 # Short Cuts
+cbc1-ottawa    sat 11:32-12:00 # Under the Influence
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
-portraits      sat 15:00-18:00
+portraits      sat 15:00-17:30
+bbc-world      sat 17:30-18:00 # Heart and Soul
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
-cbc1-ottawa    sat 18:30-19:00 # Laugh Out Loud
-bbc-world      sat 19:00-20:00 # The Science Hour
-bbc-world      sat 20:00-21:00 # Business Weekly
-bbc-world      sat 21:00-21:30 # News Room
-bbc-world      sat 21:30-21:50 # Trending
-bbc-world      sat 21:50-22:00 # Over to You
-bbc-world      sat 22:00-23:00 # World Wise Web
-bbc-world      sat 23:00-23:30 # From Our Own Correspondant
-bbc-world      sat 23:30-23:50 # United Zingdom
-bbc-world      sat 23:50-00:00 # The Big Idea
+bbc-world      sat 18:30-19:00 # Business Weekly (second half)
+bbc-world      sat 19:00-19:30 # The Cultural Frontline
+bbc-world      sat 19:30-19:50 # Mayday
+bbc-world      sat 19:50-20:00 # Over to You
+bbc-world      sat 20:00-21:00 # The Science Hour
+bbc-world      sat 21:00-21:30 # Worklife India
+bbc-world      sat 21:30-21:50 # Two Minutes Past Nine
+bbc-world      sat 21:50-22:00 # More or Less
+bbc-world      sat 22:00-23:00 # Business Weekly
+bbc-world      sat 23:00-00:00 # The Documentary
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
@@ -113,5 +113,4 @@ cbc1-winnipeg mon 01:00-02:00 # The Sunday Midnight Magazine
 cbc1-halifax  mon 02:00-02:35 # DW - Living Planet
 cbc1-halifax  mon 02:35-03:00 # BBC - The Documentary
 
-portraits mon-fri 13:00-15:00
-christian
+christian # default program - Christian Music and Bible Reading
