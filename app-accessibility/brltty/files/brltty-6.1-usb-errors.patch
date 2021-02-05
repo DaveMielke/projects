@@ -1,0 +1,47 @@
+commit 4bd30635ca8c5101c0cfa0df8c17a9cf16de326b
+Author: Dave Mielke <Dave@Mielke.cc>
+Date:   Fri Dec 18 01:42:39 2020 -0500
+
+    Fix problems with USB URB error handling on Linux. (dm)
+
+diff --git a/Programs/usb_linux.c b/Programs/usb_linux.c
+index 43437a25a..50a6450fb 100644
+--- a/Programs/usb_linux.c
++++ b/Programs/usb_linux.c
+@@ -1070,25 +1070,27 @@ ASYNC_MONITOR_CALLBACK(usbHandleCompletedInputRequests) {
+     int error = parameters->error;
+ 
+     if (error) {
+-      logActionError(error, "USBFS output monitor");
+-      usbSetDeviceInputError(device, errno);
++      logActionError(error, "USBFS monitor");
++      usbSetDeviceInputError(device, error);
+       return 0;
+     }
+   }
+ 
+   while ((endpoint = usbReapURB(device, 0))) {
+     UsbEndpointExtension *eptx = endpoint->extension;
+-    struct usbdevfs_urb *urb;
+ 
+-    while ((urb = dequeueItem(eptx->completedRequests))) {
++    while (1) {
++      struct usbdevfs_urb *urb = dequeueItem(eptx->completedRequests);
++      if (!urb) break;
+       usbLogURB(urb, "reaped");
+ 
+-      {
+-        int handled = usbHandleCompletedInputRequest(endpoint, urb);
+-        if (!handled) usbSetEndpointInputError(endpoint, errno);
++      int handled = usbHandleCompletedInputRequest(endpoint, urb);
++      int error = errno;
++      free(urb);
+ 
+-        free(urb);
+-        if (!handled) return 0;
++      if (!handled) {
++        usbSetEndpointInputError(endpoint, error);
++        return 0;
+       }
+     }
+   }

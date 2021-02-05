@@ -4,6 +4,11 @@
 
 cros_pre_src_prepare_brltty_config() {
 	epatch "${FILESDIR}"/${P}-fix-build.patch
+	epatch "${FILESDIR}"/${P}-condition-logging.patch
+	epatch "${FILESDIR}"/${P}-monitor-errors.patch
+	epatch "${FILESDIR}"/${P}-server-flush.patch
+	epatch "${FILESDIR}"/${P}-usb-errors.patch
+	epatch "${FILESDIR}"/${P}-udev-start.patch
 }
 
 cros_post_src_prepare_brltty_config() {

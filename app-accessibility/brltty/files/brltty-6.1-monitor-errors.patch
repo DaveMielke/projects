@@ -1,0 +1,23 @@
+commit 965d0daaea39048e42a861fbad038c8aba5688cb
+Author: Dave Mielke <Dave@Mielke.cc>
+Date:   Sat Dec 5 15:57:02 2020 -0500
+
+    Async: Remove a monitor from its queue if it encounters an error. (dm)
+
+diff --git a/Programs/async_io.c b/Programs/async_io.c
+index e36267f53..18530d770 100644
+--- Programs/async_io.c
++++ Programs/async_io.c
+@@ -589,7 +589,11 @@ invokeMonitorCallback (OperationEntry *operation) {
+       .data = operation->data
+     };
+ 
+-    if (callback(&parameters)) return 1;
++    if (callback(&parameters)) {
++      if (!operation->error) {
++        return 1;
++      }
++    }
+   }
+ 
+   return 0;

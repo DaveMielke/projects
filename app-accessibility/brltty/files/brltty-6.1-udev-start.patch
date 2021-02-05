@@ -1,0 +1,27 @@
+--- old	2020-12-16 17:22:40.304450397 -0500
++++ Autostart/Udev/rules	2020-12-19 18:04:56.271835832 -0500
+@@ -519,9 +519,21 @@
+ GOTO="brltty_end"
+ 
+ LABEL="brltty_upstart"
+-ACTION=="add", RUN+="/sbin/start brltty"
+-ACTION=="change", RUN+="/sbin/start brltty"
+-ACTION=="remove", RUN+="/sbin/stop brltty"
++ACTION=="add", GOTO="brltty_upstart_start"
++ACTION=="remove", GOTO="brltty_upstart_stop"
++GOTO="brltty_end"
++
++LABEL="brltty_upstart_start"
++PROGRAM="/sbin/initctl status brltty", RESULT=="*running*", GOTO="brltty_upstart_restart"
++RUN+="/sbin/initctl start --quiet --no-wait brltty 'BRLTTY_BRAILLE_DEVICE=$env{BRLTTY_BRAILLE_DEVICE}' 'BRLTTY_BRAILLE_DRIVER=$env{BRLTTY_BRAILLE_DRIVER}'"
++GOTO="brltty_end"
++
++LABEL="brltty_upstart_restart"
++RUN+="/sbin/initctl restart --quiet --no-wait brltty 'BRLTTY_BRAILLE_DEVICE=$env{BRLTTY_BRAILLE_DEVICE}' 'BRLTTY_BRAILLE_DRIVER=$env{BRLTTY_BRAILLE_DRIVER}'"
++GOTO="brltty_end"
++
++LABEL="brltty_upstart_stop"
++RUN+="/sbin/initctl stop --quiet --no-wait brltty"
+ GOTO="brltty_end"
+ 
+ LABEL="brltty_systemd"
