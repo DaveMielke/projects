@@ -3,7 +3,8 @@
 # found in the LICENSE file.
 
 cros_pre_src_prepare_brltty_config() {
-	epatch "${FILESDIR}"/${P}-fix-build.patch
+	epatch "${FILESDIR}"/${P}-gettext-as-format-string.patch
+	epatch "${FILESDIR}"/${P}-locale-not-found-log.patch
 }
 
 cros_post_src_prepare_brltty_config() {
@@ -16,7 +17,7 @@ cros_post_src_prepare_brltty_config() {
 	# modify the usb device definitions in the C source, and for those
 	# to be picked up by updusbdevs, those patches need to be applied
 	# before the below line.
-	./updusbdevs -nogeneric udev:Autostart/Udev/rules || die
+	./updusbdevs -nogeneric udev:Autostart/Udev/device.rules.in || die
 }
 
 cros_post_src_install_brltty_config() {
