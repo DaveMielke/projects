@@ -1,10 +1,11 @@
-cbc1-ottawa 2021 jan 20 11:00-12:30 # US Presidential Inauguration - Joe Biden
-cbc1-ottawa 2020 jul 20-23 11:00-12:00 # Canada Reads
+cbc1-ottawa 2021 mar 8-11 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
-portraits   2021 mar 14-27 mon-fri 13:00-16:00
-bbc-world   2021 mar 14-27 mon-fri 16:00-18:00
-bbc-world   2021 mar 14-27 sat     15:00-16:00
+portraits   2021 nov 1-6 mon-fri 13:00-16:00
+bbc-world   2021 nov 1-6 mon-fri 16:00-18:00
+bbc-world   2021 nov 1-6 mon-fri 23:00-00:00
+portraits   2021 nov 1-6 sat     14:00-15:00
+bbc-world   2021 nov 1-6 sat     17:00-18:00
 
 cbc1-winnipeg 2020 dec 24 23:00-00:00 # Noël with Florence K
 cbc1-winnipeg 2020 dec 25 01:00-07:00 # Christmas Night
@@ -54,11 +55,18 @@ bbc-world wed 15:30-16:00 # Health Check
 bbc-world thu 15:30-16:00 # Science in Action
 bbc-world fri 15:30-16:00 # Crowd Science
 
+bbc-world mon 17:00-17:30 # Hard Talk
+bbc-world tue 17:00-17:30 # People Fixing the World
+bbc-world wed 17:00-17:30 # Hard Talk
+bbc-world thu 17:00-17:30 # The Inquiry
+bbc-world fri 17:00-17:30 # Hard Talk
+
+bbc-world wed 17:30-18:00 # Project 17
+
 portraits   mon-fri 13:00-16:00 # weekday afternoon music
 bbc-world   mon-fri 16:00-17:00 # Newshour
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
-cbc1-ottawa mon-fri 20:00-21:00 # Ideas
 
 cbc1-ottawa mon 23:00-00:00 # Snap Judgment
 cbc1-ottawa tue 23:00-00:00 # The Doc Project
@@ -66,7 +74,8 @@ bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-01:00 # The Cultural Frontline
+bbc-world   sat     00:30-00:50 # Trending
+bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
 cbc1-halifax tue 02:00-02:31 # BBC - Discovery
@@ -92,19 +101,16 @@ cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
-portraits      sat 15:00-17:30
-bbc-world      sat 17:30-18:00 # Heart and Soul
+portraits      sat 15:00-18:00
 cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
-bbc-world      sat 18:30-19:00 # Business Weekly (second half)
-bbc-world      sat 19:00-19:30 # The Cultural Frontline
-bbc-world      sat 19:30-19:50 # Mayday
+bbc-world      sat 19:30-19:50 # Trending
 bbc-world      sat 19:50-20:00 # Over to You
 bbc-world      sat 20:00-21:00 # The Science Hour
-bbc-world      sat 21:00-21:30 # Worklife India
-bbc-world      sat 21:30-21:50 # Two Minutes Past Nine
-bbc-world      sat 21:50-22:00 # More or Less
-bbc-world      sat 22:00-23:00 # Business Weekly
-bbc-world      sat 23:00-00:00 # The Documentary
+bbc-world      sat 21:00-21:30 # The Newsroom
+bbc-world      sat 21:30-22:00 # When Katty Met Carlos
+bbc-world      sat 22:00-23:00 # The Documentary
+bbc-world      sat 23:00-23:30 # From Our Own Correspondant
+bbc-world      sat 23:30-00:00 # The Cultural Frontline
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
