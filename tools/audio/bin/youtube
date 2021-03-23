@@ -1,24 +1,78 @@
 #!/bin/bash
 set -e
 
-identifier="${1}"
+defaultAudioFormat="mp3"
+defaultInteractiveInterface="rc"
+
+programMessage() {
+   local message="${1}"
+
+   echo >&2 "${0##*/}: ${message}"
+}
+
+syntaxError() {
+   local message="${1}"
+
+   programMessage "${message}"
+   exit 2
+}
+
+playStream() {
+   local url="${1}"
+
+   vlc --quiet --intf "${vlcInterface}" --no-video --play-and-exit -- "${url}"
+}
+
+audioFormat="mp3"
+interactiveInterface="rc"
+
+while getopts ":f:i:" option
+do
+   case "${option}"
+   in
+      f) audioFormat="${OPTARG}";;
+      i) interactiveInterface="${OPTARG}";;
+
+      :) syntaxError "missing operand: -${OPTARG}";;
+     \?) syntaxError "unknown option: -${OPTARG}";;
+      *) syntaxError "unimplemented option: -${option}";;
+   esac
+done
+shift $((OPTIND - 1))
+
+[ "${#}" -eq 0 ] && syntaxError "missing stream identifier"
+streamIdentifier="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+[ -n "$audioFormat}" ] || audioFormat="${defaultAudioFormat}"
+[ -n "$interactiveInterface}" ] || interactiveInterface="${defaultInteractiveInterface}"
 
 {
    read title
+   echo "Title: ${title}"
+
+   read file
    read duration
-} < <( youtube-dl --get-title --get-duration -- "${identifier}" )
+} < <( youtube-dl --get-title --get-filename --get-duration  -- "${streamIdentifier}" )
 
-echo "Title: ${title}"
-echo "Duration: ${duration}"
+if [ "${duration}" = "0" ]
+then
+   {
+      read url
+   } < <( youtube-dl --get-url  -- "${streamIdentifier}" )
 
-title="$(tr '"|' "'_" <<<"${title}")"
-title="$(sed -e 's/:/ -/g' <<<"${title}")"
-file="${title}-${identifier}.mp3"
-path="$(pwd)/${file}"
-echo "file: ${file}"
+   playStream "${url}"
+else
+   file="${file%.*}.${audioFormat}"
+   path="$(pwd)/${file}"
 
-youtube-dl -q -x --audio-format mp3 -- "${identifier}"
-vlc --quiet --intf dummy --no-video --play-and-exit -- "file://${path}"
-rm -- "${path}"
+   echo "Duration: ${duration}"
+   echo "File: ${file}"
+
+   youtube-dl --quiet --extract-audio --audio-format "${audioFormat}" -- "${streamIdentifier}"
+   playStream "file://${path}"
+   rm -- "${path}"
+fi
 
 exit 0
