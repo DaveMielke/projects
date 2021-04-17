@@ -4,6 +4,12 @@ christian /home/radio/bin/music-christian -l christian.log
 portraits /home/radio/bin/music-portraits -l portraits.log
 lombardo /home/radio/bin/music-lombardo -l lombardo.log
 
+nasatv /home/radio/bin/youtube 21X5lGlDOfg
+cpac /home/radio/bin/youtube arie3QYu_nQ
+aljazeera /home/radio/bin/youtube -upyPouRrB8
+ottawa /home/radio/bin/youtube CuFl_4Y_LxA
+ontario /home/radio/bin/youtube KjLZ5pTdRsM
+
 cbc1-kamloops http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_kam
 cbc1-kelowna http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_kel
 cbc1-princegeorge http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_prg
