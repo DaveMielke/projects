@@ -1,0 +1,19 @@
+#!/bin/bash -p
+set -e
+umask 022
+
+buildDirectory=~android/brltty/git/master/Android/Gradle/api/src/main
+archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android/BrlAPI"
+
+mkdir -p "${archiveDirectory}"
+cd "${archiveDirectory}"
+cp -a "${buildDirectory}/libs/"*".jar" .
+
+for abiDirectory in "${buildDirectory}/jniLibs/"*
+do
+   abiName="${abiDirectory##*/}"
+   mkdir -p "${abiName}"
+   cp -a "${abiDirectory}/"*".so" "${abiName}/"
+done
+
+exit 0

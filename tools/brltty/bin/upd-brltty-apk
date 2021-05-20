@@ -2,7 +2,7 @@
 set -e
 
 repositoryDirectory=~dave/brltty/git/main
-buildDirectory=~android/brltty/git/Android/Application
+buildDirectory=~android/brltty/git/master/Android/Application
 archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android"
 cd "${archiveDirectory}"
 
