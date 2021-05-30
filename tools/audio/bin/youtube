@@ -20,7 +20,7 @@ syntaxError() {
 playStream() {
    local url="${1}"
 
-   vlc --quiet --intf "${vlcInterface}" --no-video --play-and-exit -- "${url}"
+   vlc --quiet --intf "${interactiveInterface}" --no-video --play-and-exit -- "${url}"
 }
 
 audioFormat="mp3"
