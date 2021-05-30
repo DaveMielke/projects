@@ -7,7 +7,7 @@ Before=sound.target
 [Service]
 # Note that notify will only work if --daemonize=no
 Type=notify
-ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --high-priority --disallow-exit --exit-idle-time=-1 --disable-shm --disallow-module-loading
+ExecStart=/usr/bin/pulseaudio --daemonize=no --system --realtime --high-priority --disallow-exit --exit-idle-time=-1 --disable-shm
 Restart=on-failure
 RestartSec=10
 SupplementaryGroups=pulse-access
