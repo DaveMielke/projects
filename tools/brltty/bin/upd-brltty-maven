@@ -1,0 +1,15 @@
+#!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
+set -e
+umask 022
+
+groupIdentifier="org/a11y/brltty"
+localDirectory=~android/".m2/repository/${groupIdentifier}"
+publicDirectory="/mnt/opt/dave/web/brltty/archive/Maven2/${groupIdentifier}"
+
+[ -d "${publicDirectory}" ] || semanticError "public directory not found: ${publicDirectory}"
+[ -d "${localDirectory}" ] || semanticError "local directory not found: ${localDirectory}"
+
+rsync --quiet --checksum --archive --delete "${localDirectory}/" "${publicDirectory}/"
+exit 0
