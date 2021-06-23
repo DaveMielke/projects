@@ -1,19 +1,47 @@
 #!/bin/bash -p
+. "$(dirname "${0}")/prologue.sh"
+
 set -e
 umask 022
 
-buildDirectory=~android/brltty/git/master/Android/Gradle/api/src/main
-archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android/BrlAPI"
+copyFile() {
+   local fileName="${1}"
+   local sourceDirectory="${2}"
+   local targetDirectory="${3}"
 
+   local sourceFile="${sourceDirectory}/${fileName}"
+   local targetFile="${targetDirectory}/${fileName}"
+
+   if [ -f "${sourceFile}" ]
+   then
+      cmp -s "${sourceFile}" "${targetFile}" || {
+         programMessage "updating file: ${targetFile}"
+         cp -a "${sourceFile}" "${targetFile}"
+      }
+   else
+      programMessage "file not found: ${fileName}"
+   fi
+}
+
+archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android/BrlAPI"
 mkdir -p "${archiveDirectory}"
 cd "${archiveDirectory}"
-cp -a "${buildDirectory}/libs/"*".jar" .
 
-for abiDirectory in "${buildDirectory}/jniLibs/"*
+rootDirectory=~android/"brltty/git/master/Android/Gradle"
+apiDirectory="${rootDirectory}/api/src/main"
+
+copyFile "brlapi-android.gradle" "${rootDirectory}" .
+copyFile "brlapi.jar" "${apiDirectory}/libs" .
+
+for abiDirectory in "${apiDirectory}/jniLibs/"*
 do
    abiName="${abiDirectory##*/}"
    mkdir -p "${abiName}"
-   cp -a "${abiDirectory}/"*".so" "${abiName}/"
+
+   for library in brlapi brlapi_java
+   do
+      copyFile "lib${library}.so" "${abiDirectory}" "${abiName}"
+   done
 done
 
 exit 0
