@@ -2,7 +2,7 @@
 set -e
 
 repositoryDirectory=~dave/brltty/git/main
-buildDirectory=~android/brltty/git/master/Android/Application
+buildDirectory=~android/brltty/git/master/Android/Gradle
 archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android"
 cd "${archiveDirectory}"
 
@@ -11,6 +11,6 @@ rst2html \
    "${repositoryDirectory}/Documents/README.Android" \
    "brltty-on-android.html"
 
-cp -a "${buildDirectory}/bin/BRLTTY_App-debug.apk" brltty-latest.apk
+cp -a "${buildDirectory}/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk" brltty-latest.apk
 cp -a "${repositoryDirectory}/Android/STRINGS" android-strings.txt
 exit 0
