@@ -71,6 +71,7 @@ else
    echo "File: ${file}"
 
    youtube-dl --quiet --extract-audio --audio-format "${audioFormat}" -- "${streamIdentifier}"
+   ln -f -- "${path}" "yt.${audioFormat}"
    playStream "file://${path}"
    rm -- "${path}"
 fi
