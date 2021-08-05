@@ -64,13 +64,14 @@ bbc-world wed 17:00-17:30 # Hard Talk
 bbc-world thu 17:00-17:30 # The Inquiry
 bbc-world fri 17:00-17:30 # Hard Talk
 
-bbc-world wed 17:30-18:00 # On the Podium
+bbc-world wed 17:30-18:00 # The Documentary
 
 portraits   mon-fri 13:00-16:00 # weekday afternoon music
 bbc-world   mon-fri 16:00-17:00 # Newshour
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 bbc-world   mon-fri 20:00-21:00 # Business Matters
+bbc-world   fri     21:00-21:30 # From Our Own Correspondent
 
 cbc1-ottawa mon 23:00-00:00 # Snap Judgment
 cbc1-ottawa tue 23:00-00:00 # The Doc Project
