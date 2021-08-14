@@ -1,0 +1,47 @@
+#!/bin/bash
+. "$(dirname "${0}")/prologue.sh"
+
+[ "${#}" -gt 0 ] || syntaxError "missing mp3 file"
+mp3File="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+[ -e "${mp3File}" ] || semanticError "file not found: ${mp3File}"
+[ -f "${mp3File}" ] || semanticError "not a file: ${mp3File}"
+[ -r "${mp3File}" ] || semanticError "file not readable: ${mp3File}"
+
+propertiesPattern='^\[silencedetect *@.*\] *(.+?) *$'
+propertyPattern='([a-z_]+): *([^ ]+)'
+silencePeriods=""
+
+while read line
+do
+   [[ "${line}" =~ ${propertiesPattern} ]] && {
+      properties="${BASH_REMATCH[1]}"
+
+      while :
+      do
+         property="${properties%%|*}"
+
+         [[ "${property}" =~ ${propertyPattern} ]] && {
+            name="${BASH_REMATCH[1]}"
+            value="${BASH_REMATCH[2]}"
+
+            case "${name}"
+            in
+               silence_start) silencePeriods+="${value}";;
+               silence_end) silencePeriods+="-${value}";;
+               silence_duration) silencePeriods+="=${value} ";;
+            esac
+         }
+
+         tail="${properties#*|}"
+         [ "${tail}" = "${properties}" ] && break
+         properties="${tail}"
+      done
+   }
+done < <(ffmpeg -hide_banner -i "${mp3File}" -af silencedetect=duration=0.5 -f null /dev/null 2>&1)
+
+echo "${silencePeriods}"
+exit 0
