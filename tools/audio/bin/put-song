@@ -16,6 +16,7 @@ These options may be specified:
 -h            show a usage summary (this one) and then exit
 -n string     the album's name (required)
 -r            replace an existing song
+-s            allow the same name as another song
 -x extension  the audio file extension (default is ${defaultAudioExtension})
 END-OF-USAGE
 exit 0
@@ -59,11 +60,12 @@ albumName=""
 albumDirectory=""
 audioExtension=""
 isReplacement=false
+sameName=false
 newArtist=false
 editArtist=false
 showUsage=false
 
-while getopts ":Aad:hn:rx:" option
+while getopts ":Aad:hn:rsx:" option
 do
    case "${option}"
    in
@@ -73,6 +75,7 @@ do
       h) showUsage=true;;
       n) albumName="${OPTARG}";;
       r) isReplacement=true;;
+      s) sameName=true;;
       x) audioExtension="${OPTARG}";;
 
       :) syntaxError "missing operand: -${OPTARG}";;
@@ -140,27 +143,30 @@ do
       updateVerb="adding"
    fi
 
-   otherPaths=( "${albumDirectory}/"*"/${songFile}" )
-   [ "${#otherPaths[*]}" -eq 0 ] || {
-      problem=""
+   "${sameName}" || {
+      otherPaths=( "${albumDirectory}/"*"/${songFile}" )
 
-      for path in "${otherPaths[@]}"
-      do
-         artist="${path%/*}"
-         artist="${artist##*/}"
-         [ "${artist}" = "${artistName}" ] && continue
+      [ "${#otherPaths[*]}" -eq 0 ] || {
+         problem=""
 
-         if [ -n "${problem}" ]
-         then
-            problem+=","
-         else
-            problem="other artists: ${songName}:"
-         fi
+         for path in "${otherPaths[@]}"
+         do
+            artist="${path%/*}"
+            artist="${artist##*/}"
+            [ "${artist}" = "${artistName}" ] && continue
 
-         problem+=" ${artist}"
-      done
+            if [ -n "${problem}" ]
+            then
+               problem+=","
+            else
+               problem="other artists: ${songName}:"
+            fi
 
-      [ -n "${problem}" ] && updateProblem "${problem}"
+            problem+=" ${artist}"
+         done
+
+         [ -n "${problem}" ] && updateProblem "${problem}"
+      }
    }
 
    wordifyString songName
