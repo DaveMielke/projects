@@ -11,23 +11,32 @@ shift 1
 [ -f "${mp3File}" ] || semanticError "not a file: ${mp3File}"
 [ -r "${mp3File}" ] || semanticError "file not readable: ${mp3File}"
 
-pattern='^\[.*\] *([^ ]+): *([^ ]+).*$'
+propertyPattern='^\[.*\] *([^ ]+): *([^ ]+).*$'
+histogramPattern='^histogram_(.+)db$'
+
 meanVolume="?"
 maximumVolume="?"
+histogram=()
 
 while read line
 do
-   [[ "${line}" =~ ${pattern} ]] && {
+   [[ "${line}" =~ ${propertyPattern} ]] && {
       propertyName="${BASH_REMATCH[1]}"
       propertyValue="${BASH_REMATCH[2]}"
 
-      case "${propertyName}"
-      in
-         mean_volume) meanVolume="${propertyValue}";;
-         max_volume) maximumVolume="${propertyValue}";;
-      esac
+      if [[ "${propertyName}" =~ $histogramPattern ]]
+      then
+         level="${BASH_REMATCH[1]}"
+         histogram+=( "${level}:${propertyValue}" )
+      else
+         case "${propertyName}"
+         in
+            mean_volume) meanVolume="${propertyValue}";;
+            max_volume) maximumVolume="${propertyValue}";;
+         esac
+      fi
    }
 done < <(ffmpeg -hide_banner -i "${mp3File}" -af volumedetect -f null /dev/null 2>&1)
 
-echo "${meanVolume} ${maximumVolume}"
+echo "${maximumVolume} ${meanVolume} ${histogram[*]}"
 exit 0
