@@ -1,0 +1,83 @@
+#!/bin/bash
+. "$(dirname "${0}")/prologue.sh"
+
+parseSilencePeriod() {
+   local period="${1}"
+   local pattern='^(.+)-(.+)=(.+)$'
+
+   [[ "${period}" =~ ${pattern} ]] || return 1
+   silenceStart="${BASH_REMATCH[1]}"
+   silenceEnd="${BASH_REMATCH[2]}"
+   silenceDuration="${BASH_REMATCH[3]}"
+}
+
+[ "${#}" -gt 0 ] || syntaxError "missing mp3 file"
+mp3File="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+[ -e "${mp3File}" ] || semanticError "file not found: ${mp3File}"
+[ -f "${mp3File}" ] || semanticError "not a file: ${mp3File}"
+[ -r "${mp3File}" ] || semanticError "file not readable: ${mp3File}"
+
+commandLine=(ffmpeg -hide_banner -loglevel warning)
+commandLine+=(-y)
+commandLine+=(-i "${mp3File}")
+
+audioFilters=()
+audioStart=0
+
+set -- $("${programDirectory}/mp3volume" "${mp3File}")
+[ "${#}" -eq 0 ] && exit 1
+peakVolume="${1}"
+
+isTrue "${peakVolume} < -2" && {
+   evaluate volumeAdjustment "-0.5 - ${peakVolume}"
+   audioFilters+=( "volume=${volumeAdjustment}dB" )
+}
+
+set -- $("${programDirectory}/mp3silence" "${mp3File}")
+[ "${#}" -gt 0 ] && {
+   parseSilencePeriod "${1}" && {
+      isTrue "${silenceStart} < 0.5" && {
+         shift 1
+
+         isTrue "${silenceDuration} > 1" && {
+            fadeDuration=0.5
+            evaluate audioStart "${silenceEnd} - ${fadeDuration}"
+
+            audioFilters+=( "afade=type=in:curve=qsin:start_time=${audioStart}:duration=${fadeDuration}" )
+            commandLine+=( -ss "${audioStart}" )
+         }
+      }
+   }
+}
+
+shift $(( "${#}" - 1 ))
+[ "${#}" -gt 0 ] && {
+   parseSilencePeriod "${1}" && {
+      isTrue "${silenceDuration} > 1" && {
+         fadeDuration=0.5
+         audioFilters+=( "afade=type=out:curve=qsin:start_time=${silenceStart}:duration=${fadeDuration}" )
+
+         evaluate audioEnd "${silenceStart} + ${fadeDuration} - ${audioStart}"
+         commandLine+=( -t "${audioEnd}" )
+      }
+   }
+}
+
+audioFilters="${audioFilters[*]}"
+audioFilters="${audioFilters// /,}"
+commandLine+=(-af "${audioFilters}")
+
+temporaryFile="/tmp/${programName}.mp3"
+commandLine+=("${temporaryFile}")
+
+set -e
+"${commandLine[@]}"
+id3cp "${mp3File}" "${temporaryFile}" >/dev/null
+vlc-play "${temporaryFile}"
+
+echo ${commandLine[*]}
+exit 0
