@@ -1,0 +1,6 @@
+#!/usr/bin/env perl
+use MP3::Info;
+my $path = $ARGV[0];
+my $info = get_mp3info($path);
+print "$info->{'TIME'}\n";
+exit 0
