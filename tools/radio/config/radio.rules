@@ -1,10 +1,18 @@
 cbc1-ottawa 2021 mar 8-11 11:00-12:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
-portraits   2021 nov 1-6 mon-fri 13:00-16:00
-bbc-world   2021 nov 1-6 mon-fri 16:00-18:00
-bbc-world   2021 nov 1-6 mon-fri 20:00-00:00
-portraits   2021 nov 1-6 sat     14:00-15:00
+portraits   2022 mar 13-26 mon-fri 13:00-16:00
+portraits   2022 oct 30-31 mon-fri 13:00-16:00
+portraits   2022 nov 1-5   mon-fri 13:00-16:00
+bbc-world   2022 mar 13-26 mon-fri 16:00-18:00
+bbc-world   2022 oct 30-31 mon-fri 16:00-18:00
+bbc-world   2022 nov 1-5   mon-fri 16:00-18:00
+bbc-world   2022 mar 13-26 mon-fri 20:00-00:00
+bbc-world   2022 oct 30-31 mon-fri 20:00-00:00
+bbc-world   2022 nov 1-5   mon-fri 20:00-00:00
+portraits   2022 mar 13-26 sat     14:00-15:00
+portraits   2022 oct 30-31 sat     14:00-15:00
+portraits   2022 nov 1-5   sat     14:00-15:00
 
 cbc1-winnipeg 2020 dec 24 23:00-00:00 # Noël with Florence K
 cbc1-winnipeg 2020 dec 25 01:00-07:00 # Christmas Night
@@ -54,20 +62,15 @@ bbc-world wed 15:30-16:00 # Health Check
 bbc-world thu 15:30-16:00 # Science in Action
 bbc-world fri 15:30-16:00 # Crowd Science
 
-bbc-world mon 17:00-17:30 # Hard Talk
-bbc-world tue 17:00-17:30 # People Fixing the World
-bbc-world wed 17:00-17:30 # Hard Talk
-bbc-world thu 17:00-17:30 # The Inquiry
-bbc-world fri 17:00-17:30 # Hard Talk
-
-bbc-world wed 17:30-18:00 # The Documentary
-
 portraits   mon-fri 13:00-16:00 # weekday afternoon music
 bbc-world   mon-fri 16:00-17:00 # Newshour
+bbc-world   mon-fri 17:00-17:20 # The Newsroom
+bbc-world   mon-fri 17:20-17:30 # World Sport
+bbc-world   mon-fri 17:30-18:00 # World Business Report
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
-bbc-world   mon-fri 20:00-21:00 # Business Matters
-bbc-world   mon-fri 21:00-21:30 # The Newsroom
+bbc-world   mon-thu 20:00-21:00 # Business Matters
+bbc-world   mon-thu 21:00-21:30 # The Newsroom
 
 cbc1-ottawa tue 23:00-00:00 # The Doc Project
 bbc-world   thu 23:00-23:30 # The Newsroom
@@ -103,12 +106,10 @@ cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
-portraits      sat 11:00-18:00
-cbc1-ottawa    sat 18:00-18:30 # The World This Weekend
-bbc-world      sat 18:30-19:00 # The Cultural Frontline
-bbc-world      sat 19:00-19:30 # OS Conversations
+cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
 bbc-world      sat 19:30-19:50 # Trending
 bbc-world      sat 19:50-20:00 # Over to You
+portraits      sat 11:00-20:00 # Saturday Afternoon Music
 bbc-world      sat 20:00-21:00 # The Science Hour
 bbc-world      sat 21:00-21:30 # The Newsroom
 bbc-world      sat 21:30-22:00 # Health Check
