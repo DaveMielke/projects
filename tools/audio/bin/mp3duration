@@ -1,0 +1,22 @@
+#!/bin/bash
+. "$(dirname "${0}")/prologue.sh"
+
+[ "${#}" -gt 0 ] || syntaxError "missing mp3 file"
+mp3File="${1}"
+shift 1
+
+[ "${#}" -eq 0 ] || syntaxError "too many parameters"
+
+[ -e "${mp3File}" ] || semanticError "file not found: ${mp3File}"
+[ -f "${mp3File}" ] || semanticError "not a file: ${mp3File}"
+[ -r "${mp3File}" ] || semanticError "file not readable: ${mp3File}"
+
+duration="$(ffmpeg -i "${mp3File}" |& sed -n -e '
+s/^.*Duration *: *//
+T
+s/ *,.*$//
+p
+')"
+
+[ -z "${duration}" ] || echo "${duration}"
+exit 0
