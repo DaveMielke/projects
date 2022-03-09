@@ -84,12 +84,12 @@ proc syntaxError {message} {
 
 proc semanticError {message} {
    logWarning $message
-   exit 1
+   exit 3
 }
 
-proc systemError {message} {
+proc seriousError {message} {
    logError $message
-   exit 3
+   exit 4
 }
 
 proc removeExcessSpace {string} {
@@ -1028,7 +1028,7 @@ proc setStation {station {until ""}} {
    global holdFile
 
    if {[catch [list open $holdFile {WRONLY TRUNC CREAT}] stream] != 0} {
-      systemError $stream
+      seriousError $stream
    }
 
    puts $stream $station
@@ -1200,17 +1200,7 @@ proc processRadioOptions {operandsList} {
    }
 }
 
-proc parseStationOperand {operandsLsit} {
-   upvar 1 $operandsList operands
-}
-
-proc parseTimeOperand {operandsList} {
-   upvar 1 $operandsList operands
-
-   if {![nextOperand operands operand]} {
-      return ""
-   }
-
+proc parseTimeOperand {operand} {
    if {[catch [list clock scan $operand] value] != 0} {
       syntaxError $value
    }
@@ -1218,16 +1208,65 @@ proc parseTimeOperand {operandsList} {
    return $value
 }
 
-proc parseUntilOperand {operandsList} {
+proc verifyFutureTime {time} {
+   if {$time <= [clock seconds]} {
+      syntaxError "time not in the future: [formatTime $time]"
+   }
+}
+
+proc nextOptionalTimeOperand {operandsList} {
    upvar 1 $operandsList operands
 
-   if {[string length [set until [parseTimeOperand operands]]] > 0} {
-      if {$until <= [clock seconds]} {
-         semanticError "until not in the future: [formatTime $until]"
-      }
+   if {![nextOperand operands operand]} {
+      return ""
    }
 
-   return $until
+   return [parseTimeOperand $operand]
+}
+
+proc nextOptionalWhenOperand {operandsList} {
+   upvar 1 $operandsList operands
+
+   if {[string length [set time [nextOptionalTimeOperand operands]]] > 0} {
+      verifyFutureTime $time
+   }
+
+   return $time
+}
+
+proc actionHandler->at {operands} {
+   if {![nextOperand operands at]} {
+      syntaxError "missing at time"
+   }
+
+   set atTime [parseTimeOperand $at]
+   verifyFutureTime $atTime
+
+   if {![nextOperand operands station]} {
+      syntaxError "missing station name"
+   }
+
+   set until [nextOptionalTimeOperand operands]
+   operandsDone operands
+
+   verifyStation $station
+   set jobCommand "[file normalize [info script]] set $station"
+
+   if {[string length $until] > 0} {
+      if {$until <= $atTime} {
+         syntaxError "until not later than at"
+      }
+
+      set until [clock format $until -format "%Y-%m-%d %H:%M:%S"]
+      append jobCommand " '$until'"
+   }
+
+   append jobCommand "\n"
+   set atTime [clock format $atTime -format "%Y%m%d%H%M.%S"]
+
+   if {[catch [list exec at -M -t $atTime << $jobCommand >@ stdout] result] != 0} {
+      seriousError "at: $result"
+   }
 }
 
 proc actionHandler->automatic {operands} {
@@ -1264,7 +1303,7 @@ proc actionHandler->daemon {operands} {
       funlock $processStream
       close $processStream
    } else {
-      systemError $processStream
+      seriousError $processStream
    }
    unset processStream
 
@@ -1292,7 +1331,7 @@ proc actionHandler->daemon {operands} {
 }
 
 proc actionHandler->hold {operands} {
-   set until [parseUntilOperand operands]
+   set until [nextOptionalWhenOperand operands]
    operandsDone operands
 
    setStation [selectStation] $until
@@ -1326,7 +1365,7 @@ proc actionHandler->listen {operands} {
 }
 
 proc actionHandler->off {operands} {
-   set until [parseUntilOperand operands]
+   set until [nextOptionalWhenOperand operands]
    operandsDone operands
 
    setStation "" $until
@@ -1342,7 +1381,7 @@ proc actionHandler->set {operands} {
       syntaxError "missing station name"
    }
 
-   set until [parseUntilOperand operands]
+   set until [nextOptionalWhenOperand operands]
    operandsDone operands
 
    verifyStation $station
@@ -1350,7 +1389,7 @@ proc actionHandler->set {operands} {
 }
 
 proc actionHandler->which {operands} {
-   set when [parseTimeOperand operands]
+   set when [nextOptionalTimeOperand operands]
    operandsDone operands
 
    if {[string length $when] == 0} {
