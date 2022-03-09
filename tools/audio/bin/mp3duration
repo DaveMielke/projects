@@ -11,12 +11,23 @@ shift 1
 [ -f "${mp3File}" ] || semanticError "not a file: ${mp3File}"
 [ -r "${mp3File}" ] || semanticError "file not readable: ${mp3File}"
 
-duration="$(ffmpeg -i "${mp3File}" |& sed -n -e '
-s/^.*Duration *: *//
+duration="$(ffmpeg -i "${mp3File}" |& sed -n -E -e '
+s/^.*Duration *:? *//
 T
-s/ *,.*$//
+s/,.*$//
+s/ *$//
 p
 ')"
 
-[ -z "${duration}" ] || echo "${duration}"
+[ -z "${duration}" ] || {
+   set -- ${duration//:/ }
+
+   while [ "${#}" -lt 3 ]
+   do
+      set -- 0 "${@}"
+   done
+
+   echo "${duration}"
+}
+
 exit 0
