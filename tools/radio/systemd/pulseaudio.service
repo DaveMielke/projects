@@ -2,6 +2,7 @@
 Description=Pulse Audio Sound Service
 
 #Requires=pulseaudio.socket
+After=alsa-restore.service alsa-state.service
 Before=sound.target
 
 [Service]
