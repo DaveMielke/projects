@@ -1,79 +1,82 @@
 #!/bin/bash
-set -e
+. /brltty/current/bin/brltty-prologue.sh
 
-defaultAudioFormat="mp3"
-defaultInteractiveInterface="rc"
+downloadVideo() {
+   local arguments=("${@}")
 
-programMessage() {
-   local message="${1}"
+   [ -n "${userName}" ] && {
+      [ -n "${userPassword}" ] || {
+         local password
+         read -s -r -p "${programName}: password? " -- password
+         echo >&2 ""
 
-   echo >&2 "${0##*/}: ${message}"
-}
+         [ -n "${password}" ] || semanticError "password not entered"
+         userPassword="${password}"
+      }
 
-syntaxError() {
-   local message="${1}"
+      arguments=(--username "${userName}" --password "${userPassword}" "${@}")
+   }
 
-   programMessage "${message}"
-   exit 2
+   executeHostCommand youtube-dl "${arguments[@]}"
 }
 
 playStream() {
    local url="${1}"
 
-   vlc --quiet --intf "${interactiveInterface}" --no-video --play-and-exit -- "${url}"
+   "${noPlay}" || executeHostCommand vlc --quiet --play-and-exit --no-video --intf "${interactiveInterface}" -- "${url}"
 }
 
-audioFormat="mp3"
-interactiveInterface="rc"
+defaultAudioFormat="mp3"
+defaultInteractiveInterface="rc"
 
-while getopts ":f:i:" option
-do
-   case "${option}"
-   in
-      f) audioFormat="${OPTARG}";;
-      i) interactiveInterface="${OPTARG}";;
+addProgramOption n flag noDownload "don't download the stream"
+addProgramOption N flag noPlay "don't play the stream"
+addProgramOption f string.format audioFormat "the audio format to render" "${defaultAudioFormat}"
+addProgramOption i string.name interactiveInterface "the name of the VLC interactive interfae to use" "${defaultInteractiveInterface}"
+addProgramOption u string.user userName "the name of the user to log in with" "to not log in"
+addProgramOption p string.text userPassword "the password for the user when logging in" "to prompt for it"
+addProgramParameter identifier streamIdentifier "the 11-character stream identifier"
+parseProgramArguments "${@}"
 
-      :) syntaxError "missing operand: -${OPTARG}";;
-     \?) syntaxError "unknown option: -${OPTARG}";;
-      *) syntaxError "unimplemented option: -${option}";;
-   esac
-done
-shift $((OPTIND - 1))
+[ -n "${audioFormat}" ] || audioFormat="${defaultAudioFormat}"
+verifyChoice "audio format" "${audioFormat}" aac flac mp3 m4a opus vorbis wav
 
-[ "${#}" -eq 0 ] && syntaxError "missing stream identifier"
-streamIdentifier="${1}"
-shift 1
+[ -n "${interactiveInterface}" ] || interactiveInterface="${defaultInteractiveInterface}"
+verifyChoice "interactive interface" "${interactiveInterface}" rc lirc ncurses qt skins2
 
-[ "${#}" -eq 0 ] || syntaxError "too many parameters"
-[ -n "$audioFormat}" ] || audioFormat="${defaultAudioFormat}"
-[ -n "$interactiveInterface}" ] || interactiveInterface="${defaultInteractiveInterface}"
+set -e
 
 {
    read title
-   echo "Title: ${title}"
-
    read file
    read duration
-} < <( youtube-dl --get-title --get-filename --get-duration  -- "${streamIdentifier}" )
+} < <(downloadVideo --get-title --get-filename --get-duration -- "${streamIdentifier}")
+
+echo "Title: ${title}"
 
 if [ "${duration}" = "0" ]
 then
    {
       read url
-   } < <( youtube-dl --get-url  -- "${streamIdentifier}" )
+   } < <(downloadVideo --get-url -- "${streamIdentifier}")
 
-   playStream "${url}"
+   "${noDownload}" || playStream "${url}"
 else
-   file="${file%.*}.${audioFormat}"
-   path="$(pwd)/${file}"
-
    echo "Duration: ${duration}"
-   echo "File: ${file}"
 
-   youtube-dl --quiet --extract-audio --audio-format "${audioFormat}" -- "${streamIdentifier}"
-   ln -f -- "${path}" "yt.${audioFormat}"
-   playStream "file://${path}"
-   rm -- "${path}"
+   "${noDownload}" || {
+      file="${file%.*}.${audioFormat}"
+      echo "File: ${file}"
+
+      path="$(pwd)/${file}"
+      downloadVideo --quiet --extract-audio --audio-format "${audioFormat}" -- "${streamIdentifier}"
+
+      link="yt.${audioFormat}"
+      ln --force -- "${path}" "${link}"
+
+      playStream "file://${path}"
+      rm -- "${path}"
+   }
 fi
 
 exit 0
