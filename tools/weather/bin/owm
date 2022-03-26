@@ -1,0 +1,321 @@
+#!/bin/bash
+. ../brltty/git/main/brltty-prologue.bash
+
+addProgramOption k string.key keyValue "the key for the application performing the query" "the first line in the key file"
+addProgramOption K string.path keyFile "the file containing the application key"
+
+owmSetKey() {
+   local parametersArray="${1}"
+
+   [ -n "${keyValue}" ] || {
+      if [ -n "${keyFile}" ]
+      then
+         verifyInputFile "${keyFile}"
+      elif ! findProgramConfigurationFile keyFile "key"
+      then
+         semanticError "no API key file"
+      fi
+
+      read <"${keyFile}" keyValue
+   }
+
+   [ -n "${keyValue}" ] || semanticError "API key not specified"
+   setElement "${parametersArray}" "appid" "${keyValue}"
+}
+
+owmAddQueryParameter() {
+   local name="${1}"
+   local value="${2}"
+   curlOptions+=(--data-urlencode "${name}=${value}")
+}
+
+owmQuery() {
+   local resultArray="${1}"
+   local parametersArray="${2}"
+   shift 2
+
+   local curlOptions=(--silent --show-error --get)
+   local curlLocation="https://api.OpenWeatherMap.org"
+
+   local -A owmParameters=()
+   getElements owmParameters "${parametersArray}"
+   owmSetKey owmParameters
+   forElements owmParameters owmAddQueryParameter
+
+   local owmComponent
+   for owmComponent in "${@}"
+   do
+      curlLocation+="/${owmComponent}"
+   done
+
+   local owmResponse
+   owmResponse="$(curl "${curlOptions[@]}" -- "${curlLocation}")" || exit "${?}"
+
+   local owmMessage
+   owmMessage="$(jq -r '.message?' <<<"${owmResponse}")"
+   [ "${owmMessage}" = "null" ] && owmMessage=""
+   [ "${owmMessage}" = "0" ] && owmMessage=""
+   [ -n "${owmMessage}" ] && semanticError "${owmMessage}"
+
+   local owmName="${programName}.${1}-${3}"
+   "${saveResponses}" && jq . <<<"${owmResponse}" >"${owmName}.json"
+
+   local jqScript="${programDirectory}/${owmName}.jq"
+   local jqOptions=(--raw-output --from-file "${jqScript}")
+
+   local jqResponse
+   jqResponse="$(jq "${jqOptions[@]}" <<<"${owmResponse}")" || exit "${?}"
+
+   local name value
+   while read name value
+   do
+      [ "${value}" = "null" ] && value=""
+      setElement "${resultArray}" "${name}" "${value}"
+   done <<<"${jqResponse}"
+}
+
+owmQueryCity() {
+   local citiesArray="${1}"
+   local city="${2}"
+
+   local -A parameters=(
+      q "${city}"
+      limit 5
+   )
+
+   owmQuery "${citiesArray}" parameters geo 1.0 direct
+}
+
+owmQueryLocation() {
+   local locationsArray="${1}"
+   local latitude="${2}"
+   local longitude="${3}"
+
+   local -A parameters=(
+      lat "${latitude}"
+      lon "${longitude}"
+      limit 5
+   )
+
+   owmQuery "${locationsArray}" parameters geo 1.0 reverse
+}
+
+owmQueryForecast() {
+   local forecastArray="${1}"
+   local latitude="${2}"
+   local longitude="${3}"
+
+   local -A parameters=(
+      lat "${latitude}"
+      lon "${longitude}"
+      units metric
+   )
+
+   owmQuery "${forecastArray}" parameters data 2.5 forecast
+}
+
+owmQueryWeather() {
+   local WeatherArray="${1}"
+   local latitude="${2}"
+   local longitude="${3}"
+
+   local -A parameters=(
+      lat "${latitude}"
+      lon "${longitude}"
+      units metric
+   )
+
+   owmQuery "${WeatherArray}" parameters data 2.5 weather
+}
+
+declare -a queryArguments=()
+
+processExtraProgramParameters() {
+   queryArguments=("${@}")
+}
+
+noMoreQueryArguments() {
+   [ "${#queryArguments[*]}" -eq 0 ] || syntaxError "too many ${queryType} arguments"
+}
+
+getQueryArgument() {
+   local resultVariable="${1}"
+   local label="${2}"
+
+   set -- "${queryArguments[@]}"
+   [ "${#}" -gt 0 ] || syntaxError "${label} not specified"
+   setVariable "${resultVariable}" "${1}"
+   shift 1
+   queryArguments=("${@}")
+}
+
+getCityName() {
+   local nameVariable="${1}"
+   local citiesArray="${2}"
+   local index="${3}"
+
+   local name=""
+   local field
+
+   for field in name region country
+   do
+      local value
+      getElement value "${citiesArray}" "${index},${field}"
+      [ -n "${value}" ] || continue
+
+      [  -n "${name}" ] && name+=", "
+      name+="${value}"
+   done
+
+   setVariable "${nameVariable}" "${name}"
+}
+
+getCityCoordinates() {
+   local latitudeVariable="${1}"
+   local longitudeVariable="${2}"
+   local city="${3}"
+
+   local -A cities=()
+   owmQueryCity cities "${city}"
+   local cityCount="${cities["count"]}"
+
+   if [ "${cityCount}" -eq 1 ]
+   then
+      local cityName
+      getCityName cityName cities 0
+
+      local cityLatitude="${cities["0,latitude"]}"
+      [ -n "${cityLatitude}" ] || semanticError "city latitude not known: ${cityName}"
+      setVariable "${latitudeVariable}" "${cityLatitude}"
+
+      local cityLongitude="${cities["0,longitude"]}"
+      [ -n "${cityLongitude}" ] || semanticError "city longitude not known: ${cityName}"
+      setVariable "${longitudeVariable}" "${cityLongitude}"
+   elif [ "${cityCount}" -eq 0 ]
+   then
+      semanticError "city not found: ${city}"
+   else
+      local cityNames=""
+      local cityIndex=0
+
+      while [ "${cityIndex}" -lt "${cityCount}" ]
+      do
+         local cityName
+         getCityName cityName cities "${cityIndex}"
+
+         [ -n "${cityNames}" ] && cityNames+="; "
+         cityNames+="${cityName}"
+
+         let "cityIndex += 1"
+      done
+
+      semanticError "more than one city: ${cityNames}"
+   fi
+}
+
+getCoordinateArgument() {
+   local resultVariable="${1}"
+   local label="${2}"
+   local maximum="${3}"
+   local positive="${4}"
+   local negative="${5}"
+
+   local coodinate
+   getQueryArgument coordinate "${label}"
+   setVariable "${resultVariable}" "${coordinate}"
+}
+
+getLatitudeArgument() {
+   getCoordinateArgument "${1}" latitude 90 N S
+}
+
+getLongitudeArgument() {
+   getCoordinateArgument "${1}" longitude 180 E W
+}
+
+getCoordinatesArguments() {
+   local latitudeVariable="${1}"
+   local longitudeVariable="${2}"
+
+   if [ -n "${cityDescriptor}" ]
+   then
+      getCityCoordinates "${latitudeVariable}" "${longitudeVariable}" "${cityDescriptor}"
+   else
+      getLatitudeArgument "${latitudeVariable}"
+      getLongitudeArgument "${longitudeVariable}"
+   fi
+}
+
+showCities() {
+   local citiesArray="${1}"
+
+   local cityCount
+   getElement cityCount "${citiesArray}" "count"
+
+   [ "${cityCount}" -gt 0 ] || semanticError "city not found: ${cityDescriptor}"
+   local cityIndex=0
+
+   while [ "${cityIndex}" -lt "${cityCount}" ]
+   do
+      local cityName
+      getCityName cityName "${citiesArray}" "${cityIndex}"
+
+      local cityLatitude
+      getElement cityLatitude "${citiesArray}" "${cityIndex},latitude"
+
+      local cityLongitude
+      getElement cityLongitude "${citiesArray}" "${cityIndex},longitude"
+
+      echo "${cityName}: ${cityLatitude} ${cityLongitude}"
+      let "cityIndex += 1"
+   done
+}
+
+performQuery_city() {
+   [ -n "${cityDescriptor}" ] || getQueryArgument cityDescriptor "city"
+   noMoreQueryArguments
+
+   local -A cities=()
+   owmQueryCity cities "${cityDescriptor}"
+   showCities cities
+}
+
+performQuery_location() {
+   local latitude longitude
+   getCoordinatesArguments latitude longitude
+   noMoreQueryArguments
+
+   local -A locations=()
+   owmQueryLocation locations "${latitude}" "${longitude}"
+   showCities locations
+}
+
+performQuery_forecast() {
+   local latitude longitude
+   getCoordinatesArguments latitude longitude
+   noMoreQueryArguments
+
+   local -A forecast=()
+   owmQueryForecast forecast "${latitude}" "${longitude}"
+   listElements forecast
+}
+
+performQuery_weather() {
+   local latitude longitude
+   getCoordinatesArguments latitude longitude
+   noMoreQueryArguments
+
+   local -A weather=()
+   owmQueryWeather weather "${latitude}" "${longitude}"
+   listElements weather
+}
+
+addProgramOption c string.city cityDescriptor "the name of the city (name[[,state],country])"
+addProgramOption R flag saveResponses "save the Open Weather Map API responses"
+addProgramParameter type queryType "the type of query to perform"
+optionalProgramParameters "arg" "arguments for the query"
+parseProgramArguments "${@}"
+
+verifyChoice "query type" queryType city location forecast weather
+"performQuery_${queryType}"
+exit 0
