@@ -1,5 +1,6 @@
 #!/bin/bash
 . ../brltty/git/main/brltty-prologue.bash
+shopt -s extglob
 
 addProgramOption k string.key keyValue "the key for the application performing the query" "the first line in the key file"
 addProgramOption K string.path keyFile "the file containing the application key"
@@ -213,15 +214,63 @@ getCityCoordinates() {
    fi
 }
 
+testCoordinateSpecification() {
+   local valueVariable="${1}"
+   local maximumValue="${2}"
+   local positiveSuffix="${3}"
+   local negativeSuffix="${4}"
+
+   local value="${!valueVariable}"
+   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
+
+   [[ "${value}" =~ ${pattern} ]] || return 1
+   local sign="${BASH_REMATCH[1]}"
+   local integer="${BASH_REMATCH[2]}"
+   local fraction="${BASH_REMATCH[3]}"
+   local suffix="${BASH_REMATCH[4]}"
+
+   if [ "${integer}" -eq "${maximumValue}" ]
+   then
+      fraction="${fraction##.*(0)}"
+      [ -n "${fraction}" ] && return 1
+   elif [ "${integer}" -gt "${maximumValue}" ]
+   then
+      return 1
+   fi
+
+   local negativeSign=false
+   [ "${sign}" = "-" ] && negativeSign=true
+
+   [ -n "${suffix}" ] && {
+      if [ "${suffix}" = "${negativeSuffix}" ]
+      then
+         "${negativeSign}" && negativeSign=false || negativeSign=true
+      elif [ "${suffix}" != "${positiveSuffix}" ]
+      then
+         return 1
+      fi
+   }
+
+   value="${integer:-0}${fraction}"
+   "${negativeSign}" && value="-${value}"
+   setVariable "${valueVariable}" "${value}"
+   return 0
+}
+
 getCoordinateArgument() {
    local resultVariable="${1}"
    local label="${2}"
-   local maximum="${3}"
-   local positive="${4}"
-   local negative="${5}"
+   local maximumValue="${3}"
+   local positiveSuffix="${4}"
+   local negativeSuffix="${5}"
 
-   local coodinate
+   local coordinate
    getQueryArgument coordinate "${label}"
+
+   testCoordinateSpecification coordinate "${maximumValue}" "${positiveSuffix}" "${negativeSuffix}" || {
+      syntaxError "invalid ${label}: ${coordinate}"
+   }
+
    setVariable "${resultVariable}" "${coordinate}"
 }
 
@@ -248,11 +297,12 @@ getCoordinatesArguments() {
 
 showCities() {
    local citiesArray="${1}"
+   local cityIdentifier="${2}"
 
    local cityCount
    getElement cityCount "${citiesArray}" "count"
 
-   [ "${cityCount}" -gt 0 ] || semanticError "city not found: ${cityDescriptor}"
+   [ "${cityCount}" -gt 0 ] || semanticError "city not found: ${cityIdentifier}"
    local cityIndex=0
 
    while [ "${cityIndex}" -lt "${cityCount}" ]
@@ -277,7 +327,7 @@ performQuery_city() {
 
    local -A cities=()
    owmQueryCity cities "${cityDescriptor}"
-   showCities cities
+   showCities cities "${cityDescriptor}"
 }
 
 performQuery_location() {
@@ -287,7 +337,7 @@ performQuery_location() {
 
    local -A locations=()
    owmQueryLocation locations "${latitude}" "${longitude}"
-   showCities locations
+   showCities locations "[${latitude}, ${longitude}]"
 }
 
 performQuery_forecast() {
