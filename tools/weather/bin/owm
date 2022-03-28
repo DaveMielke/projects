@@ -2,26 +2,26 @@
 . ../brltty/git/main/brltty-prologue.bash
 shopt -s extglob
 
-addProgramOption k string.key keyValue "the key for the application performing the query" "the first line in the key file"
-addProgramOption K string.path keyFile "the file containing the application key"
+addProgramOption k string.key owmKeyValue "the key for the application performing the query" "the first line in the key file"
+addProgramOption K string.path owmKeyFile "the file containing the application key"
 
 owmSetKey() {
    local parametersArray="${1}"
 
-   [ -n "${keyValue}" ] || {
-      if [ -n "${keyFile}" ]
+   [ -n "${owmKeyValue}" ] || {
+      if [ -n "${owmKeyFile}" ]
       then
-         verifyInputFile "${keyFile}"
-      elif ! findProgramConfigurationFile keyFile "key"
+         verifyInputFile "${owmKeyFile}"
+      elif ! findProgramConfigurationFile owmKeyFile "key"
       then
          semanticError "no API key file"
       fi
 
-      read <"${keyFile}" keyValue
+      read <"${owmKeyFile}" owmKeyValue
    }
 
-   [ -n "${keyValue}" ] || semanticError "API key not specified"
-   setElement "${parametersArray}" "appid" "${keyValue}"
+   [ -n "${owmKeyValue}" ] || semanticError "API key not specified"
+   setElement "${parametersArray}" "appid" "${owmKeyValue}"
 }
 
 owmAddQueryParameter() {
@@ -133,6 +133,22 @@ declare -a queryArguments=()
 
 processExtraProgramParameters() {
    queryArguments=("${@}")
+}
+
+showProgramUsageNotes() {
+cat <<END_OF_PROGRAM_USAGE_NOTES
+
+Queries:
+  city [name]
+  location [latitude longitude]
+  forecast [latitude longitude]
+  weather [latitude longitude]
+
+The -c option may be used to specify a city in lieu of its identifying arguments.
+A city is specified as name[[,state],country] - the name may be abbreviated.
+The optional two-letter ISO 3166 country code must be last.
+The optional two-letter state code only applies to the United States.
+END_OF_PROGRAM_USAGE_NOTES
 }
 
 noMoreQueryArguments() {
@@ -340,6 +356,87 @@ performQuery_location() {
    showCities locations "[${latitude}, ${longitude}]"
 }
 
+showLines() {
+   local text="" line
+
+   for line
+   do
+      text+="${line}"
+      text+=$'\n'
+   done
+
+   echo -n "${text}"
+}
+
+showWeather() {
+   local weatherArray="${1}"
+
+   local timeFormat="%H:%M on %A, %B %d"
+   local windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
+   local lines=() line
+
+   local time offset
+   getElement time "${weatherArray}" "time"
+   getElement offset "${weatherArray}" "time,offset"
+   printf -v line "as of %(${timeFormat})T" "${time}"
+   lines+=("${line}")
+
+   local name description general
+   getElement name "${weatherArray}" "name"
+   getElement description "${weatherArray}" "weather,description"
+   getElement general "${weatherArray}" "weather,general"
+   [ -n "${description}" ] || description="${general}"
+   printf -v line "%s: %s" "${name}" "${description}"
+   lines+=("${line}")
+
+   local temperature feelsLike
+   getElement temperature "${weatherArray}" "temperature"
+   getElement feelsLike "${weatherArray}" "temperature,feels"
+   temperature="${temperature%.*}"
+   feelsLike="${feelsLike%.*}"
+   line="temperature is ${temperature}C"
+   [ "${feelsLike}" = "${temperature}" ] || line+=" (feels like ${feelsLike}C)"
+   lines+=("${line}")
+
+   local speed angle
+   getElement speed "${weatherArray}" "wind,speed"
+   getElement angle "${weatherArray}" "wind,direction"
+   local direction=$(( ((((angle * 4) + 45) % 1440) / 90) ))
+   direction="${windDirections[direction]}"
+   printf -v line "wind is %dM/s from the %s (%d°)" "${speed%.*}" "${direction}" "${angle}"
+   lines+=("${line}")
+
+   local humidity pressure
+   getElement humidity "${weatherArray}" "humidity"
+   getElement pressure "${weatherArray}" "pressure"
+   printf -v line "%d%% humidity, pressure is %dhPa" "${humidity}" "${pressure}"
+   lines+=("${line}")
+
+   local clouds visibility
+   getElement clouds "${weatherArray}" "clouds,percent"
+   getElement visibility "${weatherArray}" "visibility"
+   line="${clouds}% clouds, "
+
+   if [ "${visibility}" -lt 10000 ]
+   then
+      local unit="M"
+
+      [ "${visibility}" -lt 1000 ] || {
+         unit="K${unit}"
+         local fraction="${visibility: -3:1}"
+         let "visibility /= 1000"
+         visibility+=".${fraction}"
+      }
+
+      line+="${visibility}${unit} visibility"
+   else
+      line+="clear"
+   fi
+
+   lines+=("${line}")
+   showLines "${lines[@]}"
+}
+
 performQuery_forecast() {
    local latitude longitude
    getCoordinatesArguments latitude longitude
@@ -357,12 +454,12 @@ performQuery_weather() {
 
    local -A weather=()
    owmQueryWeather weather "${latitude}" "${longitude}"
-   listElements weather
+   showWeather weather
 }
 
-addProgramOption c string.city cityDescriptor "the name of the city (name[[,state],country])"
+addProgramOption c string.city cityDescriptor "the specification of a city - see below"
 addProgramOption R flag saveResponses "save the Open Weather Map API responses"
-addProgramParameter type queryType "the type of query to perform"
+addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
 

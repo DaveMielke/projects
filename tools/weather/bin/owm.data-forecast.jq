@@ -4,7 +4,7 @@
     ("country \(.country)"),
     ("sun,rise \(.sunrise)"),
     ("sun,set \(.sunset)"),
-    ("time,zone \(.timezone)")
+    ("time,offset \(.timezone)")
 ),
 
 (

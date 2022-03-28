@@ -27,5 +27,5 @@
 
 ("visibility \(.visibility)"),
 ("time \(.dt)"),
-("time,zone \(.timezone)"),
+("time,offset \(.timezone)"),
 ("name \(.name)")
