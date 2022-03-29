@@ -1,4 +1,4 @@
-cbc1-ottawa 2022 mar 28-31 11:00-12:00 # Canada Reads
+cbc1-ottawa 2022 mar 28-31 11:00-12:00 20:00-21:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
 portraits   2023 mar 12-25 mon-fri 13:00-16:00
@@ -85,7 +85,7 @@ bbc-world   fri 23:00-00:00 # The Real Story
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
 bbc-world   sat     00:30-00:50 # World of Wisdom
-bbc-world   sat     00:50-01:00 # Ros Atkins on ...
+bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
 cbc1-halifax tue 02:00-02:31 # BBC - Discovery
