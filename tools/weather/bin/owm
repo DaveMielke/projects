@@ -1,9 +1,129 @@
 #!/bin/bash
-. ../brltty/git/main/brltty-prologue.bash
+. brltty-prologue.bash
 shopt -s extglob
+
+windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
+
+distanceUnits=(m km mi)
+addProgramOption D string.unit distanceUnit "the unit to display visibility in"
+
+pressureUnits=(hpa kpa mb inHg)
+addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in"
+
+speedUnits=(m/s km/hr mph)
+addProgramOption S string.unit speedUnit "the unit to display wind speed in"
+
+temperatureUnits=(C K F R)
+addProgramOption T string.unit temperatureUnit "the unit to display temperature in"
+
+convertUnit() {
+   local resultVariable="${1}"
+   local from="${2}"
+   local to="${3}"
+   local precision="${4}"
+
+   local toValue
+   setVariable toValue "$(units --terse --output-format "%.${precision:-0}f" "${from}" "${to}")"
+
+   [ "${toValue}" = "${toValue%.*}" ] || {
+      toValue="${toValue%%*(0)}"
+      toValue="${toValue%.}"
+   }
+
+   setVariable "${resultVariable}" "${toValue}"
+}
+
+convertSimpleUnit() {
+   local resultVariable="${1}"
+   local fromValue="${2}"
+   local fromUnit="${3}"
+   local toUnit="${4}"
+   local precision="${5}"
+
+   convertUnit "${resultVariable}" "${fromValue}${fromUnit}" "${toUnit}" "${precision}"
+}
+
+formatSimpleUnit() {
+   local variable="${1}"
+   local fromUnit="${2}"
+   local toUnit="${3}"
+   local precision="${4}"
+
+   local value="${!variable}"
+   convertSimpleUnit value "${value}" "${fromUnit}" "${toUnit}" "${precision}"
+   setVariable "${variable}" "${value}${toUnit}"
+}
+
+convertComplexUnit() {
+   local resultVariable="${1}"
+   local fromValue="${2}"
+   local fromUnit="${3}"
+   local toUnit="${4}"
+   local unitType="${5}"
+   local precision="${6}"
+
+   convertUnit "${resultVariable}" "${unitType}${fromUnit}(${fromValue})" "${unitType}${toUnit}" "${precision}"
+}
+
+formatComplexUnit() {
+   local variable="${1}"
+   local fromUnit="${2}"
+   local toUnit="${3}"
+   local unitType="${4}"
+   local precision="${5}"
+
+   local value="${!variable}"
+   convertComplexUnit value "${value}" "${fromUnit}" "${toUnit}" "${unitType}" "${precision}"
+   setVariable "${variable}" "${value}${toUnit}"
+}
+
+formatDistance() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatSimpleUnit "${variable}" "${distanceUnits[0]}" "${distanceUnit}" "${precision}"
+}
+
+verifyDistanceUnit() {
+   verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
+}
+
+formatPressure() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatSimpleUnit "${variable}" "${pressureUnits[0]}" "${pressureUnit}" "${precision:-1}"
+}
+
+verifyPressureUnit() {
+   verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
+}
+
+formatSpeed() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatSimpleUnit "${variable}" "${speedUnits[0]}" "${speedUnit}" "${precision}"
+}
+
+verifySpeedUnit() {
+   verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
+}
+
+formatTemperature() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatComplexUnit "${variable}" "${temperatureUnits[0]}" "${temperatureUnit}" temp "${precision}"
+}
+
+verifyTemperatureUnit() {
+   verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
+}
 
 addProgramOption k string.key owmKeyValue "the key for the application performing the query" "the first line in the key file"
 addProgramOption K string.path owmKeyFile "the file containing the application key"
+addProgramOption R flag saveResponses "save the Open Weather Map API responses"
 
 owmSetKey() {
    local parametersArray="${1}"
@@ -129,12 +249,6 @@ owmQueryWeather() {
    owmQuery "${WeatherArray}" parameters data 2.5 weather
 }
 
-declare -a queryArguments=()
-
-processExtraProgramParameters() {
-   queryArguments=("${@}")
-}
-
 showProgramUsageNotes() {
 cat <<END_OF_PROGRAM_USAGE_NOTES
 
@@ -149,6 +263,12 @@ A city is specified as name[[,state],country] - the name may be abbreviated.
 The optional two-letter ISO 3166 country code must be last.
 The optional two-letter state code only applies to the United States.
 END_OF_PROGRAM_USAGE_NOTES
+}
+
+declare -a queryArguments=()
+
+processExtraProgramParameters() {
+   queryArguments=("${@}")
 }
 
 noMoreQueryArguments() {
@@ -311,6 +431,18 @@ getCoordinatesArguments() {
    fi
 }
 
+showLines() {
+   local text="" line
+
+   for line
+   do
+      text+="${line}"
+      text+=$'\n'
+   done
+
+   echo -n "${text}"
+}
+
 showCities() {
    local citiesArray="${1}"
    local cityIdentifier="${2}"
@@ -356,29 +488,16 @@ performQuery_location() {
    showCities locations "[${latitude}, ${longitude}]"
 }
 
-showLines() {
-   local text="" line
-
-   for line
-   do
-      text+="${line}"
-      text+=$'\n'
-   done
-
-   echo -n "${text}"
-}
-
 showWeather() {
    local weatherArray="${1}"
 
-   local timeFormat="%H:%M on %A, %B %d"
-   local windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
+   local timeFormat="%H:%M, %A, %B %e"
    local lines=() line
 
    local time offset
    getElement time "${weatherArray}" "time"
    getElement offset "${weatherArray}" "time,offset"
-   printf -v line "as of %(${timeFormat})T" "${time}"
+   printf -v line "as at %(${timeFormat})T" "${time}"
    lines+=("${line}")
 
    local name description general
@@ -392,46 +511,37 @@ showWeather() {
    local temperature feelsLike
    getElement temperature "${weatherArray}" "temperature"
    getElement feelsLike "${weatherArray}" "temperature,feels"
-   temperature="${temperature%.*}"
-   feelsLike="${feelsLike%.*}"
-   line="temperature is ${temperature}C"
-   [ "${feelsLike}" = "${temperature}" ] || line+=" (feels like ${feelsLike}C)"
+   formatTemperature temperature
+   formatTemperature feelsLike
+   line="temperature: ${temperature}"
+   [ "${feelsLike}" = "${temperature}" ] || line+=" (feels like ${feelsLike})"
    lines+=("${line}")
 
    local speed angle
    getElement speed "${weatherArray}" "wind,speed"
    getElement angle "${weatherArray}" "wind,direction"
+   formatSpeed speed
    local direction=$(( ((((angle * 4) + 45) % 1440) / 90) ))
    direction="${windDirections[direction]}"
-   printf -v line "wind is %dM/s from the %s (%d°)" "${speed%.*}" "${direction}" "${angle}"
+   printf -v line "wind: %s from the %s (%d°)" "${speed}" "${direction}" "${angle}"
    lines+=("${line}")
 
    local humidity pressure
    getElement humidity "${weatherArray}" "humidity"
    getElement pressure "${weatherArray}" "pressure"
-   printf -v line "%d%% humidity, pressure is %dhPa" "${humidity}" "${pressure}"
+   formatPressure pressure
+   printf -v line "%d%% humidity, %s pressure" "${humidity}" "${pressure}"
    lines+=("${line}")
 
    local clouds visibility
    getElement clouds "${weatherArray}" "clouds,percent"
    getElement visibility "${weatherArray}" "visibility"
-   line="${clouds}% clouds, "
+   line="${clouds}% clouds"
 
-   if [ "${visibility}" -lt 10000 ]
-   then
-      local unit="M"
-
-      [ "${visibility}" -lt 1000 ] || {
-         unit="K${unit}"
-         local fraction="${visibility: -3:1}"
-         let "visibility /= 1000"
-         visibility+=".${fraction}"
-      }
-
-      line+="${visibility}${unit} visibility"
-   else
-      line+="clear"
-   fi
+   [ "${visibility}" -lt 10000 ] && {
+      formatDistance visibility
+      line+=", visibility is ${visibility}"
+   }
 
    lines+=("${line}")
    showLines "${lines[@]}"
@@ -458,11 +568,23 @@ performQuery_weather() {
 }
 
 addProgramOption c string.city cityDescriptor "the specification of a city - see below"
-addProgramOption R flag saveResponses "save the Open Weather Map API responses"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
-parseProgramArguments "${@}"
 
+parseProgramArguments "${@}"
 verifyChoice "query type" queryType city location forecast weather
+
+[ -n "${distanceUnit}" ] || distanceUnit="${distanceUnits[0]}"
+verifyDistanceUnit
+
+[ -n "${pressureUnit}" ] || pressureUnit="${pressureUnits[0]}"
+verifyPressureUnit
+
+[ -n "${speedUnit}" ] || speedUnit="${speedUnits[0]}"
+verifySpeedUnit
+
+[ -n "${temperatureUnit}" ] || temperatureUnit="${temperatureUnits[0]}"
+verifyTemperatureUnit
+
 "performQuery_${queryType}"
 exit 0
