@@ -17,7 +17,7 @@
 (
   .wind |
     ("wind,speed \(.speed)"),
-    ("wind,direction \(.deg)")
+    ("wind,degrees \(.deg)")
 ),
 
 (
@@ -25,7 +25,13 @@
     ("clouds,percent \(.all)")
 ),
 
+(
+  .coord |
+    ("place,latitude \(.lat)"),
+    ("place,longitude \(.lon)")
+),
+
 ("visibility \(.visibility)"),
 ("time \(.dt)"),
 ("time,offset \(.timezone)"),
-("name \(.name)")
+("place,name \(.name)")

@@ -1,7 +1,7 @@
 (
   .city |
-    ("city \(.name)"),
-    ("country \(.country)"),
+    ("place,name \(.name)"),
+    ("place,country \(.country)"),
     ("sun,rise \(.sunrise)"),
     ("sun,set \(.sunset)"),
     ("time,offset \(.timezone)")

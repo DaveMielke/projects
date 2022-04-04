@@ -3,18 +3,92 @@
 shopt -s extglob
 
 windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
+latitudePositiveSuffix="N"
+latitudeNegativeSuffix="S"
+longitudePositiveSuffix="E"
+longitudeNegativeSuffix="W"
 
-distanceUnits=(m km mi)
-addProgramOption D string.unit distanceUnit "the unit to display visibility in"
+toWindDirection() {
+   local directionVariable="${1}"
+   local degrees="${2}"
+
+   local direction=$(( ((((degrees * 4) + 45) % 1440) / 90) ))
+   direction="${windDirections[direction]}"
+   setVariable "${directionVariable}" "${direction}"
+}
+
+parseCoordinate() {
+   local valueVariable="${1}"
+   local maximumValue="${2}"
+   local positiveSuffix="${3}"
+   local negativeSuffix="${4}"
+
+   local value="${!valueVariable}"
+   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
+
+   [[ "${value}" =~ ${pattern} ]] || return 1
+   local sign="${BASH_REMATCH[1]}"
+   local integer="${BASH_REMATCH[2]}"
+   local fraction="${BASH_REMATCH[3]}"
+   local suffix="${BASH_REMATCH[4]}"
+
+   if [ "${integer}" -eq "${maximumValue}" ]
+   then
+      fraction="${fraction##.*(0)}"
+      [ -n "${fraction}" ] && return 1
+   elif [ "${integer}" -gt "${maximumValue}" ]
+   then
+      return 1
+   fi
+
+   local negativeSign=false
+   [ "${sign}" = "-" ] && negativeSign=true
+
+   [ -n "${suffix}" ] && {
+      if [ "${suffix}" = "${negativeSuffix}" ]
+      then
+         "${negativeSign}" && negativeSign=false || negativeSign=true
+      elif [ "${suffix}" != "${positiveSuffix}" ]
+      then
+         return 1
+      fi
+   }
+
+   value="${integer:-0}${fraction}"
+   "${negativeSign}" && value="-${value}"
+   setVariable "${valueVariable}" "${value}"
+   return 0
+}
+
+parseLatitude() {
+   local latitudeVariable="${1}"
+
+   parseCoordinate "${latitudeVariable}" 90 "${latitudePositiveSuffix}" "${latitudeNegativeSuffix}" || return 1
+   return 0
+}
+
+parseLongitude() {
+   local longitudeVariable="${1}"
+
+   parseCoordinate "${longitudeVariable}" 180 "${longitudePositiveSuffix}" "${longitudeNegativeSuffix}" || return 1
+   return 0
+}
+
+distanceUnits=(m km ft mi)
+defaultDistanceUnit="${distanceUnits[0]}"
+addProgramOption D string.unit distanceUnit "the unit to display visibility in" "${defaultDistanceUnit}"
 
 pressureUnits=(hpa kpa mb inHg)
-addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in"
+defaultPressureUnit="${pressureUnits[0]}"
+addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in" "${defaultPressureUnit}"
 
 speedUnits=(m/s km/hr mph)
-addProgramOption S string.unit speedUnit "the unit to display wind speed in"
+defaultSpeedUnit="${speedUnits[0]}"
+addProgramOption S string.unit speedUnit "the unit to display wind speed in" "${defaultSpeedUnit}"
 
-temperatureUnits=(C K F R)
-addProgramOption T string.unit temperatureUnit "the unit to display temperature in"
+temperatureUnits=(C F K R)
+defaultTemperatureUnit="${temperatureUnits[0]}"
+addProgramOption T string.unit temperatureUnit "the unit to display temperature in" "${defaultTemperatureUnit}"
 
 convertUnit() {
    local resultVariable="${1}"
@@ -81,10 +155,11 @@ formatDistance() {
    local variable="${1}"
    local precision="${2}"
 
-   formatSimpleUnit "${variable}" "${distanceUnits[0]}" "${distanceUnit}" "${precision}"
+   formatSimpleUnit "${variable}" "${defaultDistanceUnit}" "${distanceUnit}" "${precision}"
 }
 
 verifyDistanceUnit() {
+   [ -n "${distanceUnit}" ] || distanceUnit="${defaultDistanceUnit}"
    verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
 }
 
@@ -92,10 +167,11 @@ formatPressure() {
    local variable="${1}"
    local precision="${2}"
 
-   formatSimpleUnit "${variable}" "${pressureUnits[0]}" "${pressureUnit}" "${precision:-1}"
+   formatSimpleUnit "${variable}" "${defaultPressureUnit}" "${pressureUnit}" "${precision:-1}"
 }
 
 verifyPressureUnit() {
+   [ -n "${pressureUnit}" ] || pressureUnit="${defaultPressureUnit}"
    verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
 }
 
@@ -103,10 +179,11 @@ formatSpeed() {
    local variable="${1}"
    local precision="${2}"
 
-   formatSimpleUnit "${variable}" "${speedUnits[0]}" "${speedUnit}" "${precision}"
+   formatSimpleUnit "${variable}" "${defaultSpeedUnit}" "${speedUnit}" "${precision}"
 }
 
 verifySpeedUnit() {
+   [ -n "${speedUnit}" ] || speedUnit="${defaultSpeedUnit}"
    verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
 }
 
@@ -114,16 +191,17 @@ formatTemperature() {
    local variable="${1}"
    local precision="${2}"
 
-   formatComplexUnit "${variable}" "${temperatureUnits[0]}" "${temperatureUnit}" temp "${precision}"
+   formatComplexUnit "${variable}" "${defaultTemperatureUnit}" "${temperatureUnit}" temp "${precision}"
 }
 
 verifyTemperatureUnit() {
+   [ -n "${temperatureUnit}" ] || temperatureUnit="${defaultTemperatureUnit}"
    verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
 }
 
 addProgramOption k string.key owmKeyValue "the key for the application performing the query" "the first line in the key file"
 addProgramOption K string.path owmKeyFile "the file containing the application key"
-addProgramOption R flag saveResponses "save the Open Weather Map API responses"
+addProgramOption R flag owmSaveResponses "save the Open Weather Map API responses"
 
 owmSetKey() {
    local parametersArray="${1}"
@@ -178,11 +256,18 @@ owmQuery() {
    [ "${owmMessage}" = "0" ] && owmMessage=""
    [ -n "${owmMessage}" ] && semanticError "${owmMessage}"
 
-   local owmName="${programName}.${1}-${3}"
-   "${saveResponses}" && jq . <<<"${owmResponse}" >"${owmName}.json"
+   local owmName="${1}-${3}"
+   "${owmSaveResponses}" && jq . <<<"${owmResponse}" >"${programName}.${owmName}.json"
 
-   local jqScript="${programDirectory}/${owmName}.jq"
-   local jqOptions=(--raw-output --from-file "${jqScript}")
+   local jqComponent="${owmName}.jq"
+   local jqPath
+
+   findProgramComponent jqPath "${jqComponent}" || {
+      semanticError "program component not found: ${jqComponent}"
+   }
+
+   local jqOptions=(--from-file "${jqPath}")
+   jqOptions+=(--raw-output)
 
    local jqResponse
    jqResponse="$(jq "${jqOptions[@]}" <<<"${owmResponse}")" || exit "${?}"
@@ -193,6 +278,8 @@ owmQuery() {
       [ "${value}" = "null" ] && value=""
       setElement "${resultArray}" "${name}" "${value}"
    done <<<"${jqResponse}"
+
+  #listElements "${resultArray}"
 }
 
 owmQueryCity() {
@@ -350,72 +437,30 @@ getCityCoordinates() {
    fi
 }
 
-testCoordinateSpecification() {
-   local valueVariable="${1}"
-   local maximumValue="${2}"
-   local positiveSuffix="${3}"
-   local negativeSuffix="${4}"
-
-   local value="${!valueVariable}"
-   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
-
-   [[ "${value}" =~ ${pattern} ]] || return 1
-   local sign="${BASH_REMATCH[1]}"
-   local integer="${BASH_REMATCH[2]}"
-   local fraction="${BASH_REMATCH[3]}"
-   local suffix="${BASH_REMATCH[4]}"
-
-   if [ "${integer}" -eq "${maximumValue}" ]
-   then
-      fraction="${fraction##.*(0)}"
-      [ -n "${fraction}" ] && return 1
-   elif [ "${integer}" -gt "${maximumValue}" ]
-   then
-      return 1
-   fi
-
-   local negativeSign=false
-   [ "${sign}" = "-" ] && negativeSign=true
-
-   [ -n "${suffix}" ] && {
-      if [ "${suffix}" = "${negativeSuffix}" ]
-      then
-         "${negativeSign}" && negativeSign=false || negativeSign=true
-      elif [ "${suffix}" != "${positiveSuffix}" ]
-      then
-         return 1
-      fi
-   }
-
-   value="${integer:-0}${fraction}"
-   "${negativeSign}" && value="-${value}"
-   setVariable "${valueVariable}" "${value}"
-   return 0
-}
-
-getCoordinateArgument() {
+getLatitudeArgument() {
    local resultVariable="${1}"
-   local label="${2}"
-   local maximumValue="${3}"
-   local positiveSuffix="${4}"
-   local negativeSuffix="${5}"
 
-   local coordinate
+   local coordinate label="latitude"
    getQueryArgument coordinate "${label}"
 
-   testCoordinateSpecification coordinate "${maximumValue}" "${positiveSuffix}" "${negativeSuffix}" || {
+   parseLatitude coordinate || {
       syntaxError "invalid ${label}: ${coordinate}"
    }
 
    setVariable "${resultVariable}" "${coordinate}"
 }
 
-getLatitudeArgument() {
-   getCoordinateArgument "${1}" latitude 90 N S
-}
-
 getLongitudeArgument() {
-   getCoordinateArgument "${1}" longitude 180 E W
+   local resultVariable="${1}"
+
+   local coordinate label="longitude"
+   getQueryArgument coordinate "${label}"
+
+   parseLongitude coordinate || {
+      syntaxError "invalid ${label}: ${coordinate}"
+   }
+
+   setVariable "${resultVariable}" "${coordinate}"
 }
 
 getCoordinatesArguments() {
@@ -501,7 +546,7 @@ showWeather() {
    lines+=("${line}")
 
    local name description general
-   getElement name "${weatherArray}" "name"
+   getElement name "${weatherArray}" "place,name"
    getElement description "${weatherArray}" "weather,description"
    getElement general "${weatherArray}" "weather,general"
    [ -n "${description}" ] || description="${general}"
@@ -517,13 +562,12 @@ showWeather() {
    [ "${feelsLike}" = "${temperature}" ] || line+=" (feels like ${feelsLike})"
    lines+=("${line}")
 
-   local speed angle
-   getElement speed "${weatherArray}" "wind,speed"
-   getElement angle "${weatherArray}" "wind,direction"
-   formatSpeed speed
-   local direction=$(( ((((angle * 4) + 45) % 1440) / 90) ))
-   direction="${windDirections[direction]}"
-   printf -v line "wind: %s from the %s (%d°)" "${speed}" "${direction}" "${angle}"
+   local windSpeed windDegrees windDirection
+   getElement windSpeed "${weatherArray}" "wind,speed"
+   getElement windDegrees "${weatherArray}" "wind,direction"
+   formatSpeed windSpeed
+   toWindDirection windDirection "${windDegrees}"
+   printf -v line "wind: %s from the %s (%d°)" "${windSpeed}" "${windDirection}" "${windDegrees}"
    lines+=("${line}")
 
    local humidity pressure
@@ -554,7 +598,6 @@ performQuery_forecast() {
 
    local -A forecast=()
    owmQueryForecast forecast "${latitude}" "${longitude}"
-   listElements forecast
 }
 
 performQuery_weather() {
@@ -570,20 +613,12 @@ performQuery_weather() {
 addProgramOption c string.city cityDescriptor "the specification of a city - see below"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
-
 parseProgramArguments "${@}"
+
 verifyChoice "query type" queryType city location forecast weather
-
-[ -n "${distanceUnit}" ] || distanceUnit="${distanceUnits[0]}"
 verifyDistanceUnit
-
-[ -n "${pressureUnit}" ] || pressureUnit="${pressureUnits[0]}"
 verifyPressureUnit
-
-[ -n "${speedUnit}" ] || speedUnit="${speedUnits[0]}"
 verifySpeedUnit
-
-[ -n "${temperatureUnit}" ] || temperatureUnit="${temperatureUnits[0]}"
 verifyTemperatureUnit
 
 "performQuery_${queryType}"
