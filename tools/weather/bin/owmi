@@ -1,0 +1,4 @@
+#!/bin/bash
+. brltty-prologue.bash
+"${programDirectory}/owm" -D mi -P inHg -S mph -T F "${@}"
+exit "${?}"

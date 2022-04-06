@@ -2,12 +2,7 @@
 . brltty-prologue.bash
 shopt -s extglob
 
-windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
-latitudePositiveSuffix="N"
-latitudeNegativeSuffix="S"
-longitudePositiveSuffix="E"
-longitudeNegativeSuffix="W"
-
+readonly windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
 toWindDirection() {
    local directionVariable="${1}"
    local degrees="${2}"
@@ -60,12 +55,18 @@ parseCoordinate() {
    return 0
 }
 
+readonly latitudePositiveSuffix="N"
+readonly latitudeNegativeSuffix="S"
+
 parseLatitude() {
    local latitudeVariable="${1}"
 
    parseCoordinate "${latitudeVariable}" 90 "${latitudePositiveSuffix}" "${latitudeNegativeSuffix}" || return 1
    return 0
 }
+
+readonly longitudePositiveSuffix="E"
+readonly longitudeNegativeSuffix="W"
 
 parseLongitude() {
    local longitudeVariable="${1}"
@@ -74,21 +75,30 @@ parseLongitude() {
    return 0
 }
 
-distanceUnits=(m km ft mi)
-defaultDistanceUnit="${distanceUnits[0]}"
-addProgramOption D string.unit distanceUnit "the unit to display visibility in" "${defaultDistanceUnit}"
+readonly clockModes=(24hours 12hours)
+readonly defaultClockMode="${clockModes[0]}"
+addProgramOption C string.mode clockMode "the clock mode to display time in (${clockModes[*]})" "${defaultClockMode}"
 
-pressureUnits=(hpa kpa mb inHg)
-defaultPressureUnit="${pressureUnits[0]}"
-addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in" "${defaultPressureUnit}"
+readonly -A timeFormats=(
+  24hours "%H:%M"
+  12hours "%l:%M%p"
+)
 
-speedUnits=(m/s km/hr mph)
-defaultSpeedUnit="${speedUnits[0]}"
-addProgramOption S string.unit speedUnit "the unit to display wind speed in" "${defaultSpeedUnit}"
+readonly distanceUnits=(m km ft mi)
+readonly defaultDistanceUnit="${distanceUnits[0]}"
+addProgramOption D string.unit distanceUnit "the unit to display visibility in (${distanceUnits[*]})" "${defaultDistanceUnit}"
 
-temperatureUnits=(C F K R)
-defaultTemperatureUnit="${temperatureUnits[0]}"
-addProgramOption T string.unit temperatureUnit "the unit to display temperature in" "${defaultTemperatureUnit}"
+readonly pressureUnits=(hpa kpa mb inHg)
+readonly defaultPressureUnit="${pressureUnits[0]}"
+addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${pressureUnits[*]})" "${defaultPressureUnit}"
+
+readonly speedUnits=(m/s km/hr mph)
+readonly defaultSpeedUnit="${speedUnits[0]}"
+addProgramOption S string.unit speedUnit "the unit to display wind speed in (${speedUnits[*]})" "${defaultSpeedUnit}"
+
+readonly temperatureUnits=(C F K R)
+readonly defaultTemperatureUnit="${temperatureUnits[0]}"
+addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${temperatureUnits[*]})" "${defaultTemperatureUnit}"
 
 convertUnit() {
    local resultVariable="${1}"
@@ -151,15 +161,51 @@ formatComplexUnit() {
    setVariable "${variable}" "${value}${toUnit}"
 }
 
+initializeSetting() {
+   local -n value="${1}"
+   local default="${2}"
+   local setting="${3}"
+
+   [ -n "${value}" ] || {
+      getPersistentProgramSetting value "${setting}"
+
+      [ -n "${value}" ] || {
+         value="${default}"
+      }
+   }
+}
+
+verifyClockMode() {
+   initializeSetting clockMode "${defaultClockMode}" clock-mode
+   verifyChoice "clock mode" clockMode "${clockModes[@]}"
+}
+
 formatDistance() {
    local variable="${1}"
    local precision="${2}"
 
-   formatSimpleUnit "${variable}" "${defaultDistanceUnit}" "${distanceUnit}" "${precision}"
+   local value unit="${distanceUnit}"
+   convertSimpleUnit value "${!variable}" "${defaultDistanceUnit}" "${unit}" "${precision:-1}"
+
+   [ "${value}" = "0" ] && {
+      [ -n "${precision}" ] || {
+         case "${unit}"
+         in
+            k*) unit="${unit#?}";;
+            mi) unit="ft";;
+         esac
+
+         [ "${unit}" = "${distanceUnit}" ] || {
+            convertSimpleUnit value "${!variable}" "${defaultDistanceUnit}" "${unit}" "${precision}"
+         }
+      }
+   }
+
+   setVariable "${variable}" "${value}${unit}"
 }
 
 verifyDistanceUnit() {
-   [ -n "${distanceUnit}" ] || distanceUnit="${defaultDistanceUnit}"
+   initializeSetting distanceUnit "${defaultDistanceUnit}" distance-unit
    verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
 }
 
@@ -171,7 +217,7 @@ formatPressure() {
 }
 
 verifyPressureUnit() {
-   [ -n "${pressureUnit}" ] || pressureUnit="${defaultPressureUnit}"
+   initializeSetting pressureUnit "${defaultPressureUnit}" pressure-unit
    verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
 }
 
@@ -183,7 +229,7 @@ formatSpeed() {
 }
 
 verifySpeedUnit() {
-   [ -n "${speedUnit}" ] || speedUnit="${defaultSpeedUnit}"
+   initializeSetting speedUnit "${defaultSpeedUnit}" speed-unit
    verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
 }
 
@@ -195,7 +241,7 @@ formatTemperature() {
 }
 
 verifyTemperatureUnit() {
-   [ -n "${temperatureUnit}" ] || temperatureUnit="${defaultTemperatureUnit}"
+   initializeSetting temperatureUnit "${defaultTemperatureUnit}" temperature-unit
    verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
 }
 
@@ -259,11 +305,9 @@ owmQuery() {
    local owmName="${1}-${3}"
    "${owmSaveResponses}" && jq . <<<"${owmResponse}" >"${programName}.${owmName}.json"
 
-   local jqComponent="${owmName}.jq"
    local jqPath
-
-   findProgramComponent jqPath "${jqComponent}" || {
-      semanticError "program component not found: ${jqComponent}"
+   findProgramComponent jqPath "${owmName}" jq || {
+      semanticError "response interpreter not found: ${owmName}"
    }
 
    local jqOptions=(--from-file "${jqPath}")
@@ -536,7 +580,7 @@ performQuery_location() {
 showWeather() {
    local weatherArray="${1}"
 
-   local timeFormat="%H:%M, %A, %B %e"
+   local timeFormat="${timeFormats["${clockMode}"]}, %A, %B %e"
    local lines=() line
 
    local time offset
@@ -564,7 +608,7 @@ showWeather() {
 
    local windSpeed windDegrees windDirection
    getElement windSpeed "${weatherArray}" "wind,speed"
-   getElement windDegrees "${weatherArray}" "wind,direction"
+   getElement windDegrees "${weatherArray}" "wind,degrees"
    formatSpeed windSpeed
    toWindDirection windDirection "${windDegrees}"
    printf -v line "wind: %s from the %s (%d°)" "${windSpeed}" "${windDirection}" "${windDegrees}"
@@ -574,7 +618,7 @@ showWeather() {
    getElement humidity "${weatherArray}" "humidity"
    getElement pressure "${weatherArray}" "pressure"
    formatPressure pressure
-   printf -v line "%d%% humidity, %s pressure" "${humidity}" "${pressure}"
+   printf -v line "%d%% humidity, pressure is %s" "${humidity}" "${pressure}"
    lines+=("${line}")
 
    local clouds visibility
@@ -611,15 +655,28 @@ performQuery_weather() {
 }
 
 addProgramOption c string.city cityDescriptor "the specification of a city - see below"
+addProgramOption u flag saveUnits "save the units"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
 
-verifyChoice "query type" queryType city location forecast weather
+restorePersistentProgramSettins
+verifyClockMode
 verifyDistanceUnit
 verifyPressureUnit
 verifySpeedUnit
 verifyTemperatureUnit
 
+"${saveUnits}" && {
+   changePersistentProgramSetting "clock-mode" "${clockMode}"
+   changePersistentProgramSetting "distance-unit" "${distanceUnit}"
+   changePersistentProgramSetting "pressure-unit" "${pressureUnit}"
+   changePersistentProgramSetting "speed-unit" "${speedUnit}"
+   changePersistentProgramSetting "temperature-unit" "${temperatureUnit}"
+}
+
+verifyChoice "query type" queryType city location forecast weather
 "performQuery_${queryType}"
+
+savePersistentProgramSettins
 exit 0
