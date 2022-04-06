@@ -175,6 +175,16 @@ initializeSetting() {
    }
 }
 
+formatTime() {
+   local variable="${1}"
+
+   local text
+   printf -v text "%(${timeFormat})T" "${!variable}"
+   text="${text//+( )/ }"
+
+   setVariable "${variable}" "${text}"
+}
+
 verifyClockMode() {
    initializeSetting clockMode "${defaultClockMode}" clock-mode
    verifyChoice "clock mode" clockMode "${clockModes[@]}"
@@ -600,7 +610,8 @@ showWeather() {
    local time offset
    getElement time "${weatherArray}" "time"
    getElement offset "${weatherArray}" "time,offset"
-   printf -v line "as at %(${timeFormat})T" "${time}"
+   formatTime time
+   printf -v line "as at %s" "${time}"
    lines+=("${line}")
 
    local name description general
