@@ -307,7 +307,7 @@ owmQuery() {
 
    local jqPath
    findProgramComponent jqPath "${owmName}" jq || {
-      semanticError "response interpreter not found: ${owmName}"
+      semanticError "API response parser not found: ${owmName}"
    }
 
    local jqOptions=(--from-file "${jqPath}")
@@ -402,8 +402,13 @@ processExtraProgramParameters() {
    queryArguments=("${@}")
 }
 
+haveMoreQueryArguments() {
+   [ "${#queryArguments[*]}" -gt 0 ] || return 1
+   return 0
+}
+
 noMoreQueryArguments() {
-   [ "${#queryArguments[*]}" -eq 0 ] || syntaxError "too many ${queryType} arguments"
+   haveMoreQueryArguments && syntaxError "too many ${queryType} arguments"
 }
 
 getQueryArgument() {
@@ -507,17 +512,26 @@ getLongitudeArgument() {
    setVariable "${resultVariable}" "${coordinate}"
 }
 
-getCoordinatesArguments() {
+getLocation() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
 
    if [ -n "${cityDescriptor}" ]
    then
       getCityCoordinates "${latitudeVariable}" "${longitudeVariable}" "${cityDescriptor}"
-   else
+   elif haveMoreQueryArguments
+   then
       getLatitudeArgument "${latitudeVariable}"
       getLongitudeArgument "${longitudeVariable}"
+   else
+      getPersistentProgramSetting "${latitudeVariable}" latitude
+      getPersistentProgramSetting "${longitudeVariable}" longitude
    fi
+
+   [ "${saveLocation}" ] && {
+      changePersistentProgramSetting "latitude" "${!latitudeVariable}"
+      changePersistentProgramSetting "longitude" "${!longitudeVariable}"
+   }
 }
 
 showLines() {
@@ -569,7 +583,7 @@ performQuery_city() {
 
 performQuery_location() {
    local latitude longitude
-   getCoordinatesArguments latitude longitude
+   getLocation latitude longitude
    noMoreQueryArguments
 
    local -A locations=()
@@ -637,7 +651,7 @@ showWeather() {
 
 performQuery_forecast() {
    local latitude longitude
-   getCoordinatesArguments latitude longitude
+   getLocation latitude longitude
    noMoreQueryArguments
 
    local -A forecast=()
@@ -646,7 +660,7 @@ performQuery_forecast() {
 
 performQuery_weather() {
    local latitude longitude
-   getCoordinatesArguments latitude longitude
+   getLocation latitude longitude
    noMoreQueryArguments
 
    local -A weather=()
@@ -655,7 +669,8 @@ performQuery_weather() {
 }
 
 addProgramOption c string.city cityDescriptor "the specification of a city - see below"
-addProgramOption u flag saveUnits "save the units"
+addProgramOption l flag saveLocation "save the specified location"
+addProgramOption u flag saveUnits "save the specified units"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
@@ -668,11 +683,11 @@ verifySpeedUnit
 verifyTemperatureUnit
 
 "${saveUnits}" && {
-   changePersistentProgramSetting "clock-mode" "${clockMode}"
-   changePersistentProgramSetting "distance-unit" "${distanceUnit}"
-   changePersistentProgramSetting "pressure-unit" "${pressureUnit}"
-   changePersistentProgramSetting "speed-unit" "${speedUnit}"
-   changePersistentProgramSetting "temperature-unit" "${temperatureUnit}"
+   changePersistentProgramSetting clock-mode "${clockMode}"
+   changePersistentProgramSetting distance-unit "${distanceUnit}"
+   changePersistentProgramSetting pressure-unit "${pressureUnit}"
+   changePersistentProgramSetting speed-unit "${speedUnit}"
+   changePersistentProgramSetting temperature-unit "${temperatureUnit}"
 }
 
 verifyChoice "query type" queryType city location forecast weather
