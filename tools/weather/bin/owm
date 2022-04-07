@@ -55,6 +55,7 @@ parseCoordinate() {
    return 0
 }
 
+readonly latitudeSetting="latitude"
 readonly latitudePositiveSuffix="N"
 readonly latitudeNegativeSuffix="S"
 
@@ -65,6 +66,7 @@ parseLatitude() {
    return 0
 }
 
+readonly longitudeSetting="longitude"
 readonly longitudePositiveSuffix="E"
 readonly longitudeNegativeSuffix="W"
 
@@ -74,31 +76,6 @@ parseLongitude() {
    parseCoordinate "${longitudeVariable}" 180 "${longitudePositiveSuffix}" "${longitudeNegativeSuffix}" || return 1
    return 0
 }
-
-readonly clockModes=(24hours 12hours)
-readonly defaultClockMode="${clockModes[0]}"
-addProgramOption C string.mode clockMode "the clock mode to display time in (${clockModes[*]})" "${defaultClockMode}"
-
-readonly -A timeFormats=(
-  24hours "%H:%M"
-  12hours "%l:%M%p"
-)
-
-readonly distanceUnits=(m km ft mi)
-readonly defaultDistanceUnit="${distanceUnits[0]}"
-addProgramOption D string.unit distanceUnit "the unit to display visibility in (${distanceUnits[*]})" "${defaultDistanceUnit}"
-
-readonly pressureUnits=(hpa kpa mb inHg)
-readonly defaultPressureUnit="${pressureUnits[0]}"
-addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${pressureUnits[*]})" "${defaultPressureUnit}"
-
-readonly speedUnits=(m/s km/hr mph)
-readonly defaultSpeedUnit="${speedUnits[0]}"
-addProgramOption S string.unit speedUnit "the unit to display wind speed in (${speedUnits[*]})" "${defaultSpeedUnit}"
-
-readonly temperatureUnits=(C F K R)
-readonly defaultTemperatureUnit="${temperatureUnits[0]}"
-addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${temperatureUnits[*]})" "${defaultTemperatureUnit}"
 
 convertUnit() {
    local resultVariable="${1}"
@@ -161,7 +138,37 @@ formatComplexUnit() {
    setVariable "${variable}" "${value}${toUnit}"
 }
 
-initializeSetting() {
+readonly clockModes=(24hours 12hours)
+readonly defaultClockMode="${clockModes[0]}"
+readonly clockModeSetting="clock-mode"
+addProgramOption C string.mode clockMode "the clock mode to display time in (${clockModes[*]})" "${defaultClockMode}"
+
+readonly -A timeFormats=(
+  24hours "%H:%M"
+  12hours "%l:%M%p"
+)
+
+readonly distanceUnits=(m km ft mi)
+readonly defaultDistanceUnit="${distanceUnits[0]}"
+readonly distanceUnitSetting="distance-unit"
+addProgramOption D string.unit distanceUnit "the unit to display visibility in (${distanceUnits[*]})" "${defaultDistanceUnit}"
+
+readonly pressureUnits=(hpa kpa mb inHg)
+readonly defaultPressureUnit="${pressureUnits[0]}"
+readonly pressureUnitSetting="pressure-unit"
+addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${pressureUnits[*]})" "${defaultPressureUnit}"
+
+readonly speedUnits=(m/s km/hr mph)
+readonly defaultSpeedUnit="${speedUnits[0]}"
+readonly speedUnitSetting="speed-unit"
+addProgramOption S string.unit speedUnit "the unit to display wind speed in (${speedUnits[*]})" "${defaultSpeedUnit}"
+
+readonly temperatureUnits=(C F K R)
+readonly defaultTemperatureUnit="${temperatureUnits[0]}"
+readonly temperatureUnitSetting="temperature-unit"
+addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${temperatureUnits[*]})" "${defaultTemperatureUnit}"
+
+getSetting() {
    local -n value="${1}"
    local default="${2}"
    local setting="${3}"
@@ -175,6 +182,31 @@ initializeSetting() {
    }
 }
 
+verifyClockMode() {
+   getSetting clockMode "${defaultClockMode}" "${clockModeSetting}"
+   verifyChoice "clock mode" clockMode "${clockModes[@]}"
+}
+
+verifyDistanceUnit() {
+   getSetting distanceUnit "${defaultDistanceUnit}" "${distanceUnitSetting}"
+   verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
+}
+
+verifyPressureUnit() {
+   getSetting pressureUnit "${defaultPressureUnit}" "${pressureUnitSetting}"
+   verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
+}
+
+verifySpeedUnit() {
+   getSetting speedUnit "${defaultSpeedUnit}" "${speedUnitSetting}"
+   verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
+}
+
+verifyTemperatureUnit() {
+   getSetting temperatureUnit "${defaultTemperatureUnit}" "${temperatureUnitSetting}"
+   verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
+}
+
 formatTime() {
    local variable="${1}"
 
@@ -183,11 +215,6 @@ formatTime() {
    text="${text//+( )/ }"
 
    setVariable "${variable}" "${text}"
-}
-
-verifyClockMode() {
-   initializeSetting clockMode "${defaultClockMode}" clock-mode
-   verifyChoice "clock mode" clockMode "${clockModes[@]}"
 }
 
 formatDistance() {
@@ -214,21 +241,11 @@ formatDistance() {
    setVariable "${variable}" "${value}${unit}"
 }
 
-verifyDistanceUnit() {
-   initializeSetting distanceUnit "${defaultDistanceUnit}" distance-unit
-   verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
-}
-
 formatPressure() {
    local variable="${1}"
    local precision="${2}"
 
    formatSimpleUnit "${variable}" "${defaultPressureUnit}" "${pressureUnit}" "${precision:-1}"
-}
-
-verifyPressureUnit() {
-   initializeSetting pressureUnit "${defaultPressureUnit}" pressure-unit
-   verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
 }
 
 formatSpeed() {
@@ -238,21 +255,11 @@ formatSpeed() {
    formatSimpleUnit "${variable}" "${defaultSpeedUnit}" "${speedUnit}" "${precision}"
 }
 
-verifySpeedUnit() {
-   initializeSetting speedUnit "${defaultSpeedUnit}" speed-unit
-   verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
-}
-
 formatTemperature() {
    local variable="${1}"
    local precision="${2}"
 
    formatComplexUnit "${variable}" "${defaultTemperatureUnit}" "${temperatureUnit}" temp "${precision}"
-}
-
-verifyTemperatureUnit() {
-   initializeSetting temperatureUnit "${defaultTemperatureUnit}" temperature-unit
-   verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
 }
 
 addProgramOption k string.key owmKeyValue "the key for the application performing the query" "the first line in the key file"
@@ -336,19 +343,19 @@ owmQuery() {
   #listElements "${resultArray}"
 }
 
-owmQueryCity() {
-   local citiesArray="${1}"
-   local city="${2}"
+owmQueryLocation() {
+   local locationsArray="${1}"
+   local name="${2}"
 
    local -A parameters=(
-      q "${city}"
+      q "${name}"
       limit 5
    )
 
-   owmQuery "${citiesArray}" parameters geo 1.0 direct
+   owmQuery "${locationsArray}" parameters geo 1.0 direct
 }
 
-owmQueryLocation() {
+owmQueryCoordinates() {
    local locationsArray="${1}"
    local latitude="${2}"
    local longitude="${3}"
@@ -394,13 +401,13 @@ showProgramUsageNotes() {
 cat <<END_OF_PROGRAM_USAGE_NOTES
 
 Queries:
-  city [name]
-  location [latitude longitude]
+  location [name]
+  coordinates [latitude longitude]
   forecast [latitude longitude]
   weather [latitude longitude]
 
-The -c option may be used to specify a city in lieu of its identifying arguments.
-A city is specified as name[[,state],country] - the name may be abbreviated.
+The -l option may be used to specify a location in lieu of its coordinates.
+A location is specified as name[[,state],country] - the name may be abbreviated.
 The optional two-letter ISO 3166 country code must be last.
 The optional two-letter state code only applies to the United States.
 END_OF_PROGRAM_USAGE_NOTES
@@ -432,9 +439,9 @@ getQueryArgument() {
    queryArguments=("${@}")
 }
 
-getCityName() {
+makeLocationName() {
    local nameVariable="${1}"
-   local citiesArray="${2}"
+   local locationsArray="${2}"
    local index="${3}"
 
    local name=""
@@ -443,7 +450,7 @@ getCityName() {
    for field in name region country
    do
       local value
-      getElement value "${citiesArray}" "${index},${field}"
+      getElement value "${locationsArray}" "${index},${field}"
       [ -n "${value}" ] || continue
 
       [  -n "${name}" ] && name+=", "
@@ -453,46 +460,46 @@ getCityName() {
    setVariable "${nameVariable}" "${name}"
 }
 
-getCityCoordinates() {
+getLocationCoordinates() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
-   local city="${3}"
+   local name="${3}"
 
-   local -A cities=()
-   owmQueryCity cities "${city}"
-   local cityCount="${cities["count"]}"
+   local -A locations=()
+   owmQueryLocation locations "${name}"
+   local locationCount="${locations["count"]}"
 
-   if [ "${cityCount}" -eq 1 ]
+   if [ "${locationCount}" -eq 1 ]
    then
-      local cityName
-      getCityName cityName cities 0
+      local locationName
+      makeLocationName locationName locations 0
 
-      local cityLatitude="${cities["0,latitude"]}"
-      [ -n "${cityLatitude}" ] || semanticError "city latitude not known: ${cityName}"
-      setVariable "${latitudeVariable}" "${cityLatitude}"
+      local locationLatitude="${locations["0,latitude"]}"
+      [ -n "${locationLatitude}" ] || semanticError "latitude not known: ${locationName}"
+      setVariable "${latitudeVariable}" "${locationLatitude}"
 
-      local cityLongitude="${cities["0,longitude"]}"
-      [ -n "${cityLongitude}" ] || semanticError "city longitude not known: ${cityName}"
-      setVariable "${longitudeVariable}" "${cityLongitude}"
-   elif [ "${cityCount}" -eq 0 ]
+      local locationLongitude="${locations["0,longitude"]}"
+      [ -n "${locationLongitude}" ] || semanticError "longitude not known: ${locationName}"
+      setVariable "${longitudeVariable}" "${locationLongitude}"
+   elif [ "${locationCount}" -eq 0 ]
    then
-      semanticError "city not found: ${city}"
+      semanticError "location not found: ${name}"
    else
-      local cityNames=""
-      local cityIndex=0
+      local locationNames=""
+      local locationIndex=0
 
-      while [ "${cityIndex}" -lt "${cityCount}" ]
+      while [ "${locationIndex}" -lt "${locationCount}" ]
       do
-         local cityName
-         getCityName cityName cities "${cityIndex}"
+         local locationName
+         makeLocationName locationName locations "${locationIndex}"
 
-         [ -n "${cityNames}" ] && cityNames+="; "
-         cityNames+="${cityName}"
+         [ -n "${locationNames}" ] && locationNames+="; "
+         locationNames+="${locationName}"
 
-         let "cityIndex += 1"
+         let "locationIndex += 1"
       done
 
-      semanticError "more than one city: ${cityNames}"
+      semanticError "more than one location: ${locationNames}"
    fi
 }
 
@@ -526,21 +533,21 @@ getLocation() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
 
-   if [ -n "${cityDescriptor}" ]
+   if [ -n "${locationName}" ]
    then
-      getCityCoordinates "${latitudeVariable}" "${longitudeVariable}" "${cityDescriptor}"
+      getLocationCoordinates "${latitudeVariable}" "${longitudeVariable}" "${locationName}"
    elif haveMoreQueryArguments
    then
       getLatitudeArgument "${latitudeVariable}"
       getLongitudeArgument "${longitudeVariable}"
    else
-      getPersistentProgramSetting "${latitudeVariable}" latitude
-      getPersistentProgramSetting "${longitudeVariable}" longitude
+      getPersistentProgramSetting "${latitudeVariable}" "${latitudeSetting}"
+      getPersistentProgramSetting "${longitudeVariable}" "${longitudeSetting}"
    fi
 
-   [ "${saveLocation}" ] && {
-      changePersistentProgramSetting "latitude" "${!latitudeVariable}"
-      changePersistentProgramSetting "longitude" "${!longitudeVariable}"
+   "${saveLocation}" && {
+      changePersistentProgramSetting "${latitudeSetting}" "${!latitudeVariable}"
+      changePersistentProgramSetting "${longitudeSetting}" "${!longitudeVariable}"
    }
 }
 
@@ -556,49 +563,58 @@ showLines() {
    echo -n "${text}"
 }
 
-showCities() {
-   local citiesArray="${1}"
-   local cityIdentifier="${2}"
+showLocations() {
+   local locationsArray="${1}"
+   local name="${2}"
 
-   local cityCount
-   getElement cityCount "${citiesArray}" "count"
+   local locationCount
+   getElement locationCount "${locationsArray}" "count"
 
-   [ "${cityCount}" -gt 0 ] || semanticError "city not found: ${cityIdentifier}"
-   local cityIndex=0
+   [ "${locationCount}" -gt 0 ] || semanticError "location not found: ${name}"
+   local locationIndex=0
 
-   while [ "${cityIndex}" -lt "${cityCount}" ]
+   while [ "${locationIndex}" -lt "${locationCount}" ]
    do
-      local cityName
-      getCityName cityName "${citiesArray}" "${cityIndex}"
+      local locationName
+      makeLocationName locationName "${locationsArray}" "${locationIndex}"
 
-      local cityLatitude
-      getElement cityLatitude "${citiesArray}" "${cityIndex},latitude"
+      local locationLatitude
+      getElement locationLatitude "${locationsArray}" "${locationIndex},latitude"
 
-      local cityLongitude
-      getElement cityLongitude "${citiesArray}" "${cityIndex},longitude"
+      local locationLongitude
+      getElement locationLongitude "${locationsArray}" "${locationIndex},longitude"
 
-      echo "${cityName}: ${cityLatitude} ${cityLongitude}"
-      let "cityIndex += 1"
+      echo "${locationName}: ${locationLatitude} ${locationLongitude}"
+      let "locationIndex += 1"
    done
 }
 
-performQuery_city() {
-   [ -n "${cityDescriptor}" ] || getQueryArgument cityDescriptor "city"
+performQuery_location() {
+   [ -n "${locationName}" ] || getQueryArgument locationName "location"
    noMoreQueryArguments
 
-   local -A cities=()
-   owmQueryCity cities "${cityDescriptor}"
-   showCities cities "${cityDescriptor}"
+   local -A locations=()
+   owmQueryLocation locations "${locationName}"
+   showLocations locations "${locationName}"
 }
 
-performQuery_location() {
+performQuery_coordinates() {
    local latitude longitude
    getLocation latitude longitude
    noMoreQueryArguments
 
    local -A locations=()
-   owmQueryLocation locations "${latitude}" "${longitude}"
-   showCities locations "[${latitude}, ${longitude}]"
+   owmQueryCoordinates locations "${latitude}" "${longitude}"
+   showLocations locations "[${latitude}, ${longitude}]"
+}
+
+performQuery_forecast() {
+   local latitude longitude
+   getLocation latitude longitude
+   noMoreQueryArguments
+
+   local -A forecast=()
+   owmQueryForecast forecast "${latitude}" "${longitude}"
 }
 
 showWeather() {
@@ -615,7 +631,7 @@ showWeather() {
    lines+=("${line}")
 
    local name description general
-   getElement name "${weatherArray}" "place,name"
+   getElement name "${weatherArray}" "location,name"
    getElement description "${weatherArray}" "weather,description"
    getElement general "${weatherArray}" "weather,general"
    [ -n "${description}" ] || description="${general}"
@@ -660,15 +676,6 @@ showWeather() {
    showLines "${lines[@]}"
 }
 
-performQuery_forecast() {
-   local latitude longitude
-   getLocation latitude longitude
-   noMoreQueryArguments
-
-   local -A forecast=()
-   owmQueryForecast forecast "${latitude}" "${longitude}"
-}
-
 performQuery_weather() {
    local latitude longitude
    getLocation latitude longitude
@@ -679,9 +686,9 @@ performQuery_weather() {
    showWeather weather
 }
 
-addProgramOption c string.city cityDescriptor "the specification of a city - see below"
-addProgramOption l flag saveLocation "save the specified location"
-addProgramOption u flag saveUnits "save the specified units"
+addProgramOption l string.location locationName "the name of a location (see below)"
+addProgramOption L flag saveLocation "save the specified location"
+addProgramOption U flag saveUnits "save the specified units"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
@@ -694,14 +701,14 @@ verifySpeedUnit
 verifyTemperatureUnit
 
 "${saveUnits}" && {
-   changePersistentProgramSetting clock-mode "${clockMode}"
-   changePersistentProgramSetting distance-unit "${distanceUnit}"
-   changePersistentProgramSetting pressure-unit "${pressureUnit}"
-   changePersistentProgramSetting speed-unit "${speedUnit}"
-   changePersistentProgramSetting temperature-unit "${temperatureUnit}"
+   changePersistentProgramSetting "${clockModeSetting}" "${clockMode}"
+   changePersistentProgramSetting "${distanceUnitSetting}" "${distanceUnit}"
+   changePersistentProgramSetting "${pressureUnitSetting}" "${pressureUnit}"
+   changePersistentProgramSetting "${speedUnitSetting}" "${speedUnit}"
+   changePersistentProgramSetting "${temperatureUnitSetting}" "${temperatureUnit}"
 }
 
-verifyChoice "query type" queryType city location forecast weather
+verifyChoice "query type" queryType location coordinates forecast weather
 "performQuery_${queryType}"
 
 savePersistentProgramSettins

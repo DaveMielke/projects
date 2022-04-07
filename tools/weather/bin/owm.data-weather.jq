@@ -27,11 +27,11 @@
 
 (
   .coord |
-    ("place,latitude \(.lat)"),
-    ("place,longitude \(.lon)")
+    ("location,latitude \(.lat)"),
+    ("location,longitude \(.lon)")
 ),
 
 ("visibility \(.visibility)"),
 ("time \(.dt)"),
 ("time,offset \(.timezone)"),
-("place,name \(.name)")
+("location,name \(.name)")
