@@ -1,268 +1,14 @@
 #!/bin/bash
 . brltty-prologue.bash
+includeProgramComponent weather
 shopt -s extglob
 
-readonly windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
-toWindDirection() {
-   local directionVariable="${1}"
-   local degrees="${2}"
+readonly owmDistanceUnit="m"
+readonly owmPressureUnit="hpa"
+readonly owmSpeedUnit="m/s"
+readonly owmTemperatureUnit="C"
 
-   local direction=$(( ((((degrees * 4) + 45) % 1440) / 90) ))
-   direction="${windDirections[direction]}"
-   setVariable "${directionVariable}" "${direction}"
-}
-
-parseCoordinate() {
-   local valueVariable="${1}"
-   local maximumValue="${2}"
-   local positiveSuffix="${3}"
-   local negativeSuffix="${4}"
-
-   local value="${!valueVariable}"
-   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
-
-   [[ "${value}" =~ ${pattern} ]] || return 1
-   local sign="${BASH_REMATCH[1]}"
-   local integer="${BASH_REMATCH[2]}"
-   local fraction="${BASH_REMATCH[3]}"
-   local suffix="${BASH_REMATCH[4]}"
-
-   if [ "${integer}" -eq "${maximumValue}" ]
-   then
-      fraction="${fraction##.*(0)}"
-      [ -n "${fraction}" ] && return 1
-   elif [ "${integer}" -gt "${maximumValue}" ]
-   then
-      return 1
-   fi
-
-   local negativeSign=false
-   [ "${sign}" = "-" ] && negativeSign=true
-
-   [ -n "${suffix}" ] && {
-      if [ "${suffix}" = "${negativeSuffix}" ]
-      then
-         "${negativeSign}" && negativeSign=false || negativeSign=true
-      elif [ "${suffix}" != "${positiveSuffix}" ]
-      then
-         return 1
-      fi
-   }
-
-   value="${integer:-0}${fraction}"
-   "${negativeSign}" && value="-${value}"
-   setVariable "${valueVariable}" "${value}"
-   return 0
-}
-
-readonly latitudeSetting="latitude"
-readonly latitudePositiveSuffix="N"
-readonly latitudeNegativeSuffix="S"
-
-parseLatitude() {
-   local latitudeVariable="${1}"
-
-   parseCoordinate "${latitudeVariable}" 90 "${latitudePositiveSuffix}" "${latitudeNegativeSuffix}" || return 1
-   return 0
-}
-
-readonly longitudeSetting="longitude"
-readonly longitudePositiveSuffix="E"
-readonly longitudeNegativeSuffix="W"
-
-parseLongitude() {
-   local longitudeVariable="${1}"
-
-   parseCoordinate "${longitudeVariable}" 180 "${longitudePositiveSuffix}" "${longitudeNegativeSuffix}" || return 1
-   return 0
-}
-
-convertUnit() {
-   local resultVariable="${1}"
-   local from="${2}"
-   local to="${3}"
-   local precision="${4}"
-
-   local toValue
-   setVariable toValue "$(units --terse --output-format "%.${precision:-0}f" "${from}" "${to}")"
-
-   [ "${toValue}" = "${toValue%.*}" ] || {
-      toValue="${toValue%%*(0)}"
-      toValue="${toValue%.}"
-   }
-
-   setVariable "${resultVariable}" "${toValue}"
-}
-
-convertSimpleUnit() {
-   local resultVariable="${1}"
-   local fromValue="${2}"
-   local fromUnit="${3}"
-   local toUnit="${4}"
-   local precision="${5}"
-
-   convertUnit "${resultVariable}" "${fromValue}${fromUnit}" "${toUnit}" "${precision}"
-}
-
-formatSimpleUnit() {
-   local variable="${1}"
-   local fromUnit="${2}"
-   local toUnit="${3}"
-   local precision="${4}"
-
-   local value="${!variable}"
-   convertSimpleUnit value "${value}" "${fromUnit}" "${toUnit}" "${precision}"
-   setVariable "${variable}" "${value}${toUnit}"
-}
-
-convertComplexUnit() {
-   local resultVariable="${1}"
-   local fromValue="${2}"
-   local fromUnit="${3}"
-   local toUnit="${4}"
-   local unitType="${5}"
-   local precision="${6}"
-
-   convertUnit "${resultVariable}" "${unitType}${fromUnit}(${fromValue})" "${unitType}${toUnit}" "${precision}"
-}
-
-formatComplexUnit() {
-   local variable="${1}"
-   local fromUnit="${2}"
-   local toUnit="${3}"
-   local unitType="${4}"
-   local precision="${5}"
-
-   local value="${!variable}"
-   convertComplexUnit value "${value}" "${fromUnit}" "${toUnit}" "${unitType}" "${precision}"
-   setVariable "${variable}" "${value}${toUnit}"
-}
-
-readonly clockModes=(24hours 12hours)
-readonly defaultClockMode="${clockModes[0]}"
-readonly clockModeSetting="clock-mode"
-addProgramOption C string.mode clockMode "the clock mode to display time in (${clockModes[*]})" "${defaultClockMode}"
-
-readonly -A timeFormats=(
-  24hours "%H:%M"
-  12hours "%l:%M%p"
-)
-
-readonly distanceUnits=(m km ft mi)
-readonly defaultDistanceUnit="${distanceUnits[0]}"
-readonly distanceUnitSetting="distance-unit"
-addProgramOption D string.unit distanceUnit "the unit to display visibility in (${distanceUnits[*]})" "${defaultDistanceUnit}"
-
-readonly pressureUnits=(hpa kpa mb inHg)
-readonly defaultPressureUnit="${pressureUnits[0]}"
-readonly pressureUnitSetting="pressure-unit"
-addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${pressureUnits[*]})" "${defaultPressureUnit}"
-
-readonly speedUnits=(m/s km/hr mph)
-readonly defaultSpeedUnit="${speedUnits[0]}"
-readonly speedUnitSetting="speed-unit"
-addProgramOption S string.unit speedUnit "the unit to display wind speed in (${speedUnits[*]})" "${defaultSpeedUnit}"
-
-readonly temperatureUnits=(C F K R)
-readonly defaultTemperatureUnit="${temperatureUnits[0]}"
-readonly temperatureUnitSetting="temperature-unit"
-addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${temperatureUnits[*]})" "${defaultTemperatureUnit}"
-
-getSetting() {
-   local -n value="${1}"
-   local default="${2}"
-   local setting="${3}"
-
-   [ -n "${value}" ] || {
-      getPersistentProgramSetting value "${setting}"
-
-      [ -n "${value}" ] || {
-         value="${default}"
-      }
-   }
-}
-
-verifyClockMode() {
-   getSetting clockMode "${defaultClockMode}" "${clockModeSetting}"
-   verifyChoice "clock mode" clockMode "${clockModes[@]}"
-}
-
-verifyDistanceUnit() {
-   getSetting distanceUnit "${defaultDistanceUnit}" "${distanceUnitSetting}"
-   verifyChoice "distance unit" distanceUnit "${distanceUnits[@]}"
-}
-
-verifyPressureUnit() {
-   getSetting pressureUnit "${defaultPressureUnit}" "${pressureUnitSetting}"
-   verifyChoice "pressure unit" pressureUnit "${pressureUnits[@]}"
-}
-
-verifySpeedUnit() {
-   getSetting speedUnit "${defaultSpeedUnit}" "${speedUnitSetting}"
-   verifyChoice "speed unit" speedUnit "${speedUnits[@]}"
-}
-
-verifyTemperatureUnit() {
-   getSetting temperatureUnit "${defaultTemperatureUnit}" "${temperatureUnitSetting}"
-   verifyChoice "temperature unit" temperatureUnit "${temperatureUnits[@]}"
-}
-
-formatTime() {
-   local variable="${1}"
-
-   local text
-   printf -v text "%(${timeFormat})T" "${!variable}"
-   text="${text//+( )/ }"
-
-   setVariable "${variable}" "${text}"
-}
-
-formatDistance() {
-   local variable="${1}"
-   local precision="${2}"
-
-   local value unit="${distanceUnit}"
-   convertSimpleUnit value "${!variable}" "${defaultDistanceUnit}" "${unit}" "${precision:-1}"
-
-   [ "${value}" = "0" ] && {
-      [ -n "${precision}" ] || {
-         case "${unit}"
-         in
-            k*) unit="${unit#?}";;
-            mi) unit="ft";;
-         esac
-
-         [ "${unit}" = "${distanceUnit}" ] || {
-            convertSimpleUnit value "${!variable}" "${defaultDistanceUnit}" "${unit}" "${precision}"
-         }
-      }
-   }
-
-   setVariable "${variable}" "${value}${unit}"
-}
-
-formatPressure() {
-   local variable="${1}"
-   local precision="${2}"
-
-   formatSimpleUnit "${variable}" "${defaultPressureUnit}" "${pressureUnit}" "${precision:-1}"
-}
-
-formatSpeed() {
-   local variable="${1}"
-   local precision="${2}"
-
-   formatSimpleUnit "${variable}" "${defaultSpeedUnit}" "${speedUnit}" "${precision}"
-}
-
-formatTemperature() {
-   local variable="${1}"
-   local precision="${2}"
-
-   formatComplexUnit "${variable}" "${defaultTemperatureUnit}" "${temperatureUnit}" temp "${precision}"
-}
-
-addProgramOption k string.key owmKeyValue "the key for the application performing the query" "the first line in the key file"
+addProgramOption k string.key owmKeyValue "the application key for Open Weather Map" "the first line in the key file"
 addProgramOption K string.path owmKeyFile "the file containing the application key"
 addProgramOption R flag owmSaveResponses "save the Open Weather Map API responses"
 
@@ -395,6 +141,165 @@ owmQueryWeather() {
    )
 
    owmQuery "${WeatherArray}" parameters data 2.5 weather
+}
+
+parseCoordinate() {
+   local valueVariable="${1}"
+   local maximumValue="${2}"
+   local positiveLetter="${3}"
+   local negativeLetter="${4}"
+
+   local value="${!valueVariable}"
+   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
+
+   [[ "${value}" =~ ${pattern} ]] || return 1
+   local sign="${BASH_REMATCH[1]}"
+   local integer="${BASH_REMATCH[2]}"
+   local fraction="${BASH_REMATCH[3]}"
+   local letter="${BASH_REMATCH[4]}"
+
+   if [ "${integer}" -eq "${maximumValue}" ]
+   then
+      fraction="${fraction##.*(0)}"
+      [ -n "${fraction}" ] && return 1
+   elif [ "${integer}" -gt "${maximumValue}" ]
+   then
+      return 1
+   fi
+
+   local negativeSign=false
+   [ "${sign}" = "-" ] && negativeSign=true
+
+   [ -n "${letter}" ] && {
+      if [ "${letter}" = "${negativeLetter}" ]
+      then
+         "${negativeSign}" && negativeSign=false || negativeSign=true
+      elif [ "${letter}" != "${positiveLetter}" ]
+      then
+         return 1
+      fi
+   }
+
+   value="${integer:-0}${fraction}"
+   "${negativeSign}" && value="-${value}"
+   setVariable "${valueVariable}" "${value}"
+   return 0
+}
+
+parseLatitude() {
+   local latitudeVariable="${1}"
+
+   parseCoordinate "${latitudeVariable}" 90 "${latitudePositiveLetter}" "${latitudeNegativeLetter}" || return 1
+   return 0
+}
+
+parseLongitude() {
+   local longitudeVariable="${1}"
+
+   parseCoordinate "${longitudeVariable}" 180 "${longitudePositiveLetter}" "${longitudeNegativeLetter}" || return 1
+   return 0
+}
+
+readonly defaultTimeFormat="24-hours"
+addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
+
+addProgramOption D string.unit distanceUnit "the unit to display visibility in (${!distanceUnits[*]})" "${owmDistanceUnit}"
+addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${!pressureUnits[*]})" "${owmPressureUnit}"
+addProgramOption S string.unit speedUnit "the unit to display wind speed in (${!speedUnits[*]})" "${owmSpeedUnit}"
+addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${!temperatureUnits[*]})" "${owmTemperatureUnit}"
+
+getSetting() {
+   local -n value="${1}"
+   local default="${2}"
+   local setting="${3}"
+
+   [ -n "${value}" ] || {
+      getPersistentProgramSetting value "${setting}"
+
+      [ -n "${value}" ] || {
+         value="${default}"
+      }
+   }
+}
+
+verifyTimeFormat() {
+   getSetting timeFormat "${defaultTimeFormat}" "${timeFormatSetting}"
+   verifyChoice "clock mode" timeFormat "${!timeFormats[@]}"
+}
+
+verifyDistanceUnit() {
+   getSetting distanceUnit "${owmDistanceUnit}" "${distanceUnitSetting}"
+   verifyChoice "distance unit" distanceUnit "${!distanceUnits[@]}"
+}
+
+verifyPressureUnit() {
+   getSetting pressureUnit "${owmPressureUnit}" "${pressureUnitSetting}"
+   verifyChoice "pressure unit" pressureUnit "${!pressureUnits[@]}"
+}
+
+verifySpeedUnit() {
+   getSetting speedUnit "${owmSpeedUnit}" "${speedUnitSetting}"
+   verifyChoice "speed unit" speedUnit "${!speedUnits[@]}"
+}
+
+verifyTemperatureUnit() {
+   getSetting temperatureUnit "${owmTemperatureUnit}" "${temperatureUnitSetting}"
+   verifyChoice "temperature unit" temperatureUnit "${!temperatureUnits[@]}"
+}
+
+formatTime() {
+   local variable="${1}"
+
+   local text
+   printf -v text "%(${timeFormats["${timeFormat}"]}, %A, %B %e)T" "${!variable}"
+   text="${text//+( )/ }"
+
+   setVariable "${variable}" "${text# }"
+}
+
+formatDistance() {
+   local variable="${1}"
+   local precision="${2}"
+
+   local value unit="${distanceUnit}"
+   convertSimpleUnit value "${!variable}" "${owmDistanceUnit}" "${unit}" "${precision:-1}"
+
+   [ "${value}" = "0" ] && {
+      [ -n "${precision}" ] || {
+         case "${unit}"
+         in
+            k*) unit="${unit#?}";;
+            mi) unit="ft";;
+         esac
+
+         [ "${unit}" = "${distanceUnit}" ] || {
+            convertSimpleUnit value "${!variable}" "${owmDistanceUnit}" "${unit}" "${precision}"
+         }
+      }
+   }
+
+   setVariable "${variable}" "${value}${unit}"
+}
+
+formatPressure() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatSimpleUnit "${variable}" "${owmPressureUnit}" "${pressureUnit}" "${precision:-1}"
+}
+
+formatSpeed() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatSimpleUnit "${variable}" "${owmSpeedUnit}" "${speedUnit}" "${precision}"
+}
+
+formatTemperature() {
+   local variable="${1}"
+   local precision="${2}"
+
+   formatComplexUnit "${variable}" "${owmTemperatureUnit}" "${temperatureUnit}" temp "${precision}"
 }
 
 showProgramUsageNotes() {
@@ -631,7 +536,6 @@ performQuery_forecast() {
 showWeather() {
    local weatherArray="${1}"
 
-   local timeFormat="${timeFormats["${clockMode}"]}, %A, %B %e"
    local lines=() line
 
    local time offset
@@ -697,7 +601,7 @@ performQuery_weather() {
    showWeather weather
 }
 
-addProgramOption l string.location locationDescriptor "the name of a location (see Location Descriptors)"
+addProgramOption l string.location locationDescriptor "the descriptor for a location (see Location Descriptors)"
 addProgramOption L flag saveLocation "save the specified location"
 addProgramOption U flag saveUnits "save the specified units"
 addProgramParameter query queryType "the type of query to perform"
@@ -705,14 +609,14 @@ optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
 
 restorePersistentProgramSettins
-verifyClockMode
+verifyTimeFormat
 verifyDistanceUnit
 verifyPressureUnit
 verifySpeedUnit
 verifyTemperatureUnit
 
 "${saveUnits}" && {
-   changePersistentProgramSetting "${clockModeSetting}" "${clockMode}"
+   changePersistentProgramSetting "${timeFormatSetting}" "${timeFormat}"
    changePersistentProgramSetting "${distanceUnitSetting}" "${distanceUnit}"
    changePersistentProgramSetting "${pressureUnitSetting}" "${pressureUnit}"
    changePersistentProgramSetting "${speedUnitSetting}" "${speedUnit}"
