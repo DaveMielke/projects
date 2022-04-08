@@ -345,10 +345,10 @@ owmQuery() {
 
 owmQueryLocation() {
    local locationsArray="${1}"
-   local name="${2}"
+   local descriptor="${2}"
 
    local -A parameters=(
-      q "${name}"
+      q "${descriptor}"
       limit 5
    )
 
@@ -400,16 +400,27 @@ owmQueryWeather() {
 showProgramUsageNotes() {
 cat <<END_OF_PROGRAM_USAGE_NOTES
 
-Queries:
-  location [name]
+Queries (may be abbreviated):
+  location [descriptor]
   coordinates [latitude longitude]
   forecast [latitude longitude]
   weather [latitude longitude]
 
 The -l option may be used to specify a location in lieu of its coordinates.
-A location is specified as name[[,state],country] - the name may be abbreviated.
-The optional two-letter ISO 3166 country code must be last.
-The optional two-letter state code only applies to the United States.
+
+Location Descriptors:
+  A location descriptor is specified as name[[,state],country].
+  The name is required and must be first. It may be abbreviated.
+  The optional two-letter ISO 3166 country code must be last.
+  The optional two-letter state code only applies to locatios within the United States.
+
+Latitudes and Longitudes
+  A latitude or longitude is specified as a number either between -90 and +90
+  (for latitudes) or between -180 and +180 (for longitudes). The sign is optional.
+  The number may contain a decimal point followed by one or more digits.
+  Positive numbers refer to north latitudes and east longitudes.
+  Negative numbers refer to south latitudes and west longitudes.
+  A letter - N or S for latitudes, E or W for longitudes - may be appended.
 END_OF_PROGRAM_USAGE_NOTES
 }
 
@@ -439,12 +450,12 @@ getQueryArgument() {
    queryArguments=("${@}")
 }
 
-makeLocationName() {
-   local nameVariable="${1}"
+makeLocationPhrase() {
+   local phraseVariable="${1}"
    local locationsArray="${2}"
-   local index="${3}"
+   local index="${3:-0}"
 
-   local name=""
+   local phrase=""
    local field
 
    for field in name region country
@@ -453,53 +464,53 @@ makeLocationName() {
       getElement value "${locationsArray}" "${index},${field}"
       [ -n "${value}" ] || continue
 
-      [  -n "${name}" ] && name+=", "
-      name+="${value}"
+      [  -n "${phrase}" ] && phrase+=", "
+      phrase+="${value}"
    done
 
-   setVariable "${nameVariable}" "${name}"
+   setVariable "${phraseVariable}" "${phrase}"
 }
 
 getLocationCoordinates() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
-   local name="${3}"
+   local descriptor="${3}"
 
    local -A locations=()
-   owmQueryLocation locations "${name}"
-   local locationCount="${locations["count"]}"
+   owmQueryLocation locations "${descriptor}"
+   local count="${locations["count"]}"
 
-   if [ "${locationCount}" -eq 1 ]
+   if [ "${count}" -eq 1 ]
    then
-      local locationName
-      makeLocationName locationName locations 0
+      local location
+      makeLocationPhrase location locations
 
-      local locationLatitude="${locations["0,latitude"]}"
-      [ -n "${locationLatitude}" ] || semanticError "latitude not known: ${locationName}"
-      setVariable "${latitudeVariable}" "${locationLatitude}"
+      local coordinate="${locations["0,latitude"]}"
+      [ -n "${coordinate}" ] || semanticError "latitude not known: ${location}"
+      setVariable "${latitudeVariable}" "${coordinate}"
 
-      local locationLongitude="${locations["0,longitude"]}"
-      [ -n "${locationLongitude}" ] || semanticError "longitude not known: ${locationName}"
-      setVariable "${longitudeVariable}" "${locationLongitude}"
-   elif [ "${locationCount}" -eq 0 ]
+      local coordinate="${locations["0,longitude"]}"
+      [ -n "${coordinate}" ] || semanticError "longitude not known: ${location}"
+      setVariable "${longitudeVariable}" "${coordinate}"
+   elif [ "${count}" -eq 0 ]
    then
-      semanticError "location not found: ${name}"
+      semanticError "location not found: ${descriptor}"
    else
-      local locationNames=""
-      local locationIndex=0
+      local locations=""
+      local index=0
 
-      while [ "${locationIndex}" -lt "${locationCount}" ]
+      while [ "${index}" -lt "${count}" ]
       do
-         local locationName
-         makeLocationName locationName locations "${locationIndex}"
+         local location
+         makeLocationPhrase location locations "${index}"
 
-         [ -n "${locationNames}" ] && locationNames+="; "
-         locationNames+="${locationName}"
+         [ -n "${locations}" ] && locations+="; "
+         locations+="${location}"
 
-         let "locationIndex += 1"
+         let "index += 1"
       done
 
-      semanticError "more than one location: ${locationNames}"
+      semanticError "more than one location: ${locations}"
    fi
 }
 
@@ -533,9 +544,9 @@ getLocation() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
 
-   if [ -n "${locationName}" ]
+   if [ -n "${locationDescriptor}" ]
    then
-      getLocationCoordinates "${latitudeVariable}" "${longitudeVariable}" "${locationName}"
+      getLocationCoordinates "${latitudeVariable}" "${longitudeVariable}" "${locationDescriptor}"
    elif haveMoreQueryArguments
    then
       getLatitudeArgument "${latitudeVariable}"
@@ -565,37 +576,37 @@ showLines() {
 
 showLocations() {
    local locationsArray="${1}"
-   local name="${2}"
+   local descriptor="${2}"
 
-   local locationCount
-   getElement locationCount "${locationsArray}" "count"
+   local count
+   getElement count "${locationsArray}" "count"
 
-   [ "${locationCount}" -gt 0 ] || semanticError "location not found: ${name}"
-   local locationIndex=0
+   [ "${count}" -gt 0 ] || semanticError "location not found: ${descriptor}"
+   local index=0
 
-   while [ "${locationIndex}" -lt "${locationCount}" ]
+   while [ "${index}" -lt "${count}" ]
    do
-      local locationName
-      makeLocationName locationName "${locationsArray}" "${locationIndex}"
+      local location
+      makeLocationPhrase location "${locationsArray}" "${index}"
 
-      local locationLatitude
-      getElement locationLatitude "${locationsArray}" "${locationIndex},latitude"
+      local latitude
+      getElement latitude "${locationsArray}" "${index},latitude"
 
-      local locationLongitude
-      getElement locationLongitude "${locationsArray}" "${locationIndex},longitude"
+      local longitude
+      getElement longitude "${locationsArray}" "${index},longitude"
 
-      echo "${locationName}: ${locationLatitude} ${locationLongitude}"
-      let "locationIndex += 1"
+      echo "${location}: ${latitude} ${longitude}"
+      let "index += 1"
    done
 }
 
 performQuery_location() {
-   [ -n "${locationName}" ] || getQueryArgument locationName "location"
+   [ -n "${locationDescriptor}" ] || getQueryArgument locationDescriptor "location"
    noMoreQueryArguments
 
    local -A locations=()
-   owmQueryLocation locations "${locationName}"
-   showLocations locations "${locationName}"
+   owmQueryLocation locations "${locationDescriptor}"
+   showLocations locations "${locationDescriptor}"
 }
 
 performQuery_coordinates() {
@@ -686,7 +697,7 @@ performQuery_weather() {
    showWeather weather
 }
 
-addProgramOption l string.location locationName "the name of a location (see below)"
+addProgramOption l string.location locationDescriptor "the name of a location (see Location Descriptors)"
 addProgramOption L flag saveLocation "save the specified location"
 addProgramOption U flag saveUnits "save the specified units"
 addProgramParameter query queryType "the type of query to perform"
