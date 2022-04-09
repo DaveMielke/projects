@@ -9,7 +9,7 @@ readonly owmSpeedUnit="m/s"
 readonly owmTemperatureUnit="C"
 
 addProgramOption k string.key owmKeyValue "the application key for Open Weather Map" "the first line in the key file"
-addProgramOption K string.path owmKeyFile "the file containing the application key"
+addProgramOption K string.file owmKeyFile "the file containing the application key"
 addProgramOption R flag owmSaveResponses "save the Open Weather Map API responses"
 
 owmSetKey() {
@@ -143,70 +143,31 @@ owmQueryWeather() {
    owmQuery "${WeatherArray}" parameters data 2.5 weather
 }
 
-parseCoordinate() {
-   local valueVariable="${1}"
-   local maximumValue="${2}"
-   local positiveLetter="${3}"
-   local negativeLetter="${4}"
-
-   local value="${!valueVariable}"
-   local pattern='^([-+])?(0|[1-9][0-9]*)?(\.[0-9]+)?([A-Za-z])?$'
-
-   [[ "${value}" =~ ${pattern} ]] || return 1
-   local sign="${BASH_REMATCH[1]}"
-   local integer="${BASH_REMATCH[2]}"
-   local fraction="${BASH_REMATCH[3]}"
-   local letter="${BASH_REMATCH[4]}"
-
-   if [ "${integer}" -eq "${maximumValue}" ]
-   then
-      fraction="${fraction##.*(0)}"
-      [ -n "${fraction}" ] && return 1
-   elif [ "${integer}" -gt "${maximumValue}" ]
-   then
-      return 1
-   fi
-
-   local negativeSign=false
-   [ "${sign}" = "-" ] && negativeSign=true
-
-   [ -n "${letter}" ] && {
-      if [ "${letter}" = "${negativeLetter}" ]
-      then
-         "${negativeSign}" && negativeSign=false || negativeSign=true
-      elif [ "${letter}" != "${positiveLetter}" ]
-      then
-         return 1
-      fi
-   }
-
-   value="${integer:-0}${fraction}"
-   "${negativeSign}" && value="-${value}"
-   setVariable "${valueVariable}" "${value}"
-   return 0
-}
-
-parseLatitude() {
-   local latitudeVariable="${1}"
-
-   parseCoordinate "${latitudeVariable}" 90 "${latitudePositiveLetter}" "${latitudeNegativeLetter}" || return 1
-   return 0
-}
-
-parseLongitude() {
-   local longitudeVariable="${1}"
-
-   parseCoordinate "${longitudeVariable}" 180 "${longitudePositiveLetter}" "${longitudeNegativeLetter}" || return 1
-   return 0
-}
-
 readonly defaultTimeFormat="24-hours"
 addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
 
-addProgramOption D string.unit distanceUnit "the unit to display visibility in (${!distanceUnits[*]})" "${owmDistanceUnit}"
+addProgramOption D string.unit distanceUnit "the unit to display visibility distance in (${!distanceUnits[*]})" "${owmDistanceUnit}"
 addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${!pressureUnits[*]})" "${owmPressureUnit}"
 addProgramOption S string.unit speedUnit "the unit to display wind speed in (${!speedUnits[*]})" "${owmSpeedUnit}"
 addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${!temperatureUnits[*]})" "${owmTemperatureUnit}"
+addProgramOption u string.group unitGroup "the group of units to default to (${unitGroupNames[*]})"
+
+useUnitGroup() {
+   local group="${1}"
+   verifyChoice "unit group" group "${unitGroupNames[@]}"
+
+   local settingsArray="${group}Units"
+   local -a settingNames=()
+   getElementNames settingNames "${settingsArray}"
+
+   local setting
+   for setting in "${settingNames[@]}"
+   do
+      local unit
+      getElement unit "${settingsArray}" "${setting}"
+      changePersistentProgramSetting "${setting}" "${unit}"
+   done
+}
 
 getSetting() {
    local -n value="${1}"
@@ -315,9 +276,9 @@ The -l option may be used to specify a location in lieu of its coordinates.
 
 Location Descriptors:
   A location descriptor is specified as name[[,state],country].
-  The name is required and must be first. It may be abbreviated.
+  The name is required, must be first, and may be abbreviated.
   The optional two-letter ISO 3166 country code must be last.
-  The optional two-letter state code only applies to locatios within the United States.
+  The optional two-letter state code only applies to the US.
 
 Latitudes and Longitudes
   A latitude or longitude is specified as a number either between -90 and +90
@@ -325,7 +286,7 @@ Latitudes and Longitudes
   The number may contain a decimal point followed by one or more digits.
   Positive numbers refer to north latitudes and east longitudes.
   Negative numbers refer to south latitudes and west longitudes.
-  A letter - N or S for latitudes, E or W for longitudes - may be appended.
+  A letter - ${positiveLatitudeLetter} or ${negativeLatitudeLetter} for latitudes, ${positiveLongitudeLetter} or ${negativeLongitudeLetter} for longitudes - may be appended.
 END_OF_PROGRAM_USAGE_NOTES
 }
 
@@ -360,7 +321,7 @@ makeLocationPhrase() {
    local locationsArray="${2}"
    local index="${3:-0}"
 
-   local phrase=""
+   local result=""
    local field
 
    for field in name region country
@@ -369,11 +330,11 @@ makeLocationPhrase() {
       getElement value "${locationsArray}" "${index},${field}"
       [ -n "${value}" ] || continue
 
-      [  -n "${phrase}" ] && phrase+=", "
-      phrase+="${value}"
+      [  -n "${result}" ] && result+=", "
+      result+="${value}"
    done
 
-   setVariable "${phraseVariable}" "${phrase}"
+   setVariable "${phraseVariable}" "${result}"
 }
 
 getLocationCoordinates() {
@@ -459,11 +420,27 @@ getLocation() {
    else
       getPersistentProgramSetting "${latitudeVariable}" "${latitudeSetting}"
       getPersistentProgramSetting "${longitudeVariable}" "${longitudeSetting}"
+      saveLocation=false
    fi
 
    "${saveLocation}" && {
       changePersistentProgramSetting "${latitudeSetting}" "${!latitudeVariable}"
       changePersistentProgramSetting "${longitudeSetting}" "${!longitudeVariable}"
+      changePersistentProgramSetting "${locationDescriptorSetting}" "${locationDescriptor}"
+
+      local phrase=""
+      local -A locations=()
+
+      owmQueryCoordinates locations "${latitude}" "${longitude}" && {
+         local count
+         getElement count locations "count"
+
+         [ "${count}" -gt 0 ] && {
+            makeLocationPhrase phrase locations 0
+         }
+      }
+
+      changePersistentProgramSetting "${locationPhraseSetting}" "${phrase}"
    }
 }
 
@@ -610,6 +587,8 @@ optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
 
 restorePersistentProgramSettins "${configurationFile}"
+[ -n "${unitGroup}" ] && useUnitGroup "${unitGroup}"
+
 verifyTimeFormat
 verifyDistanceUnit
 verifyPressureUnit
