@@ -46,6 +46,22 @@ readonly -A timeFormats=(
   12-hours "%l:%M%p"
 )
 
+readonly -A metricUnits=(
+   "${distanceUnitSetting}" km
+   "${pressureUnitSetting}" kpa
+   "${speedUnitSetting}" km/hr
+   "${temperatureUnitSetting}" C
+   "${timeFormatSetting}" 24-hours
+)
+
+readonly -A imperialUnits=(
+   "${distanceUnitSetting}" mi
+   "${pressureUnitSetting}" inHg
+   "${speedUnitSetting}" mph
+   "${temperatureUnitSetting}" F
+   "${timeFormatSetting}" 12-hours
+)
+
 readonly windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
 toWindDirection() {
    local directionVariable="${1}"
