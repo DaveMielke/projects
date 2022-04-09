@@ -84,7 +84,7 @@ bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # World of Wisdom
+bbc-world   sat     00:30-00:50 # Trending
 bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
@@ -113,7 +113,7 @@ cbc1-ottawa    sat 13:32-14:00 # The Debaters
 bbc-world      sat 14:00-15:00 # The History Hour
 portraits      sat 11:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
-bbc-world      sat 19:30-19:50 # World of Wisdom
+bbc-world      sat 19:30-19:50 # Trending
 bbc-world      sat 19:50-20:00 # More or Lesa
 bbc-world      sat 20:00-21:00 # The Science Hour
 bbc-world      sat 21:00-21:30 # The Newsroom
