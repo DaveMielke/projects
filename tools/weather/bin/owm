@@ -143,14 +143,14 @@ owmQueryWeather() {
    owmQuery "${WeatherArray}" parameters data 2.5 weather
 }
 
-readonly defaultTimeFormat="24-hours"
-addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
-
+addProgramOption u string.group unitGroup "the group of units to default to (${unitGroupNames[*]})"
 addProgramOption D string.unit distanceUnit "the unit to display visibility distance in (${!distanceUnits[*]})" "${owmDistanceUnit}"
 addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${!pressureUnits[*]})" "${owmPressureUnit}"
 addProgramOption S string.unit speedUnit "the unit to display wind speed in (${!speedUnits[*]})" "${owmSpeedUnit}"
 addProgramOption T string.unit temperatureUnit "the unit to display temperaturse in (${!temperatureUnits[*]})" "${owmTemperatureUnit}"
-addProgramOption u string.group unitGroup "the group of units to default to (${unitGroupNames[*]})"
+
+readonly defaultTimeFormat="24-hours"
+addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
 
 useUnitGroup() {
    local group="${1}"
@@ -344,26 +344,21 @@ getLocationCoordinates() {
 
    local -A locations=()
    owmQueryLocation locations "${descriptor}"
+
    local count="${locations["count"]}"
+   [ "${count}" -eq 0 ] && semanticError "location not found: ${descriptor}"
+   local index
 
    if [ "${count}" -eq 1 ]
    then
-      local location
-      makeLocationPhrase location locations
-
-      local coordinate="${locations["0,latitude"]}"
-      [ -n "${coordinate}" ] || semanticError "latitude not known: ${location}"
-      setVariable "${latitudeVariable}" "${coordinate}"
-
-      local coordinate="${locations["0,longitude"]}"
-      [ -n "${coordinate}" ] || semanticError "longitude not known: ${location}"
-      setVariable "${longitudeVariable}" "${coordinate}"
-   elif [ "${count}" -eq 0 ]
+      index=0
+   elif [ -n "${locationNumber}" ]
    then
-      semanticError "location not found: ${descriptor}"
+      index=$((locationNumber - 1))
+      [ "${index}" -lt "${count}" ] || semanticError "not that many locations: ${locationNumber} > ${count}"
    else
       local locations=""
-      local index=0
+      index=0
 
       while [ "${index}" -lt "${count}" ]
       do
@@ -378,6 +373,17 @@ getLocationCoordinates() {
 
       semanticError "more than one location: ${locations}"
    fi
+
+   local location
+   makeLocationPhrase location locations "${index}"
+
+   local coordinate="${locations["${index},latitude"]}"
+   [ -n "${coordinate}" ] || semanticError "latitude not known: ${location}"
+   setVariable "${latitudeVariable}" "${coordinate}"
+
+   local coordinate="${locations["${index},longitude"]}"
+   [ -n "${coordinate}" ] || semanticError "longitude not known: ${location}"
+   setVariable "${longitudeVariable}" "${coordinate}"
 }
 
 getLatitudeArgument() {
@@ -578,10 +584,13 @@ performQuery_weather() {
    showWeather weather
 }
 
-addProgramOption f string.file configurationFile "the configuration file to use"
 addProgramOption l string.location locationDescriptor "the descriptor for a location (see Location Descriptors)"
+addProgramOption n string.number locationNumber "the number for when there's more than one"
+
 addProgramOption L flag saveLocation "save the specified location"
 addProgramOption U flag saveUnits "save the specified units"
+
+addProgramOption f string.file configurationFile "the configuration file to use"
 addProgramParameter query queryType "the type of query to perform"
 optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
@@ -589,11 +598,15 @@ parseProgramArguments "${@}"
 restorePersistentProgramSettins "${configurationFile}"
 [ -n "${unitGroup}" ] && useUnitGroup "${unitGroup}"
 
-verifyTimeFormat
 verifyDistanceUnit
 verifyPressureUnit
 verifySpeedUnit
 verifyTemperatureUnit
+verifyTimeFormat
+
+[ -n "${locationNumber}" ] && {
+   verifyInteger "location number" "${locationNumber}" 1 99
+}
 
 "${saveUnits}" && {
    changePersistentProgramSetting "${timeFormatSetting}" "${timeFormat}"
