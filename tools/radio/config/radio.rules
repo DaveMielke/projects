@@ -38,7 +38,6 @@ cbc1-ottawa mon-fri 08:37-10:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # Cost of Living
-cbc1-ottawa wed 11:32-12:00 # What on Earth!
 cbc1-ottawa thu 11:32-12:00 # Under the Influence
 cbc1-ottawa fri 11:32-12:00 # The Debaters
 
@@ -76,9 +75,10 @@ bbc-world   thu 17:30-18:00 # The Food Chain
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
 bbc-world   mon-thu 20:00-21:00 # Business Matters
-bbc-world   mon-thu 21:00-21:30 # The Newsroom
+bbc-world   fri-fri 20:00-20:30 # World Business Report
+bbc-world   fri-fri 20:30-21:00 # Worklife India
+bbc-world   mon-fri 21:00-21:30 # The Newsroom
 
-cbc1-ottawa tue 23:00-00:00 # The Doc Project
 bbc-world   thu 23:30-00:00 # Heart and Soul
 bbc-world   fri 23:00-00:00 # The Real Story
 
@@ -110,7 +110,6 @@ cbc1-ottawa    sat 11:32-12:00 # Under the Influence
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
-bbc-world      sat 14:00-15:00 # The History Hour
 portraits      sat 11:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
 bbc-world      sat 19:30-19:50 # Trending
