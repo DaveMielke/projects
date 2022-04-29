@@ -584,6 +584,9 @@ performQuery_weather() {
    showWeather weather
 }
 
+addProgramParameter query queryType "the type of query to perform"
+optionalProgramParameters "arg" "arguments for the query"
+
 addProgramOption l string.location locationDescriptor "the descriptor for a location (see Location Descriptors)"
 addProgramOption n string.number locationNumber "the number for when there's more than one"
 
@@ -591,8 +594,6 @@ addProgramOption L flag saveLocation "save the specified location"
 addProgramOption U flag saveUnits "save the specified units"
 
 addProgramOption f string.file configurationFile "the configuration file to use"
-addProgramParameter query queryType "the type of query to perform"
-optionalProgramParameters "arg" "arguments for the query"
 parseProgramArguments "${@}"
 
 restorePersistentProgramSettins "${configurationFile}"
