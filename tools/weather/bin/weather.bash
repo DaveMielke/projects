@@ -11,51 +11,51 @@ readonly temperatureUnitSetting="temperature-unit"
 readonly timeFormatSetting="time-format"
 
 readonly -A distanceUnits=(
-   ft "feet"
-   km "kilometers"
-   m  "meters"
-   mi "miles"
+   ["ft"]="feet"
+   ["km"]="kilometers"
+   ["m"]="meters"
+   ["mi"]="miles"
 )
 
 readonly -A pressureUnits=(
-   hpa  "hectopascals"
-   inHg "inches of mercury"
-   kpa  "kilopascals"
-   mb   "millibars"
+   ["hpa"]="hectopascals"
+   ["inHg"]="inches of mercury"
+   ["kpa"]="kilopascals"
+   ["mb"]="millibars"
 )
 
 readonly -A speedUnits=(
-   km/hr "kilometers per hour"
-   m/s   "meters per second"
-   mph   "miles per hour"
+   ["km/hr"]="kilometers per hour"
+   ["m/s"]="meters per second"
+   ["mph"]="miles per hour"
 )
 
 readonly -A temperatureUnits=(
-   C "celsius"
-   F "fahrenheit"
-   K "kelvin"
-   R "rankine"
+   ["C"]="celsius"
+   ["F"]="fahrenheit"
+   ["K"]="kelvin"
+   ["R"]="rankine"
 )
 
 readonly -A timeFormats=(
-  24-hours "%H:%M"
-  12-hours "%l:%M%p"
+  ["24-hours"]="%H:%M"
+  ["12-hours"]="%l:%M%p"
 )
 
 readonly -A metricUnits=(
-   "${distanceUnitSetting}" km
-   "${pressureUnitSetting}" kpa
-   "${speedUnitSetting}" km/hr
-   "${temperatureUnitSetting}" C
-   "${timeFormatSetting}" 24-hours
+   ["${distanceUnitSetting}"]="km"
+   ["${pressureUnitSetting}"]="kpa"
+   ["${speedUnitSetting}"]="km/hr"
+   ["${temperatureUnitSetting}"]="C"
+   ["${timeFormatSetting}"]="24-hours"
 )
 
 readonly -A imperialUnits=(
-   "${distanceUnitSetting}" mi
-   "${pressureUnitSetting}" inHg
-   "${speedUnitSetting}" mph
-   "${temperatureUnitSetting}" F
-   "${timeFormatSetting}" 12-hours
+   ["${distanceUnitSetting}"]="mi"
+   ["${pressureUnitSetting}"]="inHg"
+   ["${speedUnitSetting}"]="mph"
+   ["${temperatureUnitSetting}"]="F"
+   ["${timeFormatSetting}"]="12-hours"
 )
 
 readonly unitGroupNames=(metric imperial)

@@ -94,8 +94,8 @@ owmQueryLocation() {
    local descriptor="${2}"
 
    local -A parameters=(
-      q "${descriptor}"
-      limit 5
+      ["q"]="${descriptor}"
+      ["limit"]="5"
    )
 
    owmQuery "${locationsArray}" parameters geo 1.0 direct
@@ -107,9 +107,9 @@ owmQueryCoordinates() {
    local longitude="${3}"
 
    local -A parameters=(
-      lat "${latitude}"
-      lon "${longitude}"
-      limit 5
+      ["lat"]="${latitude}"
+      ["lon"]="${longitude}"
+      ["limit"]="5"
    )
 
    owmQuery "${locationsArray}" parameters geo 1.0 reverse
@@ -121,9 +121,9 @@ owmQueryForecast() {
    local longitude="${3}"
 
    local -A parameters=(
-      lat "${latitude}"
-      lon "${longitude}"
-      units metric
+      ["lat"]="${latitude}"
+      ["lon"]="${longitude}"
+      ["units"]="metric"
    )
 
    owmQuery "${forecastArray}" parameters data 2.5 forecast
@@ -135,9 +135,9 @@ owmQueryWeather() {
    local longitude="${3}"
 
    local -A parameters=(
-      lat "${latitude}"
-      lon "${longitude}"
-      units metric
+      ["lat"]="${latitude}"
+      ["lon"]="${longitude}"
+      ["units"]="metric"
    )
 
    owmQuery "${WeatherArray}" parameters data 2.5 weather
