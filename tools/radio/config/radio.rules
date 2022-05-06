@@ -44,8 +44,7 @@ cbc1-ottawa fri 11:32-12:00 # The Debaters
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
 bbc-world   mon-thu 13:00-13:50 # Outlook
-bbc-world   fri     13:00-13:50 # The Fifth Floor
-bbc-world   mon-fri 13:50-14:00 # Witness History
+bbc-world   mon-thu 13:50-14:00 # Witness History
 
 bbc-world mon 15:00-15:30 # The Climate Question
 bbc-world tue 15:00-15:30 # The Documentary
@@ -78,6 +77,9 @@ bbc-world   mon-thu 20:00-21:00 # Business Matters
 bbc-world   fri-fri 20:00-20:30 # World Business Report
 bbc-world   fri-fri 20:30-21:00 # Worklife India
 bbc-world   mon-fri 21:00-21:30 # The Newsroom
+
+cbc1-ottawa fri-fri 22:00-22:30 # Front Burner
+cbc1-ottawa fri-fri 22:30-23:00 # Nothing Is Foreign
 
 bbc-world   thu 23:30-00:00 # Heart and Soul
 bbc-world   fri 23:00-00:00 # The Real Story
