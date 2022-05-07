@@ -7,9 +7,9 @@ curlLocation=""
 curlOptions=()
 
 curlNewRequest() {
-   local location="${1}"
+   local server="${1}"
 
-   curlLocation="${location}"
+   curlLocation="https://${server}"
    curlOptions=(--silent --show-error --get)
 }
 
@@ -43,7 +43,7 @@ curlGetResponse() {
 
 addProgramOption J flag saveJSON "save API JSON responses"
 
-jsonParse() {
+jsonFilterFields() {
    local resultArray="${1}"
    local json="${2}"
    local jqFilter="${3}"
@@ -70,7 +70,7 @@ jsonParse() {
    false && listElements "${resultArray}"
 }
 
-jsonGet() {
+jsonGetField() {
    local resultVariable="${1}"
    local json="${2}"
    local jqField="${3}"
@@ -82,13 +82,15 @@ jsonGet() {
 
 ipGetMyAddress() {
    local resultVariable="${1}"
-   curlNewRequest "https:/api64.ipify.org?format=json"
+
+   curlNewRequest "api64.ipify.org"
+   curlAddQueryParameter "format" "json"
 
    local response
    curlGetResponse response
 
    local -A results=()
-   jsonParse results "${response}" ip-address
+   jsonFilterFields results "${response}" ip-address
    setVariable "${resultVariable}" "${results["ip,address"]}"
 }
 
@@ -97,12 +99,12 @@ ipGetLocation() {
    local address="${2}"
    [ -n "${adress}" ] || ipGetMyAddress address
 
-   curlNewRequest "https:/ipapi.co"
+   curlNewRequest "ipapi.co"
    curlExtendLocation "${address}" "json"
 
    local response
    curlGetResponse response
-   jsonParse "${locationArray}" "${response}" ip-location
+   jsonFilterFields "${locationArray}" "${response}" ip-location
 }
 
 readonly owmDistanceUnit="m"
@@ -141,7 +143,7 @@ owmQuery() {
    getElements owmParameters "${parametersArray}"
    owmSetKey owmParameters
 
-   curlNewRequest "https://api.OpenWeatherMap.org"
+   curlNewRequest "api.OpenWeatherMap.org"
    curlExtendLocation "${@}"
    curlAddQueryParameters owmParameters
 
@@ -149,11 +151,11 @@ owmQuery() {
    curlGetResponse owmResponse
 
    local owmMessage
-   jsonGet owmMessage "${owmResponse}" ".message"
+   jsonGetField owmMessage "${owmResponse}" ".message"
    [ "${owmMessage}" = "0" ] && owmMessage=""
    [ -n "${owmMessage}" ] && semanticError "${owmMessage}"
 
-   jsonParse "${resultArray}" "${owmResponse}" "${1}-${3}"
+   jsonFilterFields "${resultArray}" "${owmResponse}" "${1}-${3}"
 }
 
 owmQueryLocation() {
@@ -343,13 +345,14 @@ The location to use is selected as follows:
 1: The coordinate parameters (if specified).
 2: The location descriptor (if specified via the -l option).
 3: The location setting (if saved).
-4: The current location (determined via the IP address).
+4: The current location (estimated via the IP address).
 
 Location Descriptors:
   A location descriptor is specified as name[[,state],country].
   The name is required, must be first, and may be abbreviated.
   The optional two-letter ISO 3166 country code must be last.
   The optional two-letter state code only applies to the US.
+  The special value = means the (estimated) current location.
 
 Latitudes and Longitudes
   A latitude or longitude is specified as a number either between -90 and +90
@@ -498,13 +501,16 @@ getLocation() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
 
-   if [ -n "${locationDescriptor}" ]
-   then
-      getLocationCoordinates "${latitudeVariable}" "${longitudeVariable}" "${locationDescriptor}"
-   elif haveMoreQueryArguments
+   if haveMoreQueryArguments
    then
       getLatitudeArgument "${latitudeVariable}"
       getLongitudeArgument "${longitudeVariable}"
+   elif [ "${locationDescriptor}" = "=" ]
+   then
+      getMyCoordinates "${latitudeVariable}" "${longitudeVariable}"
+   elif [ -n "${locationDescriptor}" ]
+   then
+      getLocationCoordinates "${latitudeVariable}" "${longitudeVariable}" "${locationDescriptor}"
    else
       getPersistentProgramSetting "${latitudeVariable}" "${latitudeSetting}"
       getPersistentProgramSetting "${longitudeVariable}" "${longitudeSetting}"
