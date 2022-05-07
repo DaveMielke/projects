@@ -47,7 +47,7 @@ jsonFilterFields() {
    local resultArray="${1}"
    local json="${2}"
    local jqFilter="${3}"
-   "${saveJSON}" && jq . <<<"${owmResponse}" >"${programName}.${jqFilter}.json"
+   "${saveJSON}" && jq . <<<"${json}" >"${programName}.${jqFilter}.json"
 
    local jqPath
    findProgramComponent jqPath "${jqFilter}" jq || {
@@ -67,7 +67,7 @@ jsonFilterFields() {
       setElement "${resultArray}" "${name}" "${value}"
    done <<<"${jqResponse}"
 
-   false && listElements "${resultArray}"
+   false && writeElements "${resultArray}"
 }
 
 jsonGetField() {
