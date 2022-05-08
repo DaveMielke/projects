@@ -212,7 +212,7 @@ owmQueryWeather() {
    owmQuery "${WeatherArray}" parameters data 2.5 weather
 }
 
-addProgramOption u string.group unitGroup "the group of units to default to (${unitGroupNames[*]})"
+addProgramOption u string.type unitsType "the type of units to default to (${unitsTypeNames[*]})"
 addProgramOption D string.unit distanceUnit "the unit to display visibility distance in (${!distanceUnits[*]})" "${owmDistanceUnit}"
 addProgramOption P string.unit pressureUnit "the unit to display atmospheric pressure in (${!pressureUnits[*]})" "${owmPressureUnit}"
 addProgramOption S string.unit speedUnit "the unit to display wind speed in (${!speedUnits[*]})" "${owmSpeedUnit}"
@@ -221,7 +221,7 @@ addProgramOption T string.unit temperatureUnit "the unit to display temperaturse
 readonly defaultTimeFormat="24-hours"
 addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
 
-declare -A settingVariables=(
+declare -A unitVariables=(
    ["${distanceUnitSetting}"]="distanceUnit"
    ["${pressureUnitSetting}"]="pressureUnit"
    ["${speedUnitSetting}"]="speedUnit"
@@ -229,11 +229,23 @@ declare -A settingVariables=(
    ["${timeFormatSetting}"]="timeFormat"
 )
 
-useUnitGroup() {
-   local group="${1}"
+saveUnits() {
+   local -a settingNames=()
+   getElementNames settingNames unitVariables
 
-   verifyChoice "unit group" group "${unitGroupNames[@]}"
-   local settingsArray="${group}Units"
+   local setting
+   for setting in "${settingNames[@]}"
+   do
+      local variable="${unitVariables["${setting}"]}"
+      changePersistentProgramSetting "${setting}" "${!variable}"
+   done
+}
+
+useUnits() {
+   local type="${1}"
+
+   verifyChoice "units type" type "${unitsTypeNames[@]}"
+   local settingsArray="${type}Units"
 
    local -a settingNames=()
    getElementNames settingNames "${settingsArray}"
@@ -244,7 +256,7 @@ useUnitGroup() {
       local unit
       getElement unit "${settingsArray}" "${setting}"
 
-      local variable="${settingVariables["${setting}"]}"
+      local variable="${unitVariables["${setting}"]}"
       setVariable "${variable}" "${unit}"
    done
 }
@@ -422,17 +434,18 @@ makeLocationPhrase() {
    setVariable "${phraseVariable}" "${result}"
 }
 
+declare -A myLocation=()
+getMyLocation() {
+   [ "${#myLocation[*]}" -eq 0 ] && ipGetLocation myLocation
+}
+
 getMyCoordinates() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
-   local countryVariable="${3}"
 
-   local -A result=()
-   ipGetLocation result
-
-   [ -n "${latitudeVariable}" ] && setVariable "${latitudeVariable}" "${result["location,latitude"]}"
-   [ -n "${longitudeVariable}" ] && setVariable "${longitudeVariable}" "${result["location,longitude"]}"
-   [ -n "${countryVariable}" ] && setVariable "${countryVariable}" "${result["location,country,code"]}"
+   getMyLocation
+   setVariable "${latitudeVariable}" "${myLocation["location,latitude"]}"
+   setVariable "${longitudeVariable}" "${myLocation["location,longitude"]}"
 }
 
 getLocationCoordinates() {
@@ -703,29 +716,21 @@ addProgramOption U flag saveUnits "save the specified units"
 addProgramOption f string.file configurationFile "the configuration file to use"
 parseProgramArguments "${@}"
 
+[ -n "${locationNumber}" ] && {
+   verifyInteger "location number" "${locationNumber}" 1 99
+}
+
 restorePersistentProgramSettins "${configurationFile}"
-[ -n "${unitGroup}" ] && useUnitGroup "${unitGroup}"
+[ -n "${unitsType}" ] && useUnits "${unitsType}"
 
 verifyDistanceUnit
 verifyPressureUnit
 verifySpeedUnit
 verifyTemperatureUnit
 verifyTimeFormat
-
-[ -n "${locationNumber}" ] && {
-   verifyInteger "location number" "${locationNumber}" 1 99
-}
-
-"${saveUnits}" && {
-   changePersistentProgramSetting "${timeFormatSetting}" "${timeFormat}"
-   changePersistentProgramSetting "${distanceUnitSetting}" "${distanceUnit}"
-   changePersistentProgramSetting "${pressureUnitSetting}" "${pressureUnit}"
-   changePersistentProgramSetting "${speedUnitSetting}" "${speedUnit}"
-   changePersistentProgramSetting "${temperatureUnitSetting}" "${temperatureUnit}"
-}
-
 verifyChoice "query type" queryType location coordinates forecast weather
-"performQuery_${queryType}"
 
+"${saveUnits}" && saveUnits
+"performQuery_${queryType}"
 savePersistentProgramSettins "${configurationFile}"
 exit 0
