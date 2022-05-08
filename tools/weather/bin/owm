@@ -90,12 +90,12 @@ ipGetMyAddress() {
    curlGetResponse response
 
    local -A results=()
-   jsonFilterFields results "${response}" ip-address
+   jsonFilterFields results "${response}" my-address
    setVariable "${resultVariable}" "${results["ip,address"]}"
 }
 
-ipGetLocation() {
-   local locationArray="${1}"
+ipGetProperties() {
+   local propertiesArray="${1}"
    local address="${2}"
    [ -n "${adress}" ] || ipGetMyAddress address
 
@@ -104,7 +104,7 @@ ipGetLocation() {
 
    local response
    curlGetResponse response
-   jsonFilterFields "${locationArray}" "${response}" ip-location
+   jsonFilterFields "${propertiesArray}" "${response}" address-properties
 }
 
 readonly owmDistanceUnit="m"
@@ -434,18 +434,18 @@ makeLocationPhrase() {
    setVariable "${phraseVariable}" "${result}"
 }
 
-declare -A myLocation=()
-getMyLocation() {
-   [ "${#myLocation[*]}" -eq 0 ] && ipGetLocation myLocation
+declare -A myProperties=()
+getMyProperties() {
+   [ "${#myProperties[*]}" -eq 0 ] && ipGetProperties myProperties
 }
 
 getMyCoordinates() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
 
-   getMyLocation
-   setVariable "${latitudeVariable}" "${myLocation["location,latitude"]}"
-   setVariable "${longitudeVariable}" "${myLocation["location,longitude"]}"
+   getMyProperties
+   setVariable "${latitudeVariable}" "${myProperties["location,latitude"]}"
+   setVariable "${longitudeVariable}" "${myProperties["location,longitude"]}"
 }
 
 getLocationCoordinates() {
