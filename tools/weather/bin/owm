@@ -221,11 +221,20 @@ addProgramOption T string.unit temperatureUnit "the unit to display temperaturse
 readonly defaultTimeFormat="24-hours"
 addProgramOption H string.mode timeFormat "the mode to display time in (${!timeFormats[*]})" "${defaultTimeFormat}"
 
+declare -A settingVariables=(
+   ["${distanceUnitSetting}"]="distanceUnit"
+   ["${pressureUnitSetting}"]="pressureUnit"
+   ["${speedUnitSetting}"]="speedUnit"
+   ["${temperatureUnitSetting}"]="temperatureUnit"
+   ["${timeFormatSetting}"]="timeFormat"
+)
+
 useUnitGroup() {
    local group="${1}"
-   verifyChoice "unit group" group "${unitGroupNames[@]}"
 
+   verifyChoice "unit group" group "${unitGroupNames[@]}"
    local settingsArray="${group}Units"
+
    local -a settingNames=()
    getElementNames settingNames "${settingsArray}"
 
@@ -234,7 +243,9 @@ useUnitGroup() {
    do
       local unit
       getElement unit "${settingsArray}" "${setting}"
-      changePersistentProgramSetting "${setting}" "${unit}"
+
+      local variable="${settingVariables["${setting}"]}"
+      setVariable "${variable}" "${unit}"
    done
 }
 
@@ -414,12 +425,14 @@ makeLocationPhrase() {
 getMyCoordinates() {
    local latitudeVariable="${1}"
    local longitudeVariable="${2}"
+   local countryVariable="${3}"
 
    local -A result=()
    ipGetLocation result
 
-   setVariable "${latitudeVariable}" "${result["location,latitude"]}"
-   setVariable "${longitudeVariable}" "${result["location,longitude"]}"
+   [ -n "${latitudeVariable}" ] && setVariable "${latitudeVariable}" "${result["location,latitude"]}"
+   [ -n "${longitudeVariable}" ] && setVariable "${longitudeVariable}" "${result["location,longitude"]}"
+   [ -n "${countryVariable}" ] && setVariable "${countryVariable}" "${result["location,country,code"]}"
 }
 
 getLocationCoordinates() {
