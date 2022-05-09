@@ -1,4 +1,0 @@
-#!/bin/bash
-. brltty-prologue.bash
-"${programDirectory}/owm" -D km -P kpa -S km/hr -T C "${@}"
-exit "${?}"
