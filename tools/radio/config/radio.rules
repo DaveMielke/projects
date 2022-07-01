@@ -14,24 +14,24 @@ portraits   2023 mar 12-25 sat     14:00-15:00
 portraits   2022 oct 30-31 sat     14:00-15:00
 portraits   2022 nov 1-5   sat     14:00-15:00
 
-bbc-world     2021 dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
-cbc1-winnipeg 2021 dec 25 01:00-07:00 # Christmas Night
-cbc1-ottawa   2021 dec 25 09:00-11:50 # Handel's Messiah
-cbc1-ottawa   2021 dec 25 11:50-12:00 # The Queen's Christmas Message
-cbc1-goosebay 2021 dec 25 12:00-13:00 # Noël with Florence K
-portraits          dec 25 01:00-20:00 # Christmas Day
+bbc-world     2021    dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
+cbc1-winnipeg 2021    dec 25 01:00-07:00 # Christmas Night
+cbc1-ottawa   2021    dec 25 09:00-11:50 # Handel's Messiah
+cbc1-ottawa   2021    dec 25 11:50-12:00 # The Queen's Christmas Message
+cbc1-goosebay 2021    dec 25 12:00-13:00 # Noël with Florence K
+portraits             dec 25 01:00-20:00 # Christmas Day
+christian     mon-fri dec 31 20:00-00:00 # New Year's Eve
 
-cbc1-ottawa mon-fri jan 1     16:00-18:00 # New Year's Day
-cbc1-ottawa mon     feb 15-21 16:00-18:00 # Family Day
-cbc1-ottawa mon     may 18-24 16:00-18:00 # Victoria Day
-cbc1-ottawa fri     jun 30    16:00-18:00 # Canada Day
-cbc1-ottawa mon-fri jul  1    16:00-18:00 # Canada Day
-cbc1-ottawa mon     jul  2    16:00-18:00 # Canada Day
-cbc1-ottawa mon     aug  1-7  16:00-18:00 # Civic Holiday
-cbc1-ottawa mon     sep  1-7  16:00-18:00 # Labour Day
-cbc1-ottawa mon     oct  8-14 16:00-18:00 # Thanksgiving
+portraits   mon-fri jan 1     06:00-10:00 # New Year's Day
+portraits   mon     feb 15-21 06:00-10:00 # Family Day
+portraits   mon     may 18-24 06:00-10:00 # Victoria Day
+portraits   fri     jun 30    06:00-10:00 # Canada Day
+portraits   mon-fri jul  1    06:00-10:00 # Canada Day
+portraits   mon     jul  2    06:00-10:00 # Canada Day
+portraits   mon     aug  1-7  06:00-10:00 # Civic Holiday
+portraits   mon     sep  1-7  06:00-10:00 # Labour Day
+portraits   mon     oct  8-14 06:00-10:00 # Thanksgiving
 cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
-christian   mon-fri dec 31    20:00-00:00 # New Year's Eve
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
 cbc1-ottawa mon-fri 08:37-10:00 # The Current
@@ -90,17 +90,17 @@ bbc-world   sat     00:30-00:50 # Trending
 bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
-cbc1-halifax tue 02:00-02:31 # BBC - Discovery
-cbc1-halifax wed 02:00-02:31 # BBC - In the Studio
-cbc1-halifax thu 02:00-02:31 # BBC - People Fixing the World
-cbc1-halifax fri 02:00-02:31 # BBC - The Inquiry
-cbc1-halifax sat 02:00-02:31 # BBC - The Compass
+cbc1-stjohns tue 02:00-02:31 # BBC - Discovery
+cbc1-stjohns wed 02:00-02:31 # BBC - In the Studio
+cbc1-stjohns thu 02:00-02:31 # BBC - People Fixing the World
+cbc1-stjohns fri 02:00-02:31 # BBC - The Inquiry
+cbc1-stjohns sat 02:00-02:31 # BBC - The Compass
 
-cbc1-halifax tue 02:31-03:00 # BBC - The Food Chain
-cbc1-halifax wed 02:31-03:00 # BBC - Heart and Soul
-cbc1-halifax thu 02:31-03:00 # ABC - What the Duck?!
-cbc1-halifax fri 02:31-03:00 # DW - World in Progress
-cbc1-halifax sat 02:31-03:00 # ABC - The Health Report
+cbc1-stjohns tue 02:31-03:00 # BBC - The Food Chain
+cbc1-stjohns wed 02:31-03:00 # BBC - Heart and Soul
+cbc1-stjohns thu 02:31-03:00 # ABC - What the Duck?!
+cbc1-stjohns fri 02:31-03:00 # DW - World in Progress
+cbc1-stjohns sat 02:31-03:00 # ABC - The Health Report
 
 cbc1-vancouver sat 07:00-08:00 # DW - Inside Europe
 cbc1-vancouver sat 08:00-08:32 # ABC - Rear Vision
@@ -123,7 +123,7 @@ bbc-world      sat 22:00-23:00 # The Documentary
 bbc-world      sat 23:00-23:30 # From Our Own Correspondant
 bbc-world      sat 23:30-00:00 # The Cultural Frontline
 cbc1-ottawa    sun 00:00-01:00 # The House
-cbc1-halifax   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
+cbc1-stjohns   sun 01:00-02:00 # BBC - The Science Hour (Science in Action, Crowd Science)
 
 cbc1-ottawa mon 00:00-02:00 # The Sunday Midnight Magazine
 cbc1-ottawa mon 02:00-02:31 # ABC - Future Tense
