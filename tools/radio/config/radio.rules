@@ -22,15 +22,15 @@ cbc1-goosebay 2021    dec 25 12:00-13:00 # Noël with Florence K
 portraits             dec 25 01:00-20:00 # Christmas Day
 christian     mon-fri dec 31 20:00-00:00 # New Year's Eve
 
-portraits   mon-fri jan 1     06:00-10:00 # New Year's Day
-portraits   mon     feb 15-21 06:00-10:00 # Family Day
-portraits   mon     may 18-24 06:00-10:00 # Victoria Day
-portraits   fri     jun 30    06:00-10:00 # Canada Day
-portraits   mon-fri jul  1    06:00-10:00 # Canada Day
-portraits   mon     jul  2    06:00-10:00 # Canada Day
-portraits   mon     aug  1-7  06:00-10:00 # Civic Holiday
-portraits   mon     sep  1-7  06:00-10:00 # Labour Day
-portraits   mon     oct  8-14 06:00-10:00 # Thanksgiving
+portraits   mon-fri jan 1     06:00-15:00 # New Year's Day
+portraits   mon     feb 15-21 06:00-15:00 # Family Day
+portraits   mon     may 18-24 06:00-15:00 # Victoria Day
+portraits   fri     jun 30    06:00-15:00 # Canada Day
+portraits   mon-fri jul  1    06:00-15:00 # Canada Day
+portraits   mon     jul  2    06:00-15:00 # Canada Day
+portraits   mon     aug  1-7  06:00-15:00 # Civic Holiday
+portraits   mon     sep  1-7  06:00-15:00 # Labour Day
+portraits   mon     oct  8-14 06:00-15:00 # Thanksgiving
 cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
@@ -38,8 +38,9 @@ cbc1-ottawa mon-fri 08:37-10:00 # The Current
 
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # Cost of Living
-cbc1-ottawa thu 11:32-12:00 # Under the Influence
-cbc1-ottawa fri 11:32-12:00 # The Debaters
+cbc1-ottawa wed 11:32-12:00 # Helluva Story
+#cbc1-ottawa thu 11:32-12:00 # Pop chat
+#cbc1-ottawa fri 11:32-12:00 # The Debaters
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
@@ -86,7 +87,7 @@ bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # Trending
+bbc-world   sat     00:30-00:50 # World of Wisdom
 bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
@@ -106,15 +107,15 @@ cbc1-vancouver sat 07:00-08:00 # DW - Inside Europe
 cbc1-vancouver sat 08:00-08:32 # ABC - Rear Vision
 cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
 cbc1-ottawa    sat 09:00-10:00 # The House
-cbc1-ottawa    sat 10:00-11:00 # Day 6
-cbc1-ottawa    sat 11:00-11:32 # Because News
-cbc1-ottawa    sat 11:32-12:00 # Under the Influence
+#cbc1-ottawa    sat 10:00-11:00 # Day 6
+#cbc1-ottawa    sat 11:00-11:32 # Because News
+#cbc1-ottawa    sat 11:32-12:00 # Pop chat
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
-portraits      sat 11:00-19:00 # Saturday Afternoon Music
+portraits      sat 12:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
-bbc-world      sat 19:30-19:50 # Trending
+bbc-world      sat 19:30-19:50 # World of Wisdom
 bbc-world      sat 19:50-20:00 # More or Lesa
 bbc-world      sat 20:00-21:00 # The Science Hour
 bbc-world      sat 21:00-21:30 # The Newsroom
