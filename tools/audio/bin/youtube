@@ -1,5 +1,5 @@
 #!/bin/bash
-. /brltty/current/bin/brltty-prologue.sh
+. /brltty/current/bin/brltty-prologue.bash
 
 downloadVideo() {
    local arguments=("${@}")
@@ -17,7 +17,7 @@ downloadVideo() {
       arguments=(--username "${userName}" --password "${userPassword}" "${@}")
    }
 
-   executeHostCommand youtube-dl "${arguments[@]}"
+   executeHostCommand yt-dlp "${arguments[@]}"
 }
 
 playStream() {
@@ -39,10 +39,10 @@ addProgramParameter identifier streamIdentifier "the 11-character stream identif
 parseProgramArguments "${@}"
 
 [ -n "${audioFormat}" ] || audioFormat="${defaultAudioFormat}"
-verifyChoice "audio format" "${audioFormat}" aac flac mp3 m4a opus vorbis wav
+verifyChoice "audio format" audioFormat aac flac mp3 m4a opus vorbis wav
 
 [ -n "${interactiveInterface}" ] || interactiveInterface="${defaultInteractiveInterface}"
-verifyChoice "interactive interface" "${interactiveInterface}" rc lirc ncurses qt skins2
+verifyChoice "interactive interface" interactiveInterface rc lirc ncurses qt skins2
 
 set -e
 
