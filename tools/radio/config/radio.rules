@@ -2,17 +2,14 @@ cbc1-ottawa 2022 mar 28-31 11:00-12:00 20:00-21:00 # Canada Reads
 
 # For when we're on Daylight Time but Europe is on Standard Time.
 portraits   2023 mar 12-25 mon-fri 13:00-16:00
-portraits   2022 oct 30-31 mon-fri 13:00-16:00
-portraits   2022 nov 1-5   mon-fri 13:00-16:00
+portraits   2023 oct 29-31 mon-fri 13:00-16:00
+portraits   2023 nov 1-4   mon-fri 13:00-16:00
 bbc-world   2023 mar 12-25 mon-fri 16:00-18:00
-bbc-world   2022 oct 30-31 mon-fri 16:00-18:00
-bbc-world   2022 nov 1-5   mon-fri 16:00-18:00
+bbc-world   2023 oct 29-31 mon-fri 16:00-18:00
+bbc-world   2023 nov 1-4   mon-fri 16:00-18:00
 bbc-world   2023 mar 12-25 mon-fri 20:00-00:00
-bbc-world   2022 oct 30-31 mon-fri 20:00-00:00
-bbc-world   2022 nov 1-5   mon-fri 20:00-00:00
-portraits   2023 mar 12-25 sat     14:00-15:00
-portraits   2022 oct 30-31 sat     14:00-15:00
-portraits   2022 nov 1-5   sat     14:00-15:00
+bbc-world   2023 oct 29-31 mon-fri 20:00-00:00
+bbc-world   2023 nov 1-4   mon-fri 20:00-00:00
 
 bbc-world     2021    dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
 cbc1-winnipeg 2021    dec 25 01:00-07:00 # Christmas Night
@@ -62,6 +59,10 @@ bbc-world fri 15:30-16:00 # Crowd Science
 portraits   mon-fri 13:00-16:00 # weekday afternoon music
 bbc-world   mon-fri 16:00-17:00 # Newshour
 
+bbc-world   mon-fri 17:00-17:20 # The Newsroom
+bbc-world   mon-fri 17:20-17:30 # Sports News
+bbc-world   mon-fri 17:30-18:00 # World Business Report
+
 bbc-world   mon 17:00-17:30 # Hard Talk
 bbc-world   tue 17:00-17:30 # People Fixing the World
 bbc-world   wed 17:00-17:30 # Hard Talk
@@ -87,7 +88,7 @@ bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # World of Wisdom
+bbc-world   sat     00:30-00:50 # My Indian Life
 bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
@@ -115,7 +116,7 @@ cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
 portraits      sat 12:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
-bbc-world      sat 19:30-19:50 # World of Wisdom
+bbc-world      sat 19:30-19:50 # My Indian Life
 bbc-world      sat 19:50-20:00 # More or Lesa
 bbc-world      sat 20:00-21:00 # The Science Hour
 bbc-world      sat 21:00-21:30 # The Newsroom
