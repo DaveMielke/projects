@@ -11,15 +11,15 @@ bbc-world   2023 mar 12-25 mon-fri 20:00-00:00
 bbc-world   2023 oct 29-31 mon-fri 20:00-00:00
 bbc-world   2023 nov 1-4   mon-fri 20:00-00:00
 
-bbc-world     2021    dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
-cbc1-winnipeg 2021    dec 25 01:00-07:00 # Christmas Night
-cbc1-ottawa   2021    dec 25 09:00-11:50 # Handel's Messiah
-cbc1-ottawa   2021    dec 25 11:50-12:00 # The Queen's Christmas Message
-cbc1-goosebay 2021    dec 25 12:00-13:00 # Noël with Florence K
-portraits             dec 25 01:00-20:00 # Christmas Day
-christian     mon-fri dec 31 20:00-00:00 # New Year's Eve
+bbc-world     2022    dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
+cbc1-winnipeg 2022    dec 25 01:00-07:00 # Christmas Night
+cbc1-ottawa   2022    dec 25 09:00-11:50 # Handel's Messiah
+cbc1-ottawa   2022    dec 25 11:50-12:00 # The King's Message
+cbc1-ottawa   2022    dec 25 12:00-13:00 # Noël with Florence K
+portraits     mon-sat dec 25 01:00-20:00 # Christmas Day
+christian     mon     dec 26 00:00-02:00 # Boxing Day
 
-portraits   mon-fri jan 1     06:00-15:00 # New Year's Day
+portraits   mon-fri jan  1    06:00-15:00 # New Year's Day
 portraits   mon     feb 15-21 06:00-15:00 # Family Day
 portraits   mon     may 18-24 06:00-15:00 # Victoria Day
 portraits   fri     jun 30    06:00-15:00 # Canada Day
@@ -28,7 +28,8 @@ portraits   mon     jul  2    06:00-15:00 # Canada Day
 portraits   mon     aug  1-7  06:00-15:00 # Civic Holiday
 portraits   mon     sep  1-7  06:00-15:00 # Labour Day
 portraits   mon     oct  8-14 06:00-15:00 # Thanksgiving
-cbc1-ottawa         nov  11   10:55-12:00 # Remembrance Day Ceremony
+cbc1-ottawa         nov 11    10:55-12:00 # Remembrance Day Ceremony
+portraits   mon-fri dec 26    06:00-15:00 # Boxing Day
 
 cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
 cbc1-ottawa mon-fri 08:37-10:00 # The Current
@@ -36,13 +37,14 @@ cbc1-ottawa mon-fri 08:37-10:00 # The Current
 cbc1-ottawa mon 11:32-12:00 # Because News
 cbc1-ottawa tue 11:32-12:00 # Cost of Living
 cbc1-ottawa wed 11:32-12:00 # Helluva Story
-#cbc1-ottawa thu 11:32-12:00 # Pop chat
+cbc1-ottawa thu 11:32-12:00 # Under the Influence
 #cbc1-ottawa fri 11:32-12:00 # The Debaters
 
 cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
 
 bbc-world   mon-thu 13:00-13:50 # Outlook
 bbc-world   mon-thu 13:50-14:00 # Witness History
+cbc1-ottawa fri     13:00-13:30 # And Sometimes Y
 
 bbc-world mon 15:00-15:30 # The Climate Question
 bbc-world tue 15:00-15:30 # The Documentary
@@ -75,9 +77,7 @@ bbc-world   thu 17:30-18:00 # The Food Chain
 
 cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
 cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
-bbc-world   mon-thu 20:00-21:00 # Business Matters
-bbc-world   fri-fri 20:00-20:30 # World Business Report
-bbc-world   fri-fri 20:30-21:00 # Worklife India
+bbc-world   mon-fri 20:00-21:00 # Business Matters
 bbc-world   mon-fri 21:00-21:30 # The Newsroom
 
 cbc1-ottawa fri-fri 22:00-22:30 # Front Burner
@@ -88,7 +88,7 @@ bbc-world   fri 23:00-00:00 # The Real Story
 
 bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
 bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # My Indian Life
+bbc-world   sat     00:30-00:50 # The Explanation
 bbc-world   sat     00:50-01:00 # More or Less
 cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
 
@@ -110,13 +110,13 @@ cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
 cbc1-ottawa    sat 09:00-10:00 # The House
 #cbc1-ottawa    sat 10:00-11:00 # Day 6
 #cbc1-ottawa    sat 11:00-11:32 # Because News
-#cbc1-ottawa    sat 11:32-12:00 # Pop chat
+cbc1-ottawa    sat 11:32-12:00 # Under the Influence
 cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
 cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
 cbc1-ottawa    sat 13:32-14:00 # The Debaters
 portraits      sat 12:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
-bbc-world      sat 19:30-19:50 # My Indian Life
+bbc-world      sat 19:30-19:50 # The Explanation
 bbc-world      sat 19:50-20:00 # More or Lesa
 bbc-world      sat 20:00-21:00 # The Science Hour
 bbc-world      sat 21:00-21:30 # The Newsroom
