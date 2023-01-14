@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+sourceRoot="dave@canute:brltty/Release"
+targetRoot="/mnt/opt/dave/web/brltty/archive/Canute"
+
+cd "${targetRoot}/"
+rm -f -- *
+scp -q "${sourceRoot}/*" .
+exit 0
