@@ -1,0 +1,39 @@
+#!/bin/bash -p
+set -e
+
+repositoryDirectory=~android/"brltty/git/master"
+buildDirectory="${repositoryDirectory}/Android/Gradle"
+archiveDirectory="/mnt/opt/dave/web/brltty/archive/Android"
+cd "${archiveDirectory}"
+
+rst2html \
+   --config "${repositoryDirectory}/docutils.conf" \
+   "${repositoryDirectory}/Documents/README.Android" \
+   "brltty-on-android.html"
+
+cp -a "${buildDirectory}/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk" brltty-latest.apk
+cp -a "${repositoryDirectory}/Android/STRINGS" android-strings.txt
+rm -f android-strings-*.txt
+
+for directory in "${buildDirectory}/app/src/main/res/values-"*
+do
+   name="${directory##*/}"
+   language="${name#*-}"
+   sed --quiet --regexp-extended '
+      s%^\s*<\s*string\s%%
+      T
+
+      s%^.*name="%%
+      T
+
+      s%\s*<\s*/string\s*>\s*$%%
+      T
+
+      s%^(.*?)".*?>%\1 %
+      T
+
+      p
+   ' <"${directory}/strings.xml" >"android-strings-${language}.txt"
+done
+
+exit 0
