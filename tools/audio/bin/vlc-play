@@ -10,6 +10,9 @@ exec vlc \
   --play-and-exit --sout-keep \
   --audio --no-video \
   --audio-replay-gain-mode track --audio-replay-gain-peak-protection \
+  --soundfont /usr/share/soundfonts/FluidR3_GM.sf2 \
+  --synth-gain 2 --synth-polyphony 100 \
+  --synth-sample-rate 44100 --no-synth-chorus --synth-reverb \
   "${@}"
 
 exit "${?}"
