@@ -13,6 +13,7 @@ programMessage() {
 declare -A prefixMap=(
    ["audio"]="/home/dave/"
    ["base"]="/home/dave/"
+   ["bible"]="/home/dave/bible/"
    ["bitlbee/irc"]="/home/dave/.irc/"
    ["bitlbee"]="/home/dave/."
    ["brltty"]="/home/dave/"

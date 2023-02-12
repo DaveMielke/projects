@@ -1,0 +1,45 @@
+#!/usr/bin/env tclsh
+package require Tclx
+
+set versesFile verses
+set indexFile book.index
+set bookExtension STR
+
+set versesStream [open $versesFile {WRONLY TRUNC CREAT}]
+set verseLine ""
+
+proc flushVerse {} {
+  global verseLine
+
+  if {[string length $verseLine] > 0} {
+    global versesStream bookKey
+
+    regsub -all {\s+} $verseLine " " verseLine
+    regsub -all {\[} $verseLine "\{" verseLine
+    regsub -all {\]} $verseLine "\}" verseLine
+    regsub {(\S+)} $verseLine "\[$bookKey-\\1\]" verseLine
+
+    puts $versesStream $verseLine
+    set verseLine ""
+  }
+}
+
+for_file indexLine $indexFile {
+  lassign $indexLine bookName bookKey
+  set bookFile "$bookName.$bookExtension"
+
+  for_file bookLine $bookFile {
+    if {![string equal [string index $bookLine 0] " "]} {
+      flushVerse
+    }
+
+    append verseLine $bookLine
+  }
+
+  flushVerse
+}
+
+close $versesStream
+unset versesStream
+
+exit 0
