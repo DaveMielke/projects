@@ -1,18 +1,30 @@
-#!/bin/bash -p
+#!/bin/bash
 set -e
 
 programName="${0##*/}"
 
-exec vlc \
-  --quiet --intf rc \
-  --logfile "${TMPDIR:-/tmp}/${programName}.log" --logmode text --log-verbose -1 \
-  --one-instance-when-started-from-file --started-from-file --no-playlist-enqueue \
-  --play-and-exit --sout-keep \
-  --audio --no-video \
-  --audio-replay-gain-mode track --audio-replay-gain-peak-protection \
-  --soundfont /usr/share/soundfonts/FluidR3_GM.sf2 \
-  --synth-gain 2 --synth-polyphony 100 \
-  --synth-sample-rate 44100 --no-synth-chorus --synth-reverb \
-  "${@}"
+vlcOptions=(
+  --quiet
+  --intf rc
+  --logfile "${TMPDIR:-/tmp}/${programName}.log"
+  --logmode text
+  --log-verbose -1
+  --one-instance-when-started-from-file
+  --started-from-file
+  --no-playlist-enqueue
+  --play-and-exit
+  --sout-keep
+  --audio
+  --no-video
+  --audio-replay-gain-mode track
+  --audio-replay-gain-peak-protection
+  --soundfont /usr/share/soundfonts/FluidR3_GM.sf2
+  --synth-gain 2
+  --synth-polyphony 100
+  --synth-sample-rate 44100
+  --no-synth-chorus
+  --synth-reverb
+)
 
+exec vlc "${vlcOptions[@]}" "${@}"
 exit "${?}"
