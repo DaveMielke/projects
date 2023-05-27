@@ -21,6 +21,8 @@ christian     mon     dec 26 00:00-02:00 # Boxing Day
 
 portraits   mon-fri jan  1    06:00-15:00 # New Year's Day
 portraits   mon     feb 15-21 06:00-15:00 # Family Day
+portraits   fri 2024 mar 29   06:00-15:00 # Good Friday
+portraits   mon 2024 apr  1   06:00-15:00 # Easter Monday
 portraits   mon     may 18-24 06:00-15:00 # Victoria Day
 portraits   fri     jun 30    06:00-15:00 # Canada Day
 portraits   mon-fri jul  1    06:00-15:00 # Canada Day
@@ -117,13 +119,12 @@ portraits      sat 12:00-19:00 # Saturday Afternoon Music
 cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
 bbc-world      sat 19:30-19:50 # Dear Daughter
 bbc-world      sat 19:50-20:00 # Sporting Witness
-bbc-world      sat 20:00-20:50 # The Forum
-bbc-world      sat 20:50-21:00 # Over to You
+bbc-world      sat 20:00-21:00 # Unexpected Elements
 bbc-world      sat 21:00-21:30 # The Newsroom
 bbc-world      sat 21:30-22:00 # Health Check
 bbc-world      sat 22:00-23:00 # The Documentary
 bbc-world      sat 23:00-23:30 # From Our Own Correspondant
-bbc-world      sat 23:30-23:50 # Trending
+bbc-world      sat 23:30-23:50 # The Global Jigsaw
 bbc-world      sat 23:50-00:00 # Sporting Witness
 cbc1-ottawa    sun 00:00-01:00 # The House
 cbc1-stjohns   sun 01:00-01:32 # BBC - Science in Action
