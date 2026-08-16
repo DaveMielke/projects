@@ -1,4 +1,6 @@
 #!/bin/bash
+. gettext.sh
+
 . brltty-prologue.bash
 includeProgramComponent weather
 shopt -s extglob
@@ -153,6 +155,7 @@ owmQuery() {
    curlNewRequest "api.OpenWeatherMap.org"
    curlExtendLocation "${@}"
    curlAddQueryParameters owmParameters
+   [ -n "${LANG}" ] && curlAddQueryParameter lang "${LANG%%_*}"
 
    local owmResponse
    curlGetResponse owmResponse
@@ -659,53 +662,57 @@ showWeather() {
 
    local lines=() line
 
-   local time offset
-   getElement time "${weatherArray}" "time"
-   getElement offset "${weatherArray}" "time,offset"
-   formatTime time
-   printf -v line "as at %s" "${time}"
+   local measurementTime
+   getElement measurementTime "${weatherArray}" "time"
+   formatTime measurementTime
+   line="$(eval_gettext 'As at ${measurementTime}')"
    lines+=("${line}")
 
-   local name description general
-   getElement name "${weatherArray}" "location,name"
+   local locationName description general
+   getElement locationName "${weatherArray}" "location,name"
    getElement description "${weatherArray}" "weather,description"
    getElement general "${weatherArray}" "weather,general"
    [ -n "${description}" ] || description="${general}"
-   printf -v line "%s: %s" "${name}" "${description}"
+   line="${locationName}: ${description}"
    lines+=("${line}")
 
-   local temperature feelsLike
-   getElement temperature "${weatherArray}" "temperature"
-   getElement feelsLike "${weatherArray}" "temperature,feels"
-   formatTemperature temperature
-   formatTemperature feelsLike
-   line="temperature: ${temperature}"
-   [ "${feelsLike}" = "${temperature}" ] || line+=" (feels like ${feelsLike})"
+   local actualTemperature apparentTemperature
+   getElement actualTemperature "${weatherArray}" "temperature"
+   getElement apparentTemperature "${weatherArray}" "temperature,feels"
+   formatTemperature actualTemperature
+   formatTemperature apparentTemperature
+   line="$(gettext "Temperature"): ${actualTemperature}"
+   [ "${apparentTemperature}" = "${actualTemperature}" ] || {
+      line+=", $(eval_gettext 'feels like ${apparentTemperature}')"
+   }
    lines+=("${line}")
 
-   local windSpeed windDegrees windDirection
+   local windSpeed windDegrees compassDirection
    getElement windSpeed "${weatherArray}" "wind,speed"
    getElement windDegrees "${weatherArray}" "wind,degrees"
    formatSpeed windSpeed
-   toWindDirection windDirection "${windDegrees}"
-   printf -v line "wind: %s from the %s (%d°)" "${windSpeed}" "${windDirection}" "${windDegrees}"
+   toCompassDirection compassDirection "${windDegrees}"
+   line="$(gettext "Wind")"
+   line+=": $(eval_gettext '${windSpeed} at ${windDegrees}°')"
+   line+=", ${compassDirection}"
    lines+=("${line}")
 
-   local humidity pressure
-   getElement humidity "${weatherArray}" "humidity"
-   getElement pressure "${weatherArray}" "pressure"
-   formatPressure pressure
-   printf -v line "%d%% humidity, pressure is %s" "${humidity}" "${pressure}"
+   local humidityPercentage atmosphericPressure
+   getElement humidityPercentage "${weatherArray}" "humidity"
+   getElement atmosphericPressure "${weatherArray}" "pressure"
+   formatPressure atmosphericPressure
+   line="$(eval_gettext '${humidityPercentage}% humidity')"
+   line+=", $(eval_gettext 'pressure is ${atmosphericPressure}')"
    lines+=("${line}")
 
-   local clouds visibility
-   getElement clouds "${weatherArray}" "clouds,percent"
-   getElement visibility "${weatherArray}" "visibility"
-   line="${clouds}% clouds"
+   local cloudPercentage visibilityDistance
+   getElement cloudPercentage "${weatherArray}" "clouds,percent"
+   getElement visibilityDistance "${weatherArray}" "visibility"
+   line="$(eval_gettext '${cloudPercentage}% clouds')"
 
-   [ "${visibility}" -lt 10000 ] && {
-      formatDistance visibility
-      line+=", visibility is ${visibility}"
+   [ "${visibilityDistance}" -lt 10000 ] && {
+      formatDistance visibilityDistance
+      line+=", $(eval_gettext 'visibility is ${visibilityDistance}')"
    }
 
    lines+=("${line}")

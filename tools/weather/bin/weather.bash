@@ -11,31 +11,67 @@ readonly temperatureUnitSetting="temperature-unit"
 readonly timeFormatSetting="time-format"
 
 readonly -A distanceUnits=(
-   ["ft"]="feet"
-   ["km"]="kilometers"
-   ["m"]="meters"
-   ["mi"]="miles"
+   # TRANSLATORS: this is the name of a distance unit
+   ["ft"]="$(gettext "Feet")"
+
+   # TRANSLATORS: this is the name of a distance unit
+   ["km"]="$(gettext "Kilometers")"
+
+   # TRANSLATORS: this is the name of a distance unit
+   ["m"]="$(gettext "Meters")"
+
+   # TRANSLATORS: this is the name of a distance unit
+   ["mi"]="$(gettext "Miles")"
 )
 
 readonly -A pressureUnits=(
-   ["hpa"]="hectopascals"
-   ["inHg"]="inches of mercury"
-   ["kpa"]="kilopascals"
-   ["mb"]="millibars"
+   # TRANSLATORS: this is the name of a pressure unit
+   ["hpa"]="$(gettext "Hectopascals")"
+
+   # TRANSLATORS: this is the name of a pressure unit
+   ["inHg"]="$(gettext "Inches of Mercury")"
+
+   # TRANSLATORS: this is the name of a pressure unit
+   ["kpa"]="$(gettext "Kilopascals")"
+
+   # TRANSLATORS: this is the name of a pressure unit
+   ["mb"]="$(gettext "Millibars")"
 )
 
 readonly -A speedUnits=(
-   ["km/hr"]="kilometers per hour"
-   ["knots"]="knots"
-   ["m/s"]="meters per second"
-   ["mph"]="miles per hour"
+   # TRANSLATORS: this is the name of a speed unit
+   ["km/hr"]="$(gettext "Kilometers per Hour")"
+
+   # TRANSLATORS: this is the name of a speed unit
+   ["knots"]="$(gettext "Knots")"
+
+   # TRANSLATORS: this is the name of a speed unit
+   ["m/s"]="$(gettext "Meters per Second")"
+
+   # TRANSLATORS: this is the name of a speed unit
+   ["mph"]="$(gettext "Miles per Hour")"
 )
 
 readonly -A temperatureUnits=(
-   ["C"]="celsius"
-   ["F"]="fahrenheit"
-   ["K"]="kelvin"
-   ["R"]="rankine"
+   # TRANSLATORS: this is the name of a temperature scale
+   ["C"]="$(gettext "Celsius")"
+
+   # TRANSLATORS: this is the name of a temperature scale
+   ["F"]="$(gettext "Fahrenheit")"
+
+   # TRANSLATORS: this is the name of a temperature scale
+   ["K"]="$(gettext "Kelvin")"
+
+   # TRANSLATORS: this is the name of a temperature scale
+   ["R"]="$(gettext "Rankine")"
+)
+
+readonly -A timeUnits=(
+   # TRANSLATORS: this is the name of a time format
+   ["24-hours"]="$(gettext "24-Hour Mode")"
+
+   # TRANSLATORS: this is the name of a time format
+   ["12-hours"]="$(gettext "12-Hour Mode")"
 )
 
 readonly -A timeFormats=(
@@ -60,14 +96,63 @@ readonly -A imperialUnits=(
 )
 
 readonly unitsTypeNames=(metric imperial)
-readonly windDirections=(N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW)
 
-toWindDirection() {
+readonly compassDirections=(
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "north")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "north-northeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "northeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "east-northeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "east")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "east-southeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "southeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "south-southeast")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "south")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "south-southwest")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "southwest")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "west-southwest")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "west")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "west-northwest")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "northwest")"
+
+   # TRANSLATORS: this is a compass direction
+   "$(gettext "north-northwest")"
+)
+
+toCompassDirection() {
    local directionVariable="${1}"
    local degrees="${2}"
 
    local direction=$(( ((((degrees * 4) + 45) % 1440) / 90) ))
-   direction="${windDirections[direction]}"
+   direction="${compassDirections[direction]}"
    setVariable "${directionVariable}" "${direction}"
 }
 
