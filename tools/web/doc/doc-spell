@@ -1,0 +1,19 @@
+#!/bin/sh
+. "`dirname "${0}"`/doc-prologue.sh"
+
+sedFile="${documentName}.sed"
+sedPath="${documentDirectory}/${sedFile}"
+verifyInputFile "${sedPath}"
+
+wordsFile="${documentName}.aspell"
+wordsPath="${documentDirectory}/${wordsFile}"
+verifyInputFile "${wordsPath}"
+
+set -e
+php "${documentPath}" nolatin |
+sed --regexp-extended --file="${sedPath}" |
+html2text --body-width=0 |
+aspell --mode=none --encoding=utf-8 --personal="${wordsPath}" -- list |
+sort --unique
+
+exit 0

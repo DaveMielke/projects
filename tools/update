@@ -22,6 +22,8 @@ declare -A prefixMap=(
    ["radio/systemd"]="/etc/systemd/system/"
    ["tcl/lib"]="/mnt/opt/dave/lib/tcl/"
    ["weather"]="/home/dave/"
+   ["web/doc"]="/home/dave/bin/"
+   ["web/sitemap"]="/home/dave/bin/"
 )
 
 while read file

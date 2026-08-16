@@ -1,0 +1,3 @@
+#!/bin/sh
+sitemap-update -q -u -o https://mielke.cc -d /mnt/opt/dave/web/doc -g -- "sitemap-*.xml" sitemap.xml
+exit "${?}"

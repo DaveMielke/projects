@@ -1,0 +1,5 @@
+#!/bin/sh
+. "`dirname "${0}"`/doc-prologue.sh"
+ 
+diff "${backupDirectory}/${documentFile}" "${documentPath}"
+exit "${?}"

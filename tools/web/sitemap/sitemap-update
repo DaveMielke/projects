@@ -1,0 +1,198 @@
+#!/bin/bash
+. brltty-prologue.sh
+
+showProgramUsagePurpose() {
+cat <<END_OF_PROGRAM_USAGE_PURPOSE
+Update web server site maps and indexes.
+END_OF_PROGRAM_USAGE_PURPOSE
+}
+
+showProgramUsageNotes() {
+cat <<END_OF_PROGRAM_USAGE_NOTES
+If no parameters are specified then ${defaultSitemapFile} is assumed.
+END_OF_PROGRAM_USAGE_NOTES
+}
+
+processExtraProgramParameters() {
+   [ "${#}" -gt 0 ] || set -- "${defaultSitemapFile}"
+   positionalParameters=("${@}")
+}
+
+parsePositionalParameters() {
+   sitemapFiles=()
+   local parameter file
+
+   for parameter in "${positionalParameters[@]}"
+   do
+      if "${globPatterns}"
+      then
+         set -- ${parameter}
+      else
+         set -- "${parameter}"
+      fi
+
+      for file
+      do
+         verifyInputFile "${file}"
+         sitemapFiles+=("${file}")
+      done
+   done
+}
+
+writeSitemapLine() {
+   echo "${sitemapLine}" >&${sitemapStream}
+}
+
+addSitemapLine() {
+   local tag="${1}"
+   local content="${2}"
+
+   sitemapLine="${tagIndent}<${tag}>${content}</${tag}>"
+   writeSitemapLine
+}
+
+handleTag_loc() {
+   writeSitemapLine
+
+   if [[ "${tagContent}" =~ (${urlOriginPattern})(.*)$ ]]
+   then
+      local origin="${BASH_REMATCH[1]}"
+      local file="${BASH_REMATCH[2]}"
+
+      if [ -z "${urlOrigin}" ]
+      then
+         urlOrigin="${origin}"
+      elif [ "${origin}" != "${urlOrigin}" ]
+      then
+         logWarning "unexpected URL origin: ${origin} != ${urlOrigin}: ${sitemapLineReference}"
+      fi
+
+      [ "${file}" = "${file%/}" ] || file+="index.html"
+      file="${file#/}"
+
+      let "fileCount += 1"
+      "${listFiles}" && echo "${file}"
+
+      if [ -f "${file}" ]
+      then
+         local date="$(date --reference="${file}" +"%Y-%m-%d")"
+         addSitemapLine lastmod "${date}"
+      else
+         logWarning "file not found: ${file}: ${sitemapLineReference}"
+      fi
+   else
+      logWarning "missing URL origin: ${tagContent}: ${sitemapLineReference}"
+   fi
+}
+
+handleTag_lastmod() {
+   :
+}
+
+handleTag() {
+   local tagName
+
+   for tagName in loc lastmod
+   do
+      local tagPattern="^( *)<${tagName}>(.*)</${tagName}> *\$"
+
+      [[ "${sitemapLine}" =~ ${tagPattern} ]] && {
+         local tagIndent="${BASH_REMATCH[1]}"
+         local tagContent="${BASH_REMATCH[2]}"
+
+         "handleTag_${tagName}"
+         return 0
+      }
+   done
+
+   return 1
+}
+
+setSitemapTag() {
+   [ -n "${sitemapTag}" ] || {
+      local pattern="^ *< *([a-z]+) +xmlns="
+      [[ "${sitemapLine}" =~ ${pattern} ]] || return 0
+      sitemapTag="${BASH_REMATCH[1]}"
+   }
+}
+
+urlOriginPattern="^[a-z]+://[^/]+"
+
+defaultSitemapDirectory="."
+defaultSitemapFile="sitemap.xml"
+
+addProgramOption d string.directory sitemapDirectory "the directory containing the site maps" "${defaultSitemapDirectory}"
+addProgramOption g flag globPatterns "the file names are interpreted as glob patterns"
+addProgramOption l flag listFiles "list the files"
+addProgramOption o string.origin urlOrigin "the URL origin for each file" "the origin for the first file"
+addProgramOption u flag updateSitemap "update the site maps"
+optionalProgramParameters "file" "the site maps and/or indexes to update"
+parseProgramArguments "${@}"
+
+set -e
+umask 022
+
+[ -n "${urlOrigin}" ] && {
+   [[ "${urlOrigin}" =~ ${urlOriginPattern}$ ]] || {
+      syntaxError "invalid URL origin: ${urlOrigin}"
+   }
+}
+
+[ -n "${sitemapDirectory}" ] || sitemapDirectory="${defaultSitemapDirectory}"
+verifyWritableDirectory "${sitemapDirectory}"
+cd "${sitemapDirectory}"
+parsePositionalParameters
+
+for sitemapFile in "${sitemapFiles[@]}"
+do
+   newSitemapFile="${sitemapFile}.new"
+   verifyOutputFile "${newSitemapFile}"
+
+   readarray -t sitemapArray <"${sitemapFile}"
+   rm --force -- "${newSitemapFile}"
+
+   fileCount=0
+   sitemapTag=""
+   sitemapLineNumber=0
+
+   for sitemapLine in "${sitemapArray[@]}"
+   do
+      let "sitemapLineNumber += 1"
+      sitemapLineReference="${sitemapFile}[${sitemapLineNumber}]"
+
+      handleTag || {
+         writeSitemapLine
+         setSitemapTag
+      }
+   done {sitemapStream}>"${newSitemapFile}"
+
+   [ "${fileCount}" -eq 0 ] && logWarning "no files: ${sitemapFile}"
+   [ -n "${sitemapTag}" ] || semanticError "top-level site map tag not found: ${sitemapFile}"
+
+   case "${sitemapTag}"
+   in
+      urlset) sitemapType="map";;
+      sitemapindex) sitemapType="index";;
+      *) semanticError "unrecognized top-level site map tag: ${sitemapTag}: ${sitemapFile}";;
+   esac
+
+   sitemapSchema="${programDirectory}/site${sitemapType}.xsd"
+   [ -f "${sitemapSchema}" ] || semanticError "site map schema not found: ${sitemapSchema}"
+   xmllint --quiet --noout --schema "${sitemapSchema}" "${newSitemapFile}"
+
+   if cmp --quiet -- "${newSitemapFile}" "${sitemapFile}"
+   then
+      rm -- "${newSitemapFile}"
+      logTask "site ${sitemapType} is unchanged: ${sitemapFile}"
+   elif "${updateSitemap}"
+   then
+      logNotice "updating site ${sitemapType}: ${sitemapFile}"
+      oldSitemapFile="${sitemapFile}.old"
+      mv --force -- "${sitemapFile}" "${oldSitemapFile}"
+      mv --force -- "${newSitemapFile}" "${sitemapFile}"
+   else
+      logNotice "site ${sitemapType} not updated (use -u): ${sitemapFile}"
+   fi
+done
+
+exit 0
