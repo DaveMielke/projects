@@ -11,7 +11,7 @@ rst2html \
    "${repositoryDirectory}/Documents/README.Android" \
    "brltty-on-android.html"
 
-cp -a "${buildDirectory}/app/build/outputs/apk/debug/app-armeabi-v7a-debug.apk" brltty-latest.apk
+cp -a "${buildDirectory}/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk" brltty-latest.apk
 cp -a "${repositoryDirectory}/Android/STRINGS" android-strings.txt
 rm -f android-strings-*.txt
 
