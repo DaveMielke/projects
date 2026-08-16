@@ -1,139 +1,49 @@
-cbc1-ottawa 2023 mar 27-30 10:00-11:00 # Canada Reads
+#bc1-ottawa   2026 apr 13-16 10:00-11:00 # Canada Reads
+cbc1-ottawa   2026 jul-aug fri 13:00-13:30 # That's Puzzling
+cbc1-ottawa   2026 jul-aug wed 11:30-12:00 # We Regret to Inform You
+bbc-world     2026 jul-aug mon-fri 19:00-20:00 # !Commotion
+cbc1-winnipeg 2026 jul-aug mon-fri 20:00-20:30 # As It Happens
 
-# For when we're on Daylight Time but Europe is on Standard Time.
-portraits   2024 mar 10-30 mon-fri 13:00-16:00
-portraits   2023 oct 29-31 mon-fri 13:00-16:00
-portraits   2023 nov 1-4   mon-fri 13:00-16:00
-bbc-world   2024 mar 10-30 mon-fri 16:00-18:00
-bbc-world   2023 oct 29-31 mon-fri 16:00-18:00
-bbc-world   2023 nov 1-4   mon-fri 16:00-18:00
-bbc-world   2024 mar 10-30 mon-fri 20:00-00:00
-bbc-world   2023 oct 29-31 mon-fri 20:00-00:00
-bbc-world   2023 nov 1-4   mon-fri 20:00-00:00
+bbc-world   dec 24 mon-fri 18:30-20:00 # 
+cbc1-ottawa dec 25         09:00-11:50 # Händel's Messiah
+cbc1-ottawa dec 25         11:50-12:00 # His Majesty the King's Christmas Message
+portraits   dec 25 mon-sat 06:00-15:00 # 
+bbc-world   dec 25 mon-sat 15:00-20:00 # 
 
-bbc-world     2022    dec 24 10:00-11:30 # A Festival of Nine Lessons and Carols
-cbc1-winnipeg 2022    dec 25 01:00-07:00 # Christmas Night
-cbc1-ottawa   2022    dec 25 09:00-11:50 # Handel's Messiah
-cbc1-ottawa   2022    dec 25 11:50-12:00 # The King's Message
-cbc1-ottawa   2022    dec 25 12:00-13:00 # Noël with Florence K
-portraits     mon-sat dec 25 01:00-20:00 # Christmas Day
-christian     mon     dec 26 00:00-02:00 # Boxing Day
+cbc1-ottawa    mon-fri 06:00-08:37 # Ottawa Morning
+cbc1-ottawa    mon-fri 08:37-10:00 # The Current
+cbc1-ottawa    mon-fri 12:00-13:00 # Ontario Today
+portraits      fri     13:00-15:30 # 
+cbc1-ottawa    mon-fri 18:00-18:30 # Your World Tonight
+cbc1-ottawa    mon-fri 18:30-20:00 # As It Happens
+#sm            mon-fri 23:00-00:00 # The Golden Era of the Opry
+#sm            tue-sat 00:00-01:00 # The Golden Era of the Opry
+bbc-world      mon-fri 10:00-00:00 # 
 
-portraits   mon-fri jan  1    06:00-15:00 # New Year's Day
-portraits   mon     feb 15-21 06:00-15:00 # Family Day
-portraits   fri 2024 mar 29   06:00-15:00 # Good Friday
-portraits   mon 2024 apr  1   06:00-15:00 # Easter Monday
-portraits   mon     may 18-24 06:00-15:00 # Victoria Day
-portraits   fri     jun 30    06:00-15:00 # Canada Day
-portraits   mon-fri jul  1    06:00-15:00 # Canada Day
-portraits   mon     jul  2    06:00-15:00 # Canada Day
-portraits   mon     aug  1-7  06:00-15:00 # Civic Holiday
-portraits   mon     sep  1-7  06:00-15:00 # Labour Day
-portraits   mon     oct  8-14 06:00-15:00 # Thanksgiving
-cbc1-ottawa         nov 11    10:55-12:00 # Remembrance Day Ceremony
-portraits   mon-fri dec 26    06:00-15:00 # Boxing Day
+bbc-world      sat     06:00-07:00 # Newsroom, Health Check
+cbc1-vancouver sat     07:00-08:00 # DW - Inside Europe
+cbc1-vancouver sat     08:00-08:33 # ABC - Rear Vision
+cbc1-vancouver sat     08:33-09:00 # BBC - The Conversation
+cbc1-ottawa    sat     09:00-10:00 # The House
+cbc1-ottawa    sat     10:00-11:00 # Day 6
+cbc1-ottawa    sat     11:00-11:32 # Because News
+cbc1-ottawa    sat     11:32-12:00 # Under the Influence
+cbc1-ottawa    sat     12:00-13:00 # Quirks and Quarks
+cbc1-ottawa    sat     13:00-13:32 # The Debaters
+cbc1-ottawa    sat     13:32-14:00 # White Coat, Black Art
+cbc1-winnipeg  sat     19:00-19:30 # Your World Tonight
+cbc1-winnipeg  sat     19:30-20:00 # Laugh Out Loud
+bbc-world      sat     19:00-00:00 # 
 
-cbc1-ottawa mon-fri 05:30-08:37 # Ottawa Morning
-cbc1-ottawa mon-fri 08:37-10:00 # The Current
+#sm            sun     00:00-01:00 # The Golden Era of the Opry
+cbc1-ottawa    sun     00:00-01:00 # The House
+#sm            sun     01:00-02:00 # The Midnight Jamboree
 
-cbc1-ottawa mon 11:32-12:00 # Because News
-cbc1-ottawa tue 11:32-12:00 # Cost of Living
-cbc1-ottawa wed 11:32-12:00 # Helluva Story
-cbc1-ottawa thu 11:32-12:00 # Under the Influence
-cbc1-ottawa fri 11:32-12:00 # The Debaters
+cbc1-calgary   mon     00:00-02:00 # The Sunday Magazine
+cbc1-ottawa    mon     02:00-02:33 # ABC - Every Bite
+cbc1-ottawa    mon     02:33-03:00 # ABC - All in the Mind
+cbc1-ottawa    mon     03:00-03:35 # DW - Living Planet
+cbc1-ottawa    mon     03:35-04:00 # BBC - THE DOCUMENTARY
 
-cbc1-ottawa mon-fri 12:00-13:00 # Ontario Today
-
-bbc-world   mon-thu 13:00-13:50 # Outlook
-bbc-world   mon-thu 13:50-14:00 # Witness History
-cbc1-ottawa fri     13:00-13:30 # And Sometimes Y
-
-bbc-world mon 15:00-15:30 # From Our Own Correspondant
-bbc-world tue 15:00-15:30 # The Documentary
-bbc-world wed 15:00-15:30 # The Cimate Question
-bbc-world thu 15:00-15:30 # Assignment
-bbc-world fri 15:00-15:30 # OS Conversations
-
-bbc-world mon 15:30-16:00 # Discovery
-bbc-world tue 15:30-16:00 # Tech Life
-bbc-world wed 15:30-16:00 # Health Check
-bbc-world thu 15:30-16:00 # Science in Action
-bbc-world fri 15:30-16:00 # Crowd Science
-
-portraits   mon-fri 13:00-16:00 # weekday afternoon music
-bbc-world   mon-fri 16:00-17:00 # Newshour
-
-#bbc-world   mon-fri 17:00-17:20 # The Newsroom
-#bbc-world   mon-fri 17:20-17:30 # Sports News
-#bbc-world   mon-fri 17:30-18:00 # World Business Report
-
-bbc-world   mon 17:00-17:30 # Hard Talk
-bbc-world   tue 17:00-17:30 # People Fixing the World
-bbc-world   wed 17:00-17:30 # Hard Talk
-bbc-world   thu 17:00-17:30 # The Inquiry
-bbc-world   fri 17:00-17:30 # Hard Talk
-
-bbc-world   tue 17:30-18:00 # In the Studio
-bbc-world   wed 17:30-18:00 # The Documentary
-bbc-world   thu 17:30-18:00 # The Food Chain
-bbc-world   fri 17:30-18:00 # Heart and Soul
-
-cbc1-ottawa mon-fri 18:00-18:30 # The World at Six
-cbc1-ottawa mon-fri 18:30-20:00 # As It Happens
-bbc-world   mon-fri 20:00-21:00 # Business Matters
-bbc-world   mon-fri 21:00-21:30 # The Newsroom
-
-cbc1-ottawa fri-fri 22:32-23:00 # Nothing Is Foreign
-
-bbc-world   thu 23:30-00:00 # Heart and Soul
-bbc-world   fri 23:00-00:00 # The Real Story
-
-bbc-world   tue-fri 00:00-01:00 # Newsday (first hour)
-bbc-world   sat     00:00-00:30 # The Newsroom
-bbc-world   sat     00:30-00:50 # Dear Daughter
-bbc-world   sat     00:50-01:00 # More or Less
-cbc1-ottawa tue-sat 01:00-02:00 # PRI - The World
-
-cbc1-stjohns tue 02:00-02:31 # BBC - Discovery
-cbc1-stjohns wed 02:00-02:31 # BBC - Heart and Soul
-cbc1-stjohns thu 02:00-02:31 # BBC - People Fixing the World
-cbc1-stjohns fri 02:00-02:31 # ABC - The Health Report
-cbc1-ottawa  sat 02:00-03:00 # PRX - Latino USA
-
-cbc1-stjohns tue 02:31-03:00 # BBC - The Food Chain
-cbc1-stjohns wed 02:31-03:00 # rnz - Our Changing World
-cbc1-stjohns thu 02:31-03:00 # ABC - What the Duck?!
-cbc1-stjohns fri 02:31-03:00 # DW - World in Progress
-
-cbc1-vancouver sat 07:00-08:00 # DW - Inside Europe
-cbc1-vancouver sat 08:00-08:32 # ABC - Rear Vision
-cbc1-vancouver sat 08:32-09:00 # BBC - The Conversation
-cbc1-ottawa    sat 09:00-10:00 # The House
-#cbc1-ottawa    sat 10:00-11:00 # Day 6
-#cbc1-ottawa    sat 11:00-11:32 # Because News
-cbc1-ottawa    sat 11:32-12:00 # Under the Influence
-cbc1-ottawa    sat 12:00-13:00 # Quirks and Quarks
-cbc1-ottawa    sat 13:00-13:32 # White Coat, Black Art
-#cbc1-ottawa    sat 13:32-14:00 # The Debaters
-portraits      sat 12:00-19:00 # Saturday Afternoon Music
-cbc1-winnipeg  sat 19:00-19:30 # The World This Weekend
-bbc-world      sat 19:30-19:50 # Dear Daughter
-bbc-world      sat 19:50-20:00 # Sporting Witness
-bbc-world      sat 20:00-21:00 # Unexpected Elements
-bbc-world      sat 21:00-21:30 # The Newsroom
-bbc-world      sat 21:30-22:00 # Health Check
-bbc-world      sat 22:00-23:00 # The Documentary
-bbc-world      sat 23:00-23:30 # From Our Own Correspondant
-bbc-world      sat 23:30-23:50 # The Global Jigsaw
-bbc-world      sat 23:50-00:00 # Sporting Witness
-cbc1-ottawa    sun 00:00-01:00 # The House
-cbc1-stjohns   sun 01:00-01:32 # BBC - Science in Action
-cbc1-stjohns   sun 01:32-02:00 # BBC - Crowd Science
-
-cbc1-ottawa mon 00:00-02:00 # The Sunday Midnight Magazine
-cbc1-ottawa mon 02:00-02:31 # ABC - Future Tense
-cbc1-ottawa mon 02:31-03:00 # ABC - All in the Mind
-cbc1-ottawa mon 03:00-03:34 # DW - Living Planet
-cbc1-ottawa mon 03:34-04:00 # BBC - The Documentary
-
-christian # default program - Christian Music and Bible Reading
+portraits      mon-sat 07:00-21:00 # 
+christian                          # 

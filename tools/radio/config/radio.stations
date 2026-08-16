@@ -1,8 +1,10 @@
 local rtp://@:8554
 
-christian /home/radio/bin/music-christian -l christian.log
-portraits /home/radio/bin/music-portraits -l portraits.log
-lombardo /home/radio/bin/music-lombardo -l lombardo.log
+christian ~/bin/music-christian -l christian.log
+portraits ~/bin/music-portraits -l portraits.log
+lombardo ~/bin/music-lombardo -l lombardo.log
+
+wsm https://stream01048.westreamradio.com/wsm-am-mp3
 
 nasatv /home/radio/bin/youtube 21X5lGlDOfg
 cpac /home/radio/bin/youtube arie3QYu_nQ
@@ -11,49 +13,52 @@ aljazeera /home/radio/bin/youtube -upyPouRrB8
 ottawa /home/radio/bin/youtube CuFl_4Y_LxA
 ontario /home/radio/bin/youtube KjLZ5pTdRsM
 
-cbc1-kamloops http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_kam
-cbc1-kelowna http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_kel
-cbc1-princegeorge http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_prg
-cbc1-vancouver http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_vcr
-cbc1-victoria http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_vic
-cbc1-whitehorse http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_whs
-cbc1-calgary http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_cgy
-cbc1-edmonton http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_edm
-cbc1-regina http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_reg
-cbc1-saskatoon http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ssk
-cbc1-winnipeg http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_wpg
-cbc1-iqaluit http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_iqa
-cbc1-kitchener http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ekw
-cbc1-london http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ldn
-cbc1-ottawa http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ott
-cbc1-sudbury http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_sud
-cbc1-thunderbay http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_tba
-cbc1-toronto http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_tor
-cbc1-windsor http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_wdr
-cbc1-montreal http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_mtl
-cbc1-nordquebec http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_n_mtl
-cbc1-quebeccity http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_qqu
-cbc1-fredericton http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_frd
-cbc1-moncton http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_mct
-cbc1-saintjohn http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_snb
-cbc1-charlottetown http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_chr
-cbc1-sydney http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_syd
-cbc1-halifax http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_hfx
-cbc1-cornerbrook http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_cor
-cbc1-grandfalls http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_gfa
-cbc1-goosebay http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_gba
-cbc1-stjohns http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_snf
-cbc1-inuvik http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ink
-cbc1-yellowknife http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r1_ykn
-cbc2-atlantic http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r2_hfx
-cbc2-eastern http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r2_tor
-cbc2-central http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r2_wpg
-cbc2-mountain http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r2_edm
-cbc2-pacific http://cbcmp3.ic.llnwd.net/stream/cbcmp3_cbc_r2_vcr
+cbc1-kamloops https://playerservices.streamtheworld.com/pls/CBYKFM_CBC.pls
+cbc1-kelowna https://playerservices.streamtheworld.com/pls/CBTKFM_CBC.pls
+cbc1-princegeorge https://playerservices.streamtheworld.com/pls/CBYGFM_CBC.pls
+cbc1-vancouver https://playerservices.streamtheworld.com/pls/CBU2FM_CBC.pls
+cbc1-victoria https://playerservices.streamtheworld.com/pls/CBCVFM_CBC.pls
+cbc1-whitehorse https://playerservices.streamtheworld.com/pls/CFWH_CBC.pls
+cbc1-calgary https://playerservices.streamtheworld.com/pls/CBR1FM_CBC.pls
+cbc1-edmonton https://playerservices.streamtheworld.com/pls/CBXAM_CBC.pls
+cbc1-regina https://playerservices.streamtheworld.com/pls/CBKRFM_CBC.pls
+cbc1-saskatoon https://playerservices.streamtheworld.com/pls/CBK1FM_CBC.pls
+cbc1-winnipeg https://playerservices.streamtheworld.com/pls/CBWAM_CBC.pls
+cbc1-iqaluit https://playerservices.streamtheworld.com/pls/CFFBAM_CBC.pls
+cbc1-kingston https://playerservices.streamtheworld.com/pls/CBCKFM_CBC.pls
+cbc1-kitchener https://playerservices.streamtheworld.com/pls/CBLAFM2_CBC.pls
+cbc1-london https://playerservices.streamtheworld.com/pls/CBCLFM_CBC.pls
+cbc1-ottawa https://playerservices.streamtheworld.com/pls/CBOFM_CBC.pls
+cbc1-peterborough https://playerservices.streamtheworld.com/pls/CBCPFM_CBC.pls
+cbc1-sudbury https://playerservices.streamtheworld.com/pls/CBCSFM_CBC.pls
+cbc1-thunderbay https://playerservices.streamtheworld.com/pls/CBQTFM_CBC.pls
+cbc1-toronto https://playerservices.streamtheworld.com/pls/CBLAFM_CBC.pls
+cbc1-windsor https://playerservices.streamtheworld.com/pls/CBEWFM_CBC.pls
+cbc1-montreal https://playerservices.streamtheworld.com/pls/CBMEFM_CBC.pls
+cbc1-nordquebec https://playerservices.streamtheworld.com/pls/CBMPFM_CBC.pls
+cbc1-quebeccity https://playerservices.streamtheworld.com/pls/CBVEFM_CBC.pls
+cbc1-fredericton https://playerservices.streamtheworld.com/pls/CBZFFM_CBC.pls
+cbc1-moncton https://playerservices.streamtheworld.com/pls/CBAMFM_CBC.pls
+cbc1-saintjohn https://playerservices.streamtheworld.com/pls/CBDFM_CBC.pls
+cbc1-charlottetown https://playerservices.streamtheworld.com/pls/CBCTFM_CBC.pls
+cbc1-sydney https://playerservices.streamtheworld.com/pls/CBIS_CBC.pls
+cbc1-halifax https://playerservices.streamtheworld.com/pls/CBHA_CBC.pls
+cbc1-cornerbrook https://playerservices.streamtheworld.com/pls/CBYAM_CBC.pls
+cbc1-grandfalls https://playerservices.streamtheworld.com/pls/CBGAM_CBC.pls
+cbc1-goosebay https://playerservices.streamtheworld.com/pls/CFGB_CBC.pls
+cbc1-stjohns https://playerservices.streamtheworld.com/pls/CBN1_CBC.pls
+cbc1-inuvik https://playerservices.streamtheworld.com/pls/CHAK_CBC.pls
+cbc1-yellowknife https://playerservices.streamtheworld.com/pls/CFYKFM_CBC.pls
+cbc2-atlantic https://playerservices.streamtheworld.com/pls/CBH_CBC.pls
+cbc2-eastern https://playerservices.streamtheworld.com/pls/CBLFM_CBC.pls
+cbc2-central https://playerservices.streamtheworld.com/pls/CBWFM_CBC.pls
+cbc2-mountain https://playerservices.streamtheworld.com/pls/CBXFM_CBC.pls
+cbc2-pacific https://playerservices.streamtheworld.com/pls/CBUFM_CBC.pls
 
-aljazeera https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1616468342/ei/FgVZYMfuM4228wSA-5TQCA/ip/2607:fea8:c300:b07:428d:6e4f:cbd0:7b02/id/-upyPouRrB8.1/itag/96/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D137/hls_chunk_host/r3---sn-gvbxgn-tvfe.googlevideo.com/playlist_duration/30/manifest_duration/30/vprv/1/playlist_type/DVR/initcwndbps/15390/mh/Fc/mm/44/mn/sn-gvbxgn-tvfe/ms/lva/mv/m/mvi/3/pcm2cms/yes/pl/34/dover/11/keepalive/yes/fexp/24001373,24007246/mt/1616446598/sparams/expire,ei,ip,id,itag,source,requiressl,ratebypass,live,sgoap,sgovp,playlist_duration,manifest_duration,vprv,playlist_type/sig/AOq0QJ8wRgIhAMqH9dGcDETGhTR8OycrultwVXZcFkeuF_ZPOcGfoKdSAiEAotqZ9XTleoCmiFRemicWokcJYzjcsup0IbDqMvEW1Ys%3D/lsparams/hls_chunk_host,initcwndbps,mh,mm,mn,ms,mv,mvi,pcm2cms,pl/lsig/AG3C_xAwRQIgaPcTKb6nPx2i0lwTpYOQcBkNf8-hZSdv86Ngn3ZKHJ0CIQDGKQMNJOz_RQodaf6s5ZZl_kMQr9XlRkj9nguQG62zZA%3D%3D/playlist/index.m3u8
-bbc-world https://open.live.bbc.co.uk/mediaselector/6/select/mediaset/http-icy-mp3-a/format/pls/proto/http/vpid/bbc_world_service.pls
-nasatv https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1616468833/ei/AQdZYIK-ApWJ2LYPjpe9sAM/ip/2607:fea8:c300:b07:428d:6e4f:cbd0:7b02/id/21X5lGlDOfg.3/itag/300/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D298/hls_chunk_host/r7---sn-gvbxgn-tvfl.googlevideo.com/playlist_duration/30/manifest_duration/30/vprv/1/playlist_type/DVR/initcwndbps/18490/mh/N8/mm/44/mn/sn-gvbxgn-tvfl/ms/lva/mv/m/mvi/7/pl/34/dover/11/keepalive/yes/fexp/24001373,24007246/beids/9466587/mt/1616447060/sparams/expire,ei,ip,id,itag,source,requiressl,ratebypass,live,sgoap,sgovp,playlist_duration,manifest_duration,vprv,playlist_type/sig/AOq0QJ8wRQIhAKdXHmwbglaqF2c1D16DzJLOG4f2ZdQhces5QAIF87w0AiASLa7dCDHTnoLhKgbh0qvE7mY4gzZbyfV0PmY_k0Bs6A%3D%3D/lsparams/hls_chunk_host,initcwndbps,mh,mm,mn,ms,mv,mvi,pl/lsig/AG3C_xAwRQIhAJyKOKfG0djmvpVw8twsmDhaRCyUtCAoVXUQQlmAtZ8-AiBVD_dnIuvzwJ5c8njxqm3gClgtIfF_CLmCb_BHBlRirQ%3D%3D/playlist/index.m3u8
+bbc-world https://stream.live.vc.bbcmedia.co.uk/bbc_world_service
+#bbc-world http://open.live.bbc.co.uk/mediaselector/5/select/version/2.0/mediaset/http-icy-mp3-a/vpid/bbc_world_service/format/pls.pls
+bbc-world-wa https://stream.live.vc.bbcmedia.co.uk/bbc_world_service_west_africa
+bbc-world-ea https://stream.live.vc.bbcmedia.co.uk/bbc_world_service_east_asia
 
 # stations from https://www.rte.ie/radio/page/138471-rte-radio-ways-to-listen/
 rte-radio1 http://av.rasset.ie/av/live/radio/radio1.m3u
@@ -66,5 +71,13 @@ rte-2xm http://av.rasset.ie/av/live/radio/2xm.m3u
 rte-gold http://av.rasset.ie/av/live/radio/gold.m3u
 rte-radio1extra http://av.rasset.ie/av/live/radio/radio1extra.m3u
 
+cnn https://tunein.cdnstream1.com/2868_96.mp3
+abc-news https://content.uplynk.com/channel/3324f2467c414329b3b0cc5cd987b6be.m3u8
+cbs-news https://cbsn-us.cbsnstream.cbsnews.com/out/v1/55a8648e8f134e82a470f83d562deeca/master.m3u8
+fox-news https://fox-foxnewsnow-samsungus.amagi.tv/playlist.m3u8
+nbc-news http://stream.revma.ihrhls.com/zc6043
 abc-rn http://live-radio01.mediahubaustralia.com/2RNW/mp3/
 
+aljazeera https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1616468342/ei/FgVZYMfuM4228wSA-5TQCA/ip/2607:fea8:c300:b07:428d:6e4f:cbd0:7b02/id/-upyPouRrB8.1/itag/96/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D137/hls_chunk_host/r3---sn-gvbxgn-tvfe.googlevideo.com/playlist_duration/30/manifest_duration/30/vprv/1/playlist_type/DVR/initcwndbps/15390/mh/Fc/mm/44/mn/sn-gvbxgn-tvfe/ms/lva/mv/m/mvi/3/pcm2cms/yes/pl/34/dover/11/keepalive/yes/fexp/24001373,24007246/mt/1616446598/sparams/expire,ei,ip,id,itag,source,requiressl,ratebypass,live,sgoap,sgovp,playlist_duration,manifest_duration,vprv,playlist_type/sig/AOq0QJ8wRgIhAMqH9dGcDETGhTR8OycrultwVXZcFkeuF_ZPOcGfoKdSAiEAotqZ9XTleoCmiFRemicWokcJYzjcsup0IbDqMvEW1Ys%3D/lsparams/hls_chunk_host,initcwndbps,mh,mm,mn,ms,mv,mvi,pcm2cms,pl/lsig/AG3C_xAwRQIgaPcTKb6nPx2i0lwTpYOQcBkNf8-hZSdv86Ngn3ZKHJ0CIQDGKQMNJOz_RQodaf6s5ZZl_kMQr9XlRkj9nguQG62zZA%3D%3D/playlist/index.m3u8
+nasatv https://manifest.googlevideo.com/api/manifest/hls_playlist/expire/1616468833/ei/AQdZYIK-ApWJ2LYPjpe9sAM/ip/2607:fea8:c300:b07:428d:6e4f:cbd0:7b02/id/21X5lGlDOfg.3/itag/300/source/yt_live_broadcast/requiressl/yes/ratebypass/yes/live/1/sgoap/gir%3Dyes%3Bitag%3D140/sgovp/gir%3Dyes%3Bitag%3D298/hls_chunk_host/r7---sn-gvbxgn-tvfl.googlevideo.com/playlist_duration/30/manifest_duration/30/vprv/1/playlist_type/DVR/initcwndbps/18490/mh/N8/mm/44/mn/sn-gvbxgn-tvfl/ms/lva/mv/m/mvi/7/pl/34/dover/11/keepalive/yes/fexp/24001373,24007246/beids/9466587/mt/1616447060/sparams/expire,ei,ip,id,itag,source,requiressl,ratebypass,live,sgoap,sgovp,playlist_duration,manifest_duration,vprv,playlist_type/sig/AOq0QJ8wRQIhAKdXHmwbglaqF2c1D16DzJLOG4f2ZdQhces5QAIF87w0AiASLa7dCDHTnoLhKgbh0qvE7mY4gzZbyfV0PmY_k0Bs6A%3D%3D/lsparams/hls_chunk_host,initcwndbps,mh,mm,mn,ms,mv,mvi,pl/lsig/AG3C_xAwRQIhAJyKOKfG0djmvpVw8twsmDhaRCyUtCAoVXUQQlmAtZ8-AiBVD_dnIuvzwJ5c8njxqm3gClgtIfF_CLmCb_BHBlRirQ%3D%3D/playlist/index.m3u8
+israel https://dfw.audio-stream.com/proxy/israelne?mp=/live_live

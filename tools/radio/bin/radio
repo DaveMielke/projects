@@ -1,33 +1,105 @@
-#!/usr/bin/tclsh
-package require Tclx
+#!/usr/bin/env tclsh8
 
+# at time station [until]
 # automatic
 # daemon [{display <number> | esd <server> | syslog} ...]
-# hold
+# hold [until]
 # kill
 # listen station
-# off
+# off [until]
 # reconnect
-# set station
-# which
+# set station [until]
+# which [when]
 
-set logLevel 2
-set defaultPlayers {vlc}
+try {
+   package require Tclx
+} trap {TCL PACKAGE UNFOUND} {} {
+   proc getEffectiveUserid {} {
+      return [exec id -u]
+   }
 
-keylset extensionsArray(asx) players {vlc mplayer}
-keylset extensionsArray(pls) players {xine realplay}
-keylset extensionsArray(ram) players {realplay}
-keylset extensionsArray(rm) players {realplay}
-keylset extensionsArray(rv) players {realplay}
+   proc getStreamProperty {stream property} {
+      array set stat [fconfigure $stream -stat]
+      return $stat($property)
+   }
 
-set displayCommands {
-   {Xvfb -ac -fn 7x14}
+   proc keylset {listVariable args} {
+      upvar 1 $listVariable list
+      set count [llength $args]
+
+      if {$count == 0} {
+         error "missing key name"
+      }
+
+      if {($count % 2) == 1} {
+         error "missing key value"
+      }
+
+      if {![info exists list]} {
+         set list [dict create]
+      }
+
+      foreach {key value} $args {
+         dict set list $key $value
+      }
+   }
+
+   proc keylget {listVariable key {valueVariable ""}} {
+      upvar 1 $listVariable list
+      set haveValueVariable [expr {[string length $valueVariable] > 0}]
+
+      if {[dict exists $list $key]} {
+         set value [dict get $list $key]
+
+         if {$haveValueVariable} {
+            uplevel 1 [list set $valueVariable $value]
+            return 1
+         }
+
+         return $value
+      }
+
+      if {$haveValueVariable} {
+         return 0
+      }
+
+      error "key '$key' not defined"
+   }
+
+   proc keylkeys {listVariable} {
+      upvar 1 $listVariable list
+      return [dict keys $list]
+   }
+} on ok {} {
+   proc getEffectiveUserid {} {
+      return [id effective userid]
+   }
+
+   proc getStreamProperty {stream property} {
+      return [fstat $stream $property]
+   }
 }
 
-keylset playersArray(mplayer) provides {esd}
-keylset playersArray(realplay) requires {display} kill realplay.bin
-keylset playersArray(vlc) provides {esd rtp rtsp}
-keylset playersArray(xine) provides {esd} requires {display}
+proc amRoot {} {
+   return [expr {[getEffectiveUserid] == 0}]
+}
+
+proc toAbsolutePath {path} {
+   try {
+      set path [file tildeexpand $path]
+   } trap {TCL LOOKUP SUBCOMMAND} {} {
+   }
+
+   return [file normalize $path]
+}
+
+proc getHomeDirectory {} {
+   try {
+      return [file home]
+   } trap {TCL LOOKUP SUBCOMMAND} {} {
+      return $::env(HOME)
+   }
+}
 
 proc writeStream {stream line} {
    puts $stream $line
@@ -133,7 +205,7 @@ proc updateData {dataVariable timeVariable extension define} {
                         }
                      }
 
-                     set time [fstat $stream mtime]
+                     set time [getStreamProperty $stream mtime]
                      close $stream; unset stream
                      return 1
                   } else {
@@ -553,7 +625,7 @@ proc getStationDefinition {definitionVariable reference} {
       }
    }
 
-   if {[file isfile [set file [file normalize $file]]]} {
+   if {[file isfile [set file [toAbsolutePath $file]]]} {
       keylset definition mrl "file://$file"
       return 1
    }
@@ -1437,16 +1509,34 @@ proc processOperands {operands} {
 }
 
 set applicationName "radio"
-set systemPrefix "/etc/"
+set logLevel 2
+set defaultPlayers {vlc}
+
+set displayCommands {
+   {Xvfb -ac -fn 7x14}
+}
+
+keylset extensionsArray(asx) players {vlc mplayer}
+keylset extensionsArray(pls) players {xine realplay}
+keylset extensionsArray(ram) players {realplay}
+keylset extensionsArray(rm) players {realplay}
+keylset extensionsArray(rv) players {realplay}
+
+keylset playersArray(mplayer) provides {esd}
+keylset playersArray(realplay) requires {display} kill realplay.bin
+keylset playersArray(vlc) provides {esd rtp rtsp}
+keylset playersArray(xine) provides {esd} requires {display}
+
+set systemPrefix "/etc/$applicationName"
 set processExtension "pid"
 set holdExtension "hold"
 
-if {[id effective userid] == 0} {
+if {[amRoot]} {
    set userPrefix ""
    set processFile "/var/run/$applicationName.$processExtension"
    set holdFile "$systemPrefix.$holdExtension"
 } else {
-   set userPrefix "~/.$applicationName"
+   set userPrefix [file join [getHomeDirectory] ".$applicationName"]
    set processFile "$userPrefix.$processExtension.[info host]"
    set holdFile "$userPrefix.$holdExtension"
 }

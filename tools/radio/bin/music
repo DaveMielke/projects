@@ -1,4 +1,4 @@
-#!/bin/bash -p
+#!/bin/bash
 set -e
 
 readonly defaultPauseSeconds=0.5
@@ -53,7 +53,7 @@ playFile() {
   if [ -f "${file}" ]
   then
     writeLog "playing ${file}"
-    local command=( vlc --quiet --album-art 0 --audio --no-video --play-and-exit )
+    local command=( vlc --quiet --audio --no-video --play-and-exit )
 
     if [ -t 0 ]
     then
