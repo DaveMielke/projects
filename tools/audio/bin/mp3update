@@ -54,10 +54,10 @@ else
    mp3File="$(basename "${mp3Path}")"
    mp3Reference="${mp3Directory}/.${mp3File}.ref"
 
-   touch -r "${mp3File}" -- "${mp3Reference}"
+   touch -r "${mp3Path}" -- "${mp3Reference}"
    returnCode=0
    id3v2 --"${mp3Key}" "${newValue}" -- "${mp3Path}" || returnCode="${?}"
-   touch -r "${mp3Reference}" -- "${mp3File}"
+   touch -r "${mp3Reference}" -- "${mp3Path}"
    rm -- "${mp3Reference}"
    [ "${returnCode}" -eq 0 ] || exit "${returnCode}"
 
