@@ -4,7 +4,8 @@
 downloadVideo() {
    local arguments=("${@}")
 
-   [ -n "${userName}" ] && {
+   if [ -n "${userName}" ]
+   then
       [ -n "${userPassword}" ] || {
          local password
          read -s -r -p "${programName}: password? " -- password
@@ -15,7 +16,9 @@ downloadVideo() {
       }
 
       arguments=(--username "${userName}" --password "${userPassword}" "${@}")
-   }
+   else
+      arguments=(--cookies-from-browser chromium "${@}")
+   fi
 
    executeHostCommand yt-dlp "${arguments[@]}"
 }
@@ -23,7 +26,7 @@ downloadVideo() {
 playStream() {
    local url="${1}"
 
-   "${noPlay}" || executeHostCommand vlc --quiet --play-and-exit --no-video --intf "${interactiveInterface}" -- "${url}"
+   "${noPlay}" || executeHostCommand vlc-play --intf "${interactiveInterface}" -- "${url}"
 }
 
 defaultAudioFormat="mp3"
